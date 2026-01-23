@@ -10,7 +10,7 @@ const globalForPrisma = globalThis as unknown as {
 
 // Create connection pool
 const pool = globalForPrisma.pool ?? new pg.Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.STORAGE_DATABASE_URL || process.env.DATABASE_URL,
 });
 
 // Create Prisma adapter
