@@ -20,8 +20,8 @@ export async function middleware(request: NextRequest) {
         const session = token ? await verifyToken(token) : null;
 
         if (!session) {
-            // Redirect to login with return URL
-            const url = new URL("/login", request.url);
+            // Redirect to login (root) with return URL
+            const url = new URL("/", request.url);
             url.searchParams.set("callbackUrl", pathname);
             return NextResponse.redirect(url);
         }
