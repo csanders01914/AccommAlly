@@ -1,0 +1,47 @@
+[
+  {
+    "id": "user-michael-002",
+    "emailEncrypted": "43323c9216...",
+    "emailDecrypted": "michael@accessally.org",
+    "storedHash": "451b3cb31b4db2dac8e911370b1eb1f5fe19257a14df277307074c29dd6f25b6",
+    "computedHash": "451b3cb31b4db2dac8e911370b1eb1f5fe19257a14df277307074c29dd6f25b6",
+    "match": true,
+    "role": "COORDINATOR"
+  },
+  {
+    "id": "user-system-000",
+    "emailEncrypted": "1c4edf1a72...",
+    "emailDecrypted": "system@accessally.org",
+    "storedHash": "c719958c7cd011060858de2edc42126710f5a1f67aff7c6dfe154d5d46f6c494",
+    "computedHash": "c719958c7cd011060858de2edc42126710f5a1f67aff7c6dfe154d5d46f6c494",
+    "match": true,
+    "role": "COORDINATOR"
+  },
+  {
+    "id": "user-sarah-001",
+    "emailEncrypted": "abee0e8ff5...",
+    "emailDecrypted": "sarah@accessally.org",
+    "storedHash": "4320a9d9e8e7a1e39b4bc6cd1f1dd856e4bb913506c50bb072e06ff0c1f2cd3d",
+    "computedHash": "4320a9d9e8e7a1e39b4bc6cd1f1dd856e4bb913506c50bb072e06ff0c1f2cd3d",
+    "match": true,
+    "role": "ADMIN"
+  },
+  {
+    "id": "cmklw56re0000u8n9liva245m",
+    "emailEncrypted": "4762453ff2...",
+    "emailDecrypted": "test@accessally.org",
+    "storedHash": "f9bc597376e26842694c5693ed3f060991325b97e8afbc6bc88838b6933038af",
+    "computedHash": "f9bc597376e26842694c5693ed3f060991325b97e8afbc6bc88838b6933038af",
+    "match": true,
+    "role": "COORDINATOR"
+  },
+  {
+    "id": "cmklwab7c0002u8n9cutpjnqp",
+    "emailEncrypted": "6317c51ad5...",
+    "emailDecrypted": "7977ae94cff25ae00cf6c7a740f0cf17:6de237b64dc859227ed918df289cd2157a296a6d146643b0bfdc9a11652ce6fd",
+    "storedHash": "9f0be5e11b237b4388d88aa8636835cd1f5a0f3d0d5ae48955cbdd48860f44f3",
+    "computedHash": "9f0be5e11b237b4388d88aa8636835cd1f5a0f3d0d5ae48955cbdd48860f44f3",
+    "match": true,
+    "role": "ADMIN"
+  }
+]

@@ -1,8 +1,133 @@
 @import "tailwindcss";
 
+/* Configure Tailwind v4 to use class-based dark mode */
+@variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   AccessAlly Design System
+   WCAG 2.1 AA Compliant High-Contrast Theme
+   ============================================ */
+
 :root {
+  /* Core Colors - High Contrast for Accessibility */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a;
+
+  /* Primary - Blue with 4.5:1+ contrast ratio */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+
+  /* Semantic Colors */
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  /* Surface Colors */
+  --surface: #ffffff;
+  --surface-raised: #f9fafb;
+  --border: #d1d5db;
+  --border-strong: #9ca3af;
+
+  /* Text Colors - WCAG AA Compliant */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+
+  /* Focus Ring */
+  --focus-ring: #2563eb;
+  --focus-ring-offset: #ffffff;
+}
+
+/* Dark Mode - Enhanced contrast */
+/* Dark Mode - increased specificity */
+html.dark {
+  --background: #0f0f0f;
+  --foreground: #f5f5f5;
+
+  --primary-50: #1e3a5f;
+  --primary-100: #1e40af;
+  --primary-500: #60a5fa;
+  --primary-600: #3b82f6;
+  --primary-700: #2563eb;
+
+  --success: #10b981;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  --surface: #171717;
+  --surface-raised: #262626;
+  --border: #404040;
+  --border-strong: #525252;
+
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+
+  --focus-ring: #60a5fa;
+  --focus-ring-offset: #171717;
+
+  color-scheme: dark;
+}
+
+/* Force dark mode colors on common Tailwind classes */
+html.dark .bg-white {
+  background-color: #1f1f1f !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: #0a0a0a !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #171717 !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: #262626 !important;
+}
+
+html.dark .border-gray-200 {
+  border-color: #404040 !important;
+}
+
+html.dark .border-gray-300 {
+  border-color: #525252 !important;
+}
+
+html.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+html.dark .text-gray-800 {
+  color: #e5e5e5 !important;
+}
+
+html.dark .text-gray-700 {
+  color: #d4d4d4 !important;
+}
+
+html.dark .text-gray-600 {
+  color: #a3a3a3 !important;
+}
+
+html.dark .text-gray-500 {
+  color: #737373 !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #262626 !important;
+  border-color: #404040 !important;
+  color: #f5f5f5 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #737373 !important;
 }
 
 @theme inline {
@@ -12,15 +137,73 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base Styles */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus Styles - WCAG 2.1 Compliant */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Ensure links have proper contrast */
+a {
+  color: var(--primary-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--primary-700);
+}
+
+/* Link colors in Dark Mode */
+html.dark a {
+  color: var(--primary-500);
+}
+
+html.dark a:hover {
+  color: var(--primary-600);
+}
+
+/* Skip Link for Keyboard Navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary-600);
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High Contrast Selection */
+::selection {
+  background: var(--primary-500);
+  color: white;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

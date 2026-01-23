@@ -1,0 +1,557 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// User accounts with Role-Based Access Control (RBAC)
+model User {
+  id                String          @id @default(cuid())
+  email             String
+  emailHash         String          @unique
+  name              String
+  role              Role            @default(COORDINATOR)
+  active            Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  username          String?         @unique
+  pronouns          String?
+  theme             String          @default("system")
+  notifications     Json?
+  preferences       Json?
+  twoFactorSecret   String?
+  twoFactorEnabled  Boolean         @default(false)
+  twoFactorRecoveryCodes String[]
+  passwordHash      String?
+  lastLogin         DateTime?
+  loginAttempts     Int             @default(0)
+  lockedUntil       DateTime?
+  emailSignature    String?
+  annotations       Annotation[]
+  auditLogs         AuditLog[]
+  createdCases      Case[]          @relation("CaseCreatedBy")
+  uploadedDocuments Document[]
+  inventory         InventoryItem[]
+  receivedMessages  Message[]       @relation("ReceivedMessages")
+  sentMessages      Message[]       @relation("SentMessages")
+  notes             Note[]
+  assignedTasks     Task[]          @relation("AssignedTo")
+  createdTasks      Task[]          @relation("CreatedBy")
+  organizedMeetings Meeting[]       @relation("MeetingOrganizer")
+  meetingAttendances MeetingAttendee[]
+  reminders         Reminder[]
+  messageFolders    MessageFolder[]
+  inboundRules      InboundRule[]
+
+  @@index([email])
+  @@index([role])
+}
+
+/// Client accommodation cases with unique Case Numbers
+model Case {
+  id              String          @id @default(cuid())
+  caseNumber      String          @unique
+  claimantId      String?         @unique
+  clientName      String
+  clientEmail     String?
+  clientEmailHash String?
+  clientPhone     String?
+  clientPhoneHash String?
+  clientSSN       String?
+  clientSSNHash   String?
+  clientSSNPrefix String?
+  clientSSNSuffix String?
+  title           String
+  description     String?
+  medicalCondition String?
+  category        String?
+  program         String?
+  venue           String?
+  preferredStartDate String?
+  status          CaseStatus      @default(OPEN)
+  priority        Int             @default(2)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  closedAt        DateTime?
+  createdById     String
+  accommodations  Accommodation[]
+  callRequests    CallRequest[]
+  createdBy       User            @relation("CaseCreatedBy", fields: [createdById], references: [id])
+  clientId        String?
+  client          Client?         @relation(fields: [clientId], references: [id])
+  documents       Document[]
+  inventory       InventoryItem[]
+  notes           Note[]
+  tasks           Task[]
+  meetings        Meeting[]
+  messages        Message[]
+  contacts        Contact[]
+
+  @@index([caseNumber])
+  @@index([clientName])
+  @@index([status])
+  @@index([createdById])
+  @@index([clientId])
+}
+
+/// Corporate Clients (e.g. TCP)
+model Client {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String?  // e.g. "TCP"
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cases     Case[]
+}
+
+/// Contacts associated with a Case (Address Book)
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  role      String   // e.g. "Attorney", "Doctor", "Adjuster"
+  email     String?
+  phone     String?
+  type      String   // "CLAIMANT", "ATTORNEY", "MEDICAL_PROVIDER", "EMPLOYER", "OTHER"
+  address   String?
+  notes     String?
+  
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([caseId])
+  @@index([type])
+}
+
+/// Accommodation requests linked to a Case
+model Accommodation {
+  id        String    @id @default(cuid())
+  type      String
+  request   String
+  status    String    @default("PENDING")
+  costCode  String?
+  startDate DateTime
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  caseId    String
+  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@index([status])
+}
+
+/// Tasks for case orchestration with due dates and assignees
+model Task {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  status       TaskStatus   @default(PENDING)
+  priority     String       @default("MEDIUM")
+  category     TaskCategory @default(OTHER)
+  dueDate      DateTime
+  startTime    DateTime?
+  endTime      DateTime?
+  color        String       @default("#8b5cf6")
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  caseId       String
+  assignedToId String
+  createdById  String
+  assignedTo   User         @relation("AssignedTo", fields: [assignedToId], references: [id])
+  case         Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("CreatedBy", fields: [createdById], references: [id])
+  reminders    Reminder[]
+
+  @@index([status])
+  @@index([dueDate])
+  @@index([category])
+  @@index([assignedToId])
+  @@index([caseId])
+}
+
+/// Threaded, chronological notes attached to Cases
+model Note {
+  id        String   @id @default(cuid())
+  content   String
+  noteType  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  caseId    String
+  authorId  String
+  parentId  String?
+  author    User     @relation(fields: [authorId], references: [id])
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  parent    Note?    @relation("NoteReplies", fields: [parentId], references: [id])
+  replies   Note[]   @relation("NoteReplies")
+
+  @@index([caseId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([noteType])
+}
+
+/// Automated audit log tracking "Who changed what and when"
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  field      String?
+  oldValue   String?
+  newValue   String?
+  metadata   String?
+  timestamp  DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([action])
+}
+
+/// Documents attached to Cases with Document Control Numbers
+model Document {
+  id                    String       @id @default(cuid())
+  fileName              String
+  fileType              String
+  fileSize              Int
+  fileData              Bytes
+  documentControlNumber String       @unique
+  category              String       @default("OTHER")
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  caseId                String
+  uploadedById          String
+  annotations           Annotation[]
+  case                  Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  uploadedBy            User         @relation(fields: [uploadedById], references: [id])
+
+  @@index([caseId])
+  @@index([documentControlNumber])
+  @@index([category])
+  @@index([uploadedById])
+}
+
+/// Persistent annotations/highlights on Documents
+model Annotation {
+  id          String   @id @default(cuid())
+  documentId  String
+  pageNumber  Int
+  color       String   @default("#FFFF00")
+  x           Float
+  y           Float
+  width       Float
+  height      Float
+  createdById String
+  createdAt   DateTime @default(now())
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([createdById])
+}
+
+/// Secure internal messaging between users with external email support
+model Message {
+  id              String    @id @default(cuid())
+  subject         String?
+  content         String
+  read            Boolean   @default(false)
+  inInbox         Boolean   @default(true)  // True = In Inbox. False = Moved out (Archived or Custom Folder)
+  starred         Boolean   @default(false)
+  archived        Boolean   @default(false)
+  deletedBySender Boolean   @default(false)
+  deletedByRecipient Boolean @default(false)
+  inTrash         Boolean   @default(false)
+  inJunk          Boolean   @default(false)
+  trashDate       DateTime?
+  createdAt       DateTime  @default(now())
+  
+  // Internal user references (nullable for external emails)
+  senderId        String?
+  recipientId     String?
+  
+  // External email support (for future integration)
+  isExternal          Boolean  @default(false)  // True if message involves external email
+  externalEmail       String?                    // External email address (encrypted)
+  externalEmailHash   String?                    // Hash for lookup
+  externalName        String?                    // External sender/recipient name (encrypted)
+  direction           String   @default("INTERNAL")  // INTERNAL, INBOUND, OUTBOUND
+  externalMessageId   String?                    // External email message ID for threading
+  
+  // Case and threading
+  caseId          String?
+  replyToId       String?
+  forwardedFromId String?
+  
+  // Relations
+  recipient       User?     @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  sender          User?     @relation("SentMessages", fields: [senderId], references: [id])
+  case            Case?     @relation(fields: [caseId], references: [id])
+  replyTo         Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies         Message[] @relation("MessageReplies")
+  forwardedFrom   Message?  @relation("MessageForwards", fields: [forwardedFromId], references: [id])
+  forwards        Message[] @relation("MessageForwards")
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([read])
+  @@index([caseId])
+  @@index([starred])
+  @@index([archived])
+  @@index([isExternal])
+  @@index([direction])
+  
+  folderAssignments MessageFolderAssignment[]
+}
+
+/// Custom message folders created by users
+model MessageFolder {
+  id        String    @id @default(cuid())
+  name      String
+  color     String    @default("#6366f1")
+  icon      String?
+  position  Int       @default(0)
+  userId    String
+  createdAt DateTime  @default(now())
+  
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  MessageFolderAssignment[]
+  rules     InboundRuleFolder[]
+  
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+/// Many-to-many linking messages to folders
+model MessageFolderAssignment {
+  id        String   @id @default(cuid())
+  messageId String
+  folderId  String
+  createdAt DateTime @default(now())
+  
+  message   Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  folder    MessageFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  
+  @@unique([messageId, folderId])
+  @@index([messageId])
+  @@index([folderId])
+}
+
+/// Inbound message routing rules
+model InboundRule {
+  id                 String   @id @default(cuid())
+  name               String
+  enabled            Boolean  @default(true)
+  priority           Int      @default(0)
+  
+  // Conditions (rule matches if ALL specified conditions match)
+  senderContains     String?
+  senderEquals       String?
+  subjectContains    String?
+  contentContains    String?
+  caseNumberContains String?
+  isExternal         Boolean?
+  hasAttachment      Boolean?
+  isHighPriority     Boolean?
+  
+  // Actions
+  actionKeepInInbox  Boolean  @default(false) // If false (default), it's a MOVE. If true, it's a COPY.
+  actionMarkAsRead   Boolean  @default(false)
+  actionStar         Boolean  @default(false)
+  actionArchive      Boolean  @default(false)
+  actionSendEmailNotification Boolean @default(false)
+  actionSendSMSNotification   Boolean @default(false)
+  
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetFolders InboundRuleFolder[]
+  
+  @@index([userId])
+  @@index([enabled])
+}
+
+/// Many-to-many linking rules to target folders
+model InboundRuleFolder {
+  ruleId   String
+  folderId String
+  
+  rule     InboundRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  folder   MessageFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  
+  @@id([ruleId, folderId])
+}
+
+/// Call requests/return call tracking
+model CallRequest {
+  id          String   @id @default(cuid())
+  name        String
+  phoneNumber String
+  reason      String
+  urgent      Boolean  @default(false)
+  status      String   @default("PENDING")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  scheduledFor DateTime?
+  caseId       String
+  case         Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  reminders    Reminder[]
+
+  @@index([status])
+  @@index([urgent])
+}
+
+/// Asset Inventory for Assistive Technology
+model InventoryItem {
+  id                 String          @id @default(cuid())
+  name               String
+  assetTag           String          @unique
+  serialNumber       String?
+  category           String
+  status             InventoryStatus @default(AVAILABLE)
+  condition          String          @default("GOOD")
+  purchaseDate       DateTime?
+  cost               Decimal?        @db.Decimal(10, 2)
+  supplier           String?
+  assignedToUserId   String?
+  assignedToCaseId   String?
+  assignedDate       DateTime?
+  expectedReturnDate DateTime?
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  assignedToCase     Case?           @relation(fields: [assignedToCaseId], references: [id])
+  assignedToUser     User?           @relation(fields: [assignedToUserId], references: [id])
+
+  @@index([status])
+  @@index([category])
+  @@index([assignedToUserId])
+  @@index([assignedToCaseId])
+}
+
+/// Meetings with recurrence support
+model Meeting {
+  id             String            @id @default(cuid())
+  title          String
+  description    String?
+  location       String?
+  startTime      DateTime
+  endTime        DateTime
+  allDay         Boolean           @default(false)
+  color          String            @default("#3b82f6")
+  
+  // Recurrence
+  recurrenceRule String?           // RRULE format
+  recurrenceEnd  DateTime?
+  parentId       String?
+  parent         Meeting?          @relation("MeetingRecurrence", fields: [parentId], references: [id])
+  instances      Meeting[]         @relation("MeetingRecurrence")
+  
+  // Relations
+  caseId         String?
+  case           Case?             @relation(fields: [caseId], references: [id])
+  organizerId    String
+  organizer      User              @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  attendees      MeetingAttendee[]
+  reminders      Reminder[]
+
+  // External Sync
+  externalId     String?
+  syncSource     String?
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([startTime])
+  @@index([organizerId])
+  @@index([caseId])
+}
+
+/// Meeting attendees
+model MeetingAttendee {
+  id        String   @id @default(cuid())
+  meetingId String
+  userId    String?
+  email     String?
+  status    String   @default("PENDING")
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([meetingId])
+  @@index([userId])
+}
+
+/// Reminders for meetings, tasks, and calls
+model Reminder {
+  id         String       @id @default(cuid())
+  type       String       @default("EMAIL")
+  triggerAt  DateTime
+  sent       Boolean      @default(false)
+  
+  meetingId  String?
+  taskId     String?
+  callId     String?
+  userId     String
+  
+  meeting    Meeting?     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  task       Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  callRequest CallRequest? @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id])
+
+  createdAt  DateTime     @default(now())
+
+  @@index([triggerAt])
+  @@index([sent])
+  @@index([userId])
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  ASSIGNED
+  MAINTENANCE
+  RETIRED
+  LOST
+}
+
+enum Role {
+  ADMIN
+  AUDITOR
+  COORDINATOR
+  PROGRAM_LEAD
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskCategory {
+  MEETING
+  DEADLINE
+  FOLLOW_UP
+  DOCUMENTATION
+  OTHER
+}
+
+enum CaseStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING_REVIEW
+  CLOSED
+  ARCHIVED
+  APPEAL
+}

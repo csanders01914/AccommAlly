@@ -1,0 +1,38 @@
+[0m[0m
+[0m[4mC:\Users\csand\Documents\Projects\accessally\src\app\dashboard\tasks\page.tsx[24m[0m
+[0m    [2m5:18[22m   [33mwarning[39m  'subDays' is defined but never used                        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m5:27[22m   [33mwarning[39m  'addDays' is defined but never used                        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:14[22m   [33mwarning[39m  'Plus' is defined but never used                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:20[22m   [33mwarning[39m  'Filter' is defined but never used                         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:36[22m   [33mwarning[39m  'CheckCircle' is defined but never used                    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m7:49[22m   [33mwarning[39m  'Clock' is defined but never used                          [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:5[22m    [33mwarning[39m  'AlertCircle' is defined but never used                    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:18[22m   [33mwarning[39m  'Calendar' is defined but never used                       [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m8:51[22m   [33mwarning[39m  'Trash2' is defined but never used                         [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:5[22m    [33mwarning[39m  'ArrowLeft' is defined but never used                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:16[22m   [33mwarning[39m  'User' is defined but never used                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m9:22[22m   [33mwarning[39m  'Briefcase' is defined but never used                      [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m27:5[22m    [33mwarning[39m  'useSortable' is defined but never used                    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m29:10[22m   [33mwarning[39m  'CSS' is defined but never used                            [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m73:52[22m   [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m78:12[22m   [33mwarning[39m  'selectedActionTaskId' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m83:29[22m   [33mwarning[39m  'setShowClosedTasks' is assigned a value but never used    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m207:30[22m   [33mwarning[39m  'e' is defined but never used                              [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m499:112[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m511:73[22m   [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m511:99[22m   [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m516:108[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m722:68[22m   [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m772:218[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m778:190[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m784:209[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m790:209[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m796:190[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m802:190[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m808:190[22m  [31merror[39m    Unexpected any. Specify a different type                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\csand\Documents\Projects\accessally\src\components\SortableHeader.tsx[24m[0m
+[0m  [2m69:23[22m  [33mwarning[39m  'e' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[31m[1m✖ 31 problems (13 errors, 18 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

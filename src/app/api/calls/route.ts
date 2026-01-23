@@ -1,0 +1,86 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getSession } from '@/lib/auth';
+import { decrypt, encrypt } from '@/lib/encryption';
+
+// GET all call requests
+export async function GET(request: NextRequest) {
+    try {
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const status = searchParams.get('status');
+
+        const where: any = {};
+        if (status) where.status = status;
+
+        const calls = await prisma.callRequest.findMany({
+            where,
+            include: {
+                case: { select: { id: true, caseNumber: true, clientName: true } }
+            },
+            orderBy: [
+                { urgent: 'desc' },
+                { createdAt: 'desc' }
+            ]
+        });
+
+        // Decrypt names
+        const decryptedCalls = calls.map((c: any) => ({
+            ...c,
+            name: decrypt(c.name),
+            phoneNumber: decrypt(c.phoneNumber),
+            case: c.case ? {
+                ...c.case,
+                clientName: decrypt(c.case.clientName)
+            } : null
+        }));
+
+        return NextResponse.json({ calls: decryptedCalls });
+
+    } catch (error) {
+        console.error('CallRequests GET Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+// POST create new call request
+export async function POST(request: NextRequest) {
+    try {
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await request.json();
+        const { name, phoneNumber, reason, urgent, caseId, scheduledFor } = body;
+
+        if (!name || !phoneNumber || !reason || !caseId) {
+            return NextResponse.json(
+                { error: 'name, phoneNumber, reason, and caseId are required' },
+                { status: 400 }
+            );
+        }
+
+        const call = await prisma.callRequest.create({
+            data: {
+                name: encrypt(name),
+                phoneNumber: encrypt(phoneNumber),
+                reason,
+                urgent: urgent || false,
+                caseId,
+                scheduledFor: scheduledFor ? new Date(scheduledFor) : null,
+                status: 'PENDING'
+            }
+        });
+
+        return NextResponse.json(call, { status: 201 });
+
+    } catch (error) {
+        console.error('CallRequests POST Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}

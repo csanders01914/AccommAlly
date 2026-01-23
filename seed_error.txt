@@ -1,0 +1,57 @@
+﻿node.exe : C:\Users\csand\OneDrive\Documento
+s\Projects\AccessAlly\node_modules\@prisma\c
+lient\src\runtime\utils\validatePrismaClient
+Options.ts:229
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: 
+    (C:\Users\csand\...tOptions.ts:229:Str  
+  ing) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommand 
+   Error
+ 
+    throw new 
+PrismaClientConstructorValidationError(
+          ^
+
+PrismaClientConstructorValidationError: 
+Using engine type "client" requires either 
+"adapter" or "accelerateUrl" to be provided 
+to PrismaClient constructor.
+Read more at 
+https://pris.ly/d/client-constructor
+    at validateDependentOptions (C:\Users\cs
+and\OneDrive\Documentos\Projects\AccessAlly\
+node_modules\@prisma\client\src\runtime\util
+s\validatePrismaClientOptions.ts:229:11)
+    at validatePrismaClientOptions (C:\Users
+\csand\OneDrive\Documentos\Projects\AccessAl
+ly\node_modules\@prisma\client\src\runtime\u
+tils\validatePrismaClientOptions.ts:246:3)
+    at new t (C:\Users\csand\OneDrive\Docume
+ntos\Projects\AccessAlly\node_modules\@prism
+a\client\src\runtime\getPrismaClient.ts:281:
+7)
+    at <anonymous> (C:\Users\csand\OneDrive\
+Documentos\Projects\AccessAlly\prisma\seed.t
+s:6:16)
+    at Object.<anonymous> (C:\Users\csand\On
+eDrive\Documentos\Projects\AccessAlly\prisma
+\seed.ts:65:6)
+    at Module._compile 
+(node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (C:\Users\csand\On
+eDrive\Documentos\Projects\AccessAlly\node_m
+odules\tsx\dist\register-D46fvsV_.cjs:3:1104
+)
+    at Module.load 
+(node:internal/modules/cjs/loader:1481:32)
+    at Module._load 
+(node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync 
+(node:diagnostics_channel:328:14)
+
+Node.js v24.12.0
