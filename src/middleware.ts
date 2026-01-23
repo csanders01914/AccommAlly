@@ -12,6 +12,11 @@ const AUDITOR_PATHS = ["/auditor"];
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    // Explicitly redirect /login to root /
+    if (pathname === '/login') {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
+
     // Check if path is protected
     const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
 
@@ -50,9 +55,8 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * - login (login page)
          * - public (public files)
          */
-        '/((?!api/auth|_next/static|_next/image|favicon.ico|login|images|public).*)',
+        '/((?!api/auth|_next/static|_next/image|favicon.ico|images|public).*)',
     ],
 };
