@@ -27,6 +27,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Email and password required" }, { status: 400 });
         }
 
+        // DEBUG: Log available env vars to debug missing ENCRYPTION_KEY
+        console.log("DEBUG: Available Env Vars:", Object.keys(process.env).sort());
+        console.log("DEBUG: ENCRYPTION_KEY present?", !!process.env.ENCRYPTION_KEY);
+        console.log("DEBUG: ENCRYPTION_KEY length:", process.env.ENCRYPTION_KEY?.length);
+
         // 1. Find user by hashed email (blind indexing)
         const normalizedEmail = email.toLowerCase().trim();
         const emailHash = hash(normalizedEmail);
