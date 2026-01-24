@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['prisma', '@prisma/client', 'pg'],
+  webpack: (config) => {
+    config.externals.push({
+      'pg': 'commonjs pg',
+    });
+    return config;
+  },
   async headers() {
     return [
       {
