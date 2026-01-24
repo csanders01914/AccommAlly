@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import { encryptionExtension } from './prisma-extension';
+import 'server-only';
 
 const globalForPrisma = globalThis as unknown as {
     prisma_v2: any; // Type is 'any' to support the extended client in global scope
