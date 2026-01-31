@@ -1,0 +1,54 @@
+Loaded Prisma config from prisma.config.ts.
+
+Running seed command `npx tsx prisma/seed.ts` ...
+🌱 Seeding database...
+🧹 Wiping database...
+(node:20272) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✨ Database wiped
+✅ Created users
+✅ Created clients
+❌ Seeding failed: PrismaClientKnownRequestError: 
+Invalid `prisma.claimant.create()` invocation in
+C:\Users\csand\Documents\AccommAlly\accommally\prisma\seed.ts:304:48
+
+  301 
+  302 // Keep existing demo case
+  303 // Create a claimant for demo case
+→ 304 const demoClaimant = await prisma.claimant.create(
+Unique constraint failed on the fields: (`"nameHash"`, `birthdate`)
+    at qr.handleRequestError (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client\src\runtime\RequestHandler.ts:228:13)
+    at qr.handleAndLogRequestError (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at qr.request (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async a (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:805:24)
+    at async main (C:\Users\csand\Documents\AccommAlly\accommally\prisma\seed.ts:304:26) {
+  code: 'P2002',
+  meta: {
+    modelName: 'Claimant',
+    driverAdapterError: DriverAdapterError: UniqueConstraintViolation
+        at PrismaPgAdapter.onError (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\adapter-pg\dist\index.js:687:11)
+        at PrismaPgAdapter.performIO (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\adapter-pg\dist\index.js:682:12)
+        at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at async PrismaPgAdapter.queryRaw (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\adapter-pg\dist\index.js:602:30)
+        at async <anonymous> (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\tracing.ts:68:22)
+        at async fr (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\tracing.ts:56:10)
+        at async e.interpretNode (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:190:26)
+        at async e.interpretNode (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:217:41)
+        at async e.interpretNode (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:276:41)
+        at async e.run (C:\Users\csand\Documents\AccommAlly\accommally\node_modules\@prisma\client-engine-runtime\src\interpreter\query-interpreter.ts:96:23) {
+      cause: [Object]
+    }
+  },
+  clientVersion: '7.2.0'
+}
+
+An error occurred while running the seed command:
+Error: Command failed with exit code 1: npx tsx prisma/seed.ts

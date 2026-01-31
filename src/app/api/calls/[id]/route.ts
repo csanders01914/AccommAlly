@@ -59,7 +59,8 @@ export async function PATCH(
 
         const { id } = await params;
         const body = await request.json();
-        const { scheduledFor, status, urgent, reason, note, caseId } = body;
+        const { scheduledFor, status, urgent, reason, note, caseId, phoneNumberUsed } = body;
+
 
         const updateData: any = {};
 
@@ -78,17 +79,35 @@ export async function PATCH(
             }
         });
 
-        // If completing and there's a note, save it to the case notes
+        // Audit Log: Call Request Updated
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'CallRequest',
+                entityId: call.id,
+                action: 'UPDATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    status_change: status !== undefined ? status : 'unchanged',
+                    has_note: !!note
+                })
+            }
+        });
+
         if (status === 'COMPLETED' && note && call.caseId) {
+            const noteContent = `**Return Call Note**\n` +
+                (phoneNumberUsed ? `Phone Used: ${phoneNumberUsed}\n` : '') +
+                `\n${note}`;
+
             await prisma.note.create({
                 data: {
-                    content: `**Return Call Note**\n\n${note}`,
+                    content: noteContent,
                     noteType: 'RETURN_CALL',
                     caseId: call.caseId,
                     authorId: (session as any).id
                 }
             });
         }
+
 
         // Decrypt for response
         const decrypted = {
@@ -121,6 +140,17 @@ export async function DELETE(
         }
 
         const { id } = await params;
+
+        // Audit Log: Call Request Deleted
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'CallRequest',
+                entityId: id,
+                action: 'DELETE',
+                userId: session.id,
+                metadata: JSON.stringify({ action: 'delete_call_request' })
+            }
+        });
 
         await prisma.callRequest.delete({ where: { id } });
 

@@ -55,6 +55,12 @@ export async function GET(
                 client: {
                     select: { id: true, name: true, code: true }
                 },
+                claimant: {
+                    select: { id: true, claimantNumber: true }
+                },
+                claimFamily: {
+                    select: { id: true, name: true }
+                },
             },
         });
 
@@ -115,25 +121,8 @@ export async function GET(
         }
 
         // Restore SSN Logic (Since I replaced the whole block)
-        transformedCase.clientSSN = (() => {
-            if (caseData.clientSSNSuffix) {
-                try {
-                    const suffix = decrypt(caseData.clientSSNSuffix);
-                    if (suffix && suffix.trim().length > 0) return `***-**-${suffix}`;
-                } catch (e) { }
-            }
-            if (caseData.clientSSN) {
-                try {
-                    const dec = decrypt(caseData.clientSSN);
-                    // If decryption fails, it returns original. Check if it looks encrypted (has colon)
-                    // Actually, just try to clean and mask.
-                    const clean = dec.replace(/[^a-zA-Z0-9]/g, '');
-                    const last4 = clean.length > 4 ? clean.slice(-4) : clean;
-                    return `***-**-${last4 || '0000'}`;
-                } catch (e) { }
-            }
-            return undefined;
-        })();
+        // SSN Logic removed - replaced by Claimant ID system
+        transformedCase.clientSSN = undefined;
 
         // Decrypt Phone
         if (caseData.clientPhone) {
@@ -172,8 +161,9 @@ export async function GET(
 
     } catch (error) {
         console.error('Error fetching case:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json(
-            { error: 'Failed to fetch case' },
+            { error: `Failed to fetch case: ${errorMessage}`, details: error },
             { status: 500 }
         );
     }

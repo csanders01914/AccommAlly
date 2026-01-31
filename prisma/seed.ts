@@ -86,7 +86,10 @@ async function main() {
     await prisma.contact.deleteMany();
     await prisma.message.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.identityVerification.deleteMany();
     await prisma.case.deleteMany();
+    await prisma.claimFamily.deleteMany();
+    await prisma.claimant.deleteMany();
     await prisma.client.deleteMany();
     await prisma.user.deleteMany();
     console.log('✨ Database wiped');
@@ -228,70 +231,109 @@ async function main() {
     const firstNames = ['Alex', 'Jordan', 'Taylor', 'Casey', 'Morgan', 'Riley', 'Jamie', 'Skyler', 'Cameron', 'Quinn'];
     const lastNames = ['Smith', 'Johnson', 'Rivera', 'Lee', 'Patel', 'Kim', 'Garcia', 'Martinez', 'Brown', 'Wilson'];
 
-    for (let i = 0; i < 10; i++) {
-        const firstName = pick(firstNames);
-        const lastName = pick(lastNames);
-        const fullName = `${firstName} ${lastName}`;
-        const program = pick(PROGRAMS);
-        const barrier = pick(BARRIERS);
+    for (let i = 0; i < 2; i++) {
+        try {
+            const firstName = pick(firstNames);
+            const lastName = pick(lastNames);
+            const fullName = `${firstName} ${lastName}`;
+            const program = pick(PROGRAMS);
+            const barrier = pick(BARRIERS);
 
-        // Round Robin Assignment
-        const examinerId = examiners[i % examiners.length];
+            // Round Robin Assignment
+            const examinerId = examiners[i % examiners.length];
 
-        await prisma.case.create({
-            data: {
-                title: program,
-                description: `Participant in ${program}. ${barrier}.`,
-                caseNumber: generateCaseNumber('TCP', i + 1),
-                claimantId: generateClaimantId(),
-                clientName: encrypt(fullName),
-                clientEmail: encrypt(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
-                clientEmailHash: hash(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
-                clientPhone: encrypt(`555-01${Math.floor(Math.random() * 90) + 10}`),
-                // Generate full 9-digit SSN for reveal functionality
-                clientSSN: encrypt(`${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`),
-                medicalCondition: pick(CONDITIONS),
-                program: program,
-                category: 'ACCOMMODATION',
-                venue: 'The Center Project (Two Story House)',
-                status: pick(['OPEN', 'IN_PROGRESS', 'PENDING_REVIEW']),
-                priority: Math.floor(Math.random() * 3) + 1, // 1-3
-                // @ts-ignore
-                clientId: tcpClient.id,
-                createdById: examinerId, // Created by the examiner for simplicity, or System? Usually System. Keeping as examiner to verify auth/permissions if needed, or System? Let's use System.
-                // Actually, let's use the examinerId as creator implies ownership often, but tasks define assignment.
-                // Prompt said "assigned to an examiner".
-                // I'll create a TASK assigned to them.
-                tasks: {
-                    create: {
-                        title: 'Initial Case Review',
-                        description: `Review accommodation request for ${fullName} in ${program}.`,
-                        status: 'PENDING',
-                        category: 'FOLLOW_UP',
-                        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        assignedToId: examinerId,
-                        createdById: system.id
+            // Create a claimant for this case
+            const claimantNumber = generateClaimantId();
+            const nameHash = hash(fullName.toLowerCase().trim().replace(/[^a-z0-9]/g, ''));
+            const birthdate = new Date(1980 + Math.floor(Math.random() * 30), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+            const pin = Math.floor(Math.random() * 9000 + 1000).toString(); // 4-digit PIN
+            const pinHash = await bcrypt.hash(pin, 10);
+
+            const claimant = await prisma.claimant.create({
+                data: {
+                    claimantNumber,
+                    name: encrypt(fullName),
+                    nameHash,
+                    birthdate,
+                    email: encrypt(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
+                    emailHash: hash(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
+                    phone: encrypt(`555-01${Math.floor(Math.random() * 90) + 10}`),
+                    phoneHash: hash(`555-01${Math.floor(Math.random() * 90) + 10}`),
+                    pinHash,
+                    credentialType: 'PIN',
+                }
+            });
+
+            await prisma.case.create({
+                data: {
+                    title: program,
+                    description: `Participant in ${program}. ${barrier}.`,
+                    caseNumber: generateCaseNumber('TCP', i + 1),
+                    clientName: encrypt(fullName),
+                    clientEmail: encrypt(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
+                    clientEmailHash: hash(`${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`),
+                    clientPhone: encrypt(`555-01${Math.floor(Math.random() * 90) + 10}`),
+                    clientBirthdate: birthdate,
+                    medicalCondition: pick(CONDITIONS),
+                    program: program,
+                    category: 'ACCOMMODATION',
+                    venue: 'The Center Project (Two Story House)',
+                    status: pick(['OPEN', 'IN_PROGRESS', 'PENDING_REVIEW']),
+                    priority: Math.floor(Math.random() * 3) + 1, // 1-3
+                    // @ts-ignore
+                    clientId: tcpClient.id,
+                    createdById: examinerId,
+                    claimantRef: claimant.id,
+                    tasks: {
+                        create: {
+                            title: 'Initial Case Review',
+                            description: `Review accommodation request for ${fullName} in ${program}.`,
+                            status: 'PENDING',
+                            category: 'FOLLOW_UP',
+                            dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+                            assignedToId: examinerId,
+                            createdById: system.id
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch (err) {
+            console.error(`❌ Failed to create case ${i}:`, err);
+        }
     }
 
     // Keep existing demo case
+    // Create a claimant for demo case
+    const demoClaimant = await prisma.claimant.create({
+        data: {
+            claimantNumber: generateClaimantId(),
+            name: encrypt('Robert Johnson'),
+            nameHash: hash('robertjohnson'),
+            birthdate: new Date(1985, 5, 15),
+            email: encrypt('robert.j@example.com'),
+            emailHash: hash('robert.j@example.com'),
+            phone: encrypt('555-0199'),
+            phoneHash: hash('555-0199'),
+            pinHash: await bcrypt.hash('1234', 10),
+            credentialType: 'PIN',
+        }
+    });
+
     const demoCase = await prisma.case.create({
         data: {
             title: 'Ergonomic Equipment Request',
             description: 'Request for standing desk and ergonomic chair',
             caseNumber: generateCaseNumber('TCP', 999),
-            claimantId: generateClaimantId(),
             clientName: encrypt('Robert Johnson'),
             clientEmail: encrypt('robert.j@example.com'),
             clientEmailHash: hash('robert.j@example.com'),
+            clientBirthdate: new Date(1985, 5, 15),
             status: 'OPEN',
             priority: 2,
             createdById: michael.id,
             // @ts-ignore
             clientId: tcpClient.id,
+            claimantRef: demoClaimant.id,
         }
     });
 
@@ -318,6 +360,29 @@ async function main() {
     });
 
     console.log('✅ Created messages');
+
+    // 5. Create Claim Families
+    const family = await prisma.claimFamily.create({
+        data: {
+            name: 'Test Family',
+        }
+    });
+
+    // Link first two cases to the family
+    // Refetch cases to get their IDs (since we created them in a loop)
+    const cases = await prisma.case.findMany({ take: 2 });
+    if (cases.length >= 2) {
+        await prisma.case.update({
+            where: { id: cases[0].id },
+            data: { claimFamilyId: family.id }
+        });
+        await prisma.case.update({
+            where: { id: cases[1].id },
+            data: { claimFamilyId: family.id }
+        });
+    }
+
+    console.log('✅ Created claim families');
 
     console.log('🎉 Database seeding complete!');
 }

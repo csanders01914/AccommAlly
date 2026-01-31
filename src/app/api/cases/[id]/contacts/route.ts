@@ -43,6 +43,21 @@ export async function POST(
             }
         });
 
+        // Audit Log: Contact Created
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Contact',
+                entityId: newContact.id,
+                action: 'CREATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    name: name,
+                    role: role,
+                    caseId: id
+                })
+            }
+        });
+
         return NextResponse.json(newContact);
 
     } catch (error) {

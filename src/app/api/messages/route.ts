@@ -168,6 +168,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Audit Log: Message Sent
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Message',
+                entityId: message.id,
+                action: 'CREATE', // or SEND_MESSAGE
+                userId: session.id,
+                metadata: JSON.stringify({
+                    recipientId: isExternal ? 'EXTERNAL' : recipientId,
+                    subject: subject || 'No Subject',
+                    caseId: caseId
+                })
+            }
+        });
+
         // Apply Inbound Rules for the recipient (if internal)
         if (!isExternal && recipientId) {
             // We can run this asynchronously without awaiting if we want faster response,

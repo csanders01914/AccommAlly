@@ -77,6 +77,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Audit Log: Call Request Created
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'CallRequest',
+                entityId: call.id,
+                action: 'CREATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    urgency: urgent ? 'URGENT' : 'Normal',
+                    reason: reason,
+                    caseId: caseId
+                })
+            }
+        });
+
         return NextResponse.json(call, { status: 201 });
 
     } catch (error) {

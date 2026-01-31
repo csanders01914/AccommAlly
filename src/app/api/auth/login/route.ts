@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { comparePassword, loginUser } from "@/lib/auth";
-import { hash } from "@/lib/encryption";
+import { encrypt, hash } from "@/lib/encryption";
 import fs from 'fs';
 import path from 'path';
 
@@ -9,7 +9,10 @@ function logToFile(message: string) {
     try {
         const logPath = path.join(process.cwd(), 'login-debug.txt');
         const timestamp = new Date().toISOString();
-        fs.appendFileSync(logPath, `[${timestamp}] ${message}\n`);
+        // Encrypt the entire log line including timestamp to ensure confidentiality
+        const logEntry = `[${timestamp}] ${message}`;
+        const encryptedEntry = encrypt(logEntry);
+        fs.appendFileSync(logPath, `${encryptedEntry}\n`);
     } catch (e) {
         // ignore logging errors
     }
@@ -46,6 +49,18 @@ export async function POST(request: Request) {
         // 2. Check Lockout
         if (user.lockedUntil && user.lockedUntil > new Date()) {
             logToFile('Login Failed: User locked out');
+
+            // Audit Log: Login Blocked
+            await prisma.auditLog.create({
+                data: {
+                    entityType: 'User',
+                    entityId: user.id,
+                    action: 'LOGIN_BLOCKED',
+                    userId: user.id, // User is known, so we can log it against them
+                    metadata: JSON.stringify({ reason: 'account_locked', lockedUntil: user.lockedUntil })
+                }
+            });
+
             return NextResponse.json(
                 { error: "Account locked. Try again later." },
                 { status: 403 }
@@ -77,6 +92,17 @@ export async function POST(request: Request) {
                 data: updateData
             });
 
+            // Audit Log: Login Failure
+            await prisma.auditLog.create({
+                data: {
+                    entityType: 'User',
+                    entityId: user.id,
+                    action: 'LOGIN_FAILURE',
+                    userId: user.id,
+                    metadata: JSON.stringify({ reason: 'invalid_password', attempts: newAttempts })
+                }
+            });
+
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
@@ -99,11 +125,25 @@ export async function POST(request: Request) {
             });
         }
 
+        const isSecure = request.url.startsWith("https:");
+
         const token = await loginUser({
             id: user.id,
             email: email,
             role: user.role,
-            name: user.name
+            name: user.name,
+            isSecure
+        });
+
+        // Audit Log: Login Success
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'User',
+                entityId: user.id,
+                action: 'LOGIN_SUCCESS',
+                userId: user.id,
+                metadata: JSON.stringify({ ip: request.headers.get('x-forwarded-for') || 'unknown' })
+            }
         });
 
         logToFile('Login Success');

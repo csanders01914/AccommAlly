@@ -61,22 +61,7 @@ export function generateClaimNumber(options: {
     return `AA${encodedTimestamp}-${sequenceString}${type}`;
 }
 
-/**
- * Legacy function - redirects to generateClaimNumber for backwards compatibility
- * @deprecated Use generateClaimNumber instead
- */
-export function generateCaseNumber(options: {
-    date?: Date;
-    sequence: number;
-    type: ClaimType;
-    orgPrefix?: string;
-}): string {
-    return generateClaimNumber({
-        date: options.date,
-        sequence: options.sequence,
-        type: options.type,
-    });
-}
+
 
 /**
  * Parses a claim number string back into its components
@@ -138,26 +123,7 @@ export function parseClaimNumber(claimNumber: string): {
     return null;
 }
 
-/**
- * Legacy function - redirects to parseClaimNumber for backwards compatibility
- * @deprecated Use parseClaimNumber instead
- */
-export function parseCaseNumber(caseNumber: string): {
-    orgPrefix: string;
-    dateTime: Date;
-    sequence: number;
-    type: CaseType;
-} | null {
-    const result = parseClaimNumber(caseNumber);
-    if (!result) return null;
 
-    return {
-        orgPrefix: result.prefix,
-        dateTime: result.dateTime,
-        sequence: result.sequence,
-        type: result.type,
-    };
-}
 
 /**
  * Generates the next sequence number for a given date

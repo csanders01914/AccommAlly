@@ -141,6 +141,22 @@ export async function POST(
             }
         });
 
+        // Audit Log: Message Moved
+        if (folderId !== 'starred') {
+            await prisma.auditLog.create({
+                data: {
+                    entityType: 'Message',
+                    entityId: messageId,
+                    action: 'UPDATE', // or MOVE_MESSAGE
+                    userId: session.id,
+                    metadata: JSON.stringify({
+                        action: 'move_to_folder',
+                        folder: folderId || 'inbox'
+                    })
+                }
+            });
+        }
+
         return NextResponse.json({ success: true });
 
     } catch (error) {
@@ -148,3 +164,5 @@ export async function POST(
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+

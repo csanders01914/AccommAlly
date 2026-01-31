@@ -15,8 +15,11 @@ import {
     ChevronRight,
     Users,
     FileText,
-    Search
+    Search,
+    BarChart3,
+    Bug
 } from 'lucide-react';
+import { BugReportModal } from '@/components/BugReportModal';
 
 interface SidebarProps {
     user: {
@@ -41,6 +44,7 @@ interface NavItem {
 export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onToggle }: SidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
+    const [showBugReport, setShowBugReport] = useState(false);
 
     // Initialize with prop if provided, otherwise default logic
     const [collapsed, setCollapsed] = useState(() => {
@@ -77,11 +81,13 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
 
     const adminItems: NavItem[] = [
         { name: 'Admin Console', href: '/admin', icon: Shield, adminOnly: true },
+        { name: 'Communication Hub', href: '/admin/communications', icon: Mail, adminOnly: true }, // Added Link
+        { name: 'Claimants', href: '/admin/claimants', icon: Users, adminOnly: true },
+        { name: 'Reports', href: '/reports', icon: BarChart3, adminOnly: true },
+        { name: 'Bug Reports', href: '/admin/bug-reports', icon: Bug, adminOnly: true },
     ];
 
-    const auditorItems: NavItem[] = [
-        { name: 'Auditor Console', href: '/auditor', icon: ClipboardCheck },
-    ];
+
 
     const handleLogout = async () => {
         await fetch('/api/auth/logout', { method: 'POST' });
@@ -222,45 +228,22 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
                 )}
 
                 {/* Auditor Section - visible to ADMIN and AUDITOR */}
-                {(user.role === 'ADMIN' || user.role === 'AUDITOR') && (
-                    <>
-                        <div className={`my-4 border-t border-gray-200 dark:border-gray-800 ${collapsed ? 'mx-1' : ''}`} role="separator" />
-                        {!collapsed && (
-                            <p id="auditor-nav-heading" className="px-3 mb-2 text-xs font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">
-                                Audit
-                            </p>
-                        )}
-                        <ul className="space-y-1" aria-labelledby={!collapsed ? "auditor-nav-heading" : undefined} aria-label={collapsed ? "Auditor Navigation" : undefined}>
-                            {auditorItems.map((item) => {
-                                const Icon = item.icon;
-                                const active = isActive(item.href);
-                                return (
-                                    <li key={item.name}>
-                                        <button
-                                            onClick={() => router.push(item.href)}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${active
-                                                ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium'
-                                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                                                } ${collapsed ? 'justify-center' : ''}`}
-                                            title={collapsed ? item.name : undefined}
-                                            aria-label={item.name}
-                                            aria-current={active ? 'page' : undefined}
-                                        >
-                                            <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                                            {!collapsed && (
-                                                <span className="truncate">{item.name}</span>
-                                            )}
-                                        </button>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </>
-                )}
+
             </nav>
 
-            {/* Logout Button */}
-            <div className="p-2 border-t border-gray-200 dark:border-gray-800">
+            {/* Footer Actions */}
+            <div className="p-2 border-t border-gray-200 dark:border-gray-800 space-y-1">
+                <button
+                    onClick={() => setShowBugReport(true)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors ${collapsed ? 'justify-center' : ''}`}
+                    title={collapsed ? 'Report Bug' : undefined}
+                >
+                    <div className="w-5 h-5 flex items-center justify-center">
+                        <Bug className="w-4 h-4 shrink-0" />
+                    </div>
+                    {!collapsed && <span className="text-sm">Bug Report</span>}
+                </button>
+
                 <button
                     onClick={handleLogout}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors ${collapsed ? 'justify-center' : ''
@@ -271,6 +254,12 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
                     {!collapsed && <span>Sign Out</span>}
                 </button>
             </div>
+
+            <BugReportModal
+                isOpen={showBugReport}
+                onClose={() => setShowBugReport(false)}
+                currentUser={{ name: user.name, email: user.email || '' }}
+            />
         </aside>
     );
 }

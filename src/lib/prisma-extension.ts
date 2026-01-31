@@ -1,11 +1,11 @@
 import { Prisma } from '@prisma/client';
 import { encrypt, decrypt, hash, encryptBuffer, decryptBuffer } from './encryption';
 
-export const encryptionExtension = Prisma.defineExtension((client) => {
+export const encryptionExtension = Prisma.defineExtension((client: any) => {
     return client.$extends({
         query: {
             $allModels: {
-                async $allOperations({ model, operation, args, query }) {
+                async $allOperations({ model, operation, args, query }: any) {
                     const params = args as any;
                     // --- WRITE OPERATIONS ---
                     if (['create', 'update', 'upsert', 'createMany'].includes(operation) && params.data) {

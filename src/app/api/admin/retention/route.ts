@@ -26,7 +26,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        console.log(`Retention policy complete. Deleted ${result.count} messages.`);
+
+
+        // Audit Log: Retention Policy Executed
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'System',
+                entityId: 'retention-policy',
+                action: 'EXECUTE_RETENTION',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    deletedCount: result.count,
+                    cutoffDate: cutoffDate.toISOString()
+                })
+            }
+        });
 
         return NextResponse.json({
             success: true,

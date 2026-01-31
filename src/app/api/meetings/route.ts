@@ -103,6 +103,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Audit Log: Meeting Created
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Meeting',
+                entityId: meeting.id,
+                action: 'CREATE',
+                userId: (session as any).id,
+                metadata: JSON.stringify({
+                    title: title,
+                    startTime: startTime,
+                    caseId: caseId
+                })
+            }
+        });
+
         // Create reminders if specified
         if (reminders && reminders.length > 0) {
             const reminderData = reminders.map((minutes: number) => ({

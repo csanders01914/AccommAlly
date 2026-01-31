@@ -37,6 +37,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
         width: width,
         minWidth: width,
         maxWidth: width,
+        borderRadius: isDragging ? '8px' : '0', // Rounded corners while dragging
     };
 
     const handleResizePointerDown = (e: React.PointerEvent) => {
@@ -133,22 +134,31 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
             )}
 
             {isFilterOpen && (
-                <div
-                    className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 z-50 pointer-events-auto cursor-default"
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={(e) => e.stopPropagation()}
-                    role="dialog"
-                    aria-label="Filter Column"
-                >
-                    <input
-                        type="text"
-                        placeholder="Filter..."
-                        value={filterValue || ''}
-                        onChange={(e) => onFilter?.(e.target.value)}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-transparent text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
-                        autoFocus
+                <>
+                    <div
+                        className="fixed inset-0 z-40 bg-transparent"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsFilterOpen(false);
+                        }}
                     />
-                </div>
+                    <div
+                        className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2 z-50 pointer-events-auto cursor-default"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-label="Filter Column"
+                    >
+                        <input
+                            type="text"
+                            placeholder="Filter..."
+                            value={filterValue || ''}
+                            onChange={(e) => onFilter?.(e.target.value)}
+                            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-transparent text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+                            autoFocus
+                        />
+                    </div>
+                </>
             )}
         </th>
     );

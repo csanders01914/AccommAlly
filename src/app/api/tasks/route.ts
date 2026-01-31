@@ -114,6 +114,21 @@ export async function POST(request: NextRequest) {
             }
         });
 
+        // Audit Log: Task Created
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Task',
+                entityId: newTask.id,
+                action: 'CREATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    title: title,
+                    priority: priority,
+                    assignedTo: body.assignedToId || session.id
+                })
+            }
+        });
+
         return NextResponse.json(newTask);
 
     } catch (error) {

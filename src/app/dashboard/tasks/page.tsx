@@ -112,8 +112,8 @@ export default function TasksDashboardPage() {
 
     // Date Range State
     const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
-        start: format(new Date(), 'yyyy-MM-dd'),
-        end: ''
+        start: '',
+        end: format(new Date(), 'yyyy-MM-dd')
     });
 
     // Pagination State
@@ -131,7 +131,7 @@ export default function TasksDashboardPage() {
         { id: 'caseNumber', label: 'Claim Number', sortable: true, width: 150 },
         { id: 'lob', label: 'LOB', sortable: true, width: 80 },
         { id: 'dueDate', label: 'Due Date', sortable: true, width: 120 },
-        { id: 'title', label: 'Task Description', sortable: true, width: 300 },
+        { id: 'description', label: 'Task Description', sortable: true, width: 300 },
         { id: 'category', label: 'Task Type', sortable: true, width: 150 },
         { id: 'assignedTo', label: 'Assigned To', sortable: true, width: 150 },
         { id: 'createdBy', label: 'Created By', sortable: true, width: 150 },
@@ -334,7 +334,7 @@ export default function TasksDashboardPage() {
                     case 'caseNumber': return t.case?.caseNumber?.toLowerCase().includes(q);
                     case 'lob': return true; // Mocked as AR always, so always true? Or check "AR".
                     case 'dueDate': return format(new Date(t.dueDate), 'MM/dd/yyyy').includes(q);
-                    case 'title': return t.title.toLowerCase().includes(q);
+                    case 'description': return t.description?.toLowerCase().includes(q) ?? false;
                     case 'category': return t.category.toLowerCase().includes(q);
                     case 'assignedTo': return t.assignedTo?.name.toLowerCase().includes(q);
                     case 'createdBy': return t.createdBy?.name.toLowerCase().includes(q);
@@ -350,27 +350,29 @@ export default function TasksDashboardPage() {
 
         // Date Range Filter
         if (dateRange.start) {
-            // Compare dates (ignoring time for start date if needed, but simple comparison works if standard ISO YYYY-MM-DD)
-            // t.dueDate is ISO string. Input is YYYY-MM-DD.
-            // Using simple string comparison for YYYY-MM-DD works if time is 00:00, but better to use Date objects.
-            // Start date: tasks ON or AFTER. 
-            // End date: tasks ON or BEFORE.
             result = result.filter(t => {
                 const taskDate = new Date(t.dueDate);
-                const startDate = new Date(dateRange.start);
-                // Reset times to midnight for accurate day comparison
+                // Reset task date times to midnight for accurate day comparison
                 taskDate.setHours(0, 0, 0, 0);
+
+                // Parse input date strings as local time to avoid UTC-shift issues
+                const [y, m, d] = dateRange.start.split('-').map(Number);
+                const startDate = new Date(y, m - 1, d);
                 startDate.setHours(0, 0, 0, 0);
-                return taskDate >= startDate;
+
+                return taskDate.getTime() >= startDate.getTime();
             });
         }
         if (dateRange.end) {
             result = result.filter(t => {
                 const taskDate = new Date(t.dueDate);
-                const endDate = new Date(dateRange.end);
                 taskDate.setHours(0, 0, 0, 0);
+
+                const [y, m, d] = dateRange.end.split('-').map(Number);
+                const endDate = new Date(y, m - 1, d);
                 endDate.setHours(0, 0, 0, 0);
-                return taskDate <= endDate;
+
+                return taskDate.getTime() <= endDate.getTime();
             });
         }
 
@@ -503,6 +505,29 @@ export default function TasksDashboardPage() {
         } catch (error) {
             console.error('Failed to reassign tasks:', error);
             alert('Failed to reassign some tasks. Please try again.');
+        }
+    };
+
+    const toggleSelectAll = () => {
+        // If all currently filtered/paginated tasks are selected, deselect them.
+        // Otherwise, select them.
+        // Usually Select All applies to the visible set (paginated or filtered). 
+        // Given the requirement is often "bulk action", let's select ALL FILTERED tasks, not just current page (unless desired?).
+        // The previous implementation in CaseTasksTable selected relevant tasks.
+        // Let's select all FILTERED tasks to be safe/powerful.
+
+        if (filteredTasks.length === 0) return;
+
+        const allSelected = filteredTasks.every(t => selectedTaskIds.has(t.id));
+
+        if (allSelected) {
+            const newSet = new Set(selectedTaskIds);
+            filteredTasks.forEach(t => newSet.delete(t.id));
+            setSelectedTaskIds(newSet);
+        } else {
+            const newSet = new Set(selectedTaskIds);
+            filteredTasks.forEach(t => newSet.add(t.id));
+            setSelectedTaskIds(newSet);
         }
     };
 
@@ -830,7 +855,14 @@ export default function TasksDashboardPage() {
                             <table className="w-full text-sm text-left table-fixed">
                                 <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-gray-700">
                                     <tr>
-                                        <th className="px-4 py-3 w-10"><input type="checkbox" className="rounded" /></th>
+                                        <th className="px-4 py-3 w-10">
+                                            <input
+                                                type="checkbox"
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                checked={filteredTasks.length > 0 && filteredTasks.every(t => selectedTaskIds.has(t.id))}
+                                                onChange={toggleSelectAll}
+                                            />
+                                        </th>
                                         <th className="px-4 py-3 w-10"></th>
                                         <SortableContext items={columns} strategy={horizontalListSortingStrategy}>
                                             {columns.map(col => (
@@ -887,46 +919,65 @@ export default function TasksDashboardPage() {
 
                                                 {/* Dynamic Columns */}
                                                 {columns.map(col => {
+                                                    const today = new Date();
+                                                    today.setHours(0, 0, 0, 0);
+                                                    const taskDate = new Date(task.dueDate);
+                                                    taskDate.setHours(0, 0, 0, 0);
+
+                                                    const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
+                                                    const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
+
+                                                    let primaryColor = "text-gray-900 dark:text-gray-100";
+                                                    let secondaryColor = "text-gray-500";
+
+                                                    if (isOverdue) {
+                                                        primaryColor = "text-red-600 dark:text-red-400 font-medium";
+                                                        secondaryColor = "text-red-500 dark:text-red-400";
+                                                    } else if (isDueToday) {
+                                                        primaryColor = "text-blue-600 dark:text-blue-400 font-medium";
+                                                        secondaryColor = "text-blue-500 dark:text-blue-400";
+                                                    }
+
                                                     switch (col.id) {
                                                         case 'caseNumber':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 font-medium text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 font-medium overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
                                                                     {task.case?.caseNumber || 'N/A'}
                                                                 </td>
                                                             );
                                                         case 'lob':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
                                                                     AR
                                                                 </td>
                                                             );
                                                         case 'dueDate':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-900 dark:text-gray-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
                                                                     {format(new Date(task.dueDate), 'MM/dd/yyyy')}
                                                                 </td>
                                                             );
-                                                        case 'title':
+                                                        case 'description':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-900 dark:text-gray-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
-                                                                    {task.title}
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
+                                                                    {task.description || ''}
                                                                 </td>
                                                             );
                                                         case 'category':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
                                                                     {task.category.replace('_', ' ')}
                                                                 </td>
                                                             );
                                                         case 'assignedTo':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
                                                                     {task.assignedTo?.name || 'Unassigned'}
                                                                 </td>
                                                             );
                                                         case 'createdBy':
                                                             return (
-                                                                <td key={col.id} className="px-4 py-3 text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: (col as any).width }}>
+                                                                <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
                                                                     {task.createdBy?.name || 'System'}
                                                                 </td>
                                                             );

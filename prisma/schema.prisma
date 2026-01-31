@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
 }
 
 /// User accounts with Role-Based Access Control (RBAC)
@@ -41,11 +40,14 @@ model User {
   notes             Note[]
   assignedTasks     Task[]          @relation("AssignedTo")
   createdTasks      Task[]          @relation("CreatedBy")
+  decidedAccommodations Accommodation[] @relation("DecisionMaker")
   organizedMeetings Meeting[]       @relation("MeetingOrganizer")
   meetingAttendances MeetingAttendee[]
   reminders         Reminder[]
   messageFolders    MessageFolder[]
   inboundRules      InboundRule[]
+  errorLogs         ErrorLog[]
+  bugReports        BugReport[]
 
   @@index([email])
   @@index([role])
@@ -55,16 +57,12 @@ model User {
 model Case {
   id              String          @id @default(cuid())
   caseNumber      String          @unique
-  claimantId      String?         @unique
   clientName      String
   clientEmail     String?
   clientEmailHash String?
   clientPhone     String?
   clientPhoneHash String?
-  clientSSN       String?
-  clientSSNHash   String?
-  clientSSNPrefix String?
-  clientSSNSuffix String?
+  clientBirthdate DateTime?       // For claimant matching
   title           String
   description     String?
   medicalCondition String?
@@ -72,6 +70,9 @@ model Case {
   program         String?
   venue           String?
   preferredStartDate String?
+  jobTitle        String?
+  jobFamily       String?
+  requestDate     DateTime?
   status          CaseStatus      @default(OPEN)
   priority        Int             @default(2)
   createdAt       DateTime        @default(now())
@@ -90,12 +91,25 @@ model Case {
   meetings        Meeting[]
   messages        Message[]
   contacts        Contact[]
+  
+  // Claimant relation
+  claimantRef     String?
+  claimant        Claimant?       @relation(fields: [claimantRef], references: [id])
+  
+  // Claim Family relation
+  claimFamilyId   String?
+  claimFamily     ClaimFamily?    @relation(fields: [claimFamilyId], references: [id])
+  
+  // Identity verifications for this case
+  identityVerifications IdentityVerification[]
 
   @@index([caseNumber])
   @@index([clientName])
   @@index([status])
   @@index([createdById])
   @@index([clientId])
+  @@index([claimantRef])
+  @@index([claimFamilyId])
 }
 
 /// Corporate Clients (e.g. TCP)
@@ -107,6 +121,57 @@ model Client {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   cases     Case[]
+}
+
+/// Claimant - individuals who submit accommodation requests
+model Claimant {
+  id              String    @id @default(cuid())
+  claimantNumber  String    @unique  // 6-digit unique ID (e.g., "847293")
+  name            String               // Encrypted
+  nameHash        String               // For matching (lowercase, trimmed)
+  birthdate       DateTime             // For matching
+  email           String?              // Encrypted
+  emailHash       String?              // For lookup
+  phone           String?              // Encrypted
+  phoneHash       String?              // For lookup
+  
+  // Verification credentials (PIN default, passphrase 12-65 chars)
+  pinHash         String?              // Hashed 4-6 digit PIN
+  passphraseHash  String?              // Hashed passphrase (12-65 chars)
+  credentialType  String    @default("PIN")  // "PIN" or "PASSPHRASE"
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  cases           Case[]
+  
+  @@unique([nameHash, birthdate])  // Unique combination for matching
+  @@index([claimantNumber])
+  @@index([emailHash])
+  @@index([phoneHash])
+}
+
+/// Claim Family - groups related cases together
+model ClaimFamily {
+  id          String   @id @default(cuid())
+  name        String?  // Optional family label
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cases       Case[]
+}
+
+/// Identity Verification - logs verification attempts during phone calls
+model IdentityVerification {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  noteId      String?  // Optional link to the note where verification occurred
+  verified    Boolean
+  attemptedAt DateTime @default(now())
+  verifiedById String  // User ID who performed verification
+  
+  @@index([caseId])
+  @@index([verifiedById])
 }
 
 /// Contacts associated with a Case (Address Book)
@@ -131,21 +196,44 @@ model Contact {
 }
 
 /// Accommodation requests linked to a Case
+/// Accommodation requests linked to a Case
 model Accommodation {
-  id        String    @id @default(cuid())
-  type      String
-  request   String
-  status    String    @default("PENDING")
-  costCode  String?
-  startDate DateTime
-  endDate   DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  caseId    String
-  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id               String              @id @default(cuid())
+  accommodationNumber String           @default("001") // e.g. "001", "002"
+  
+  type             AccommodationType
+  subtype          String?             // Specific subtype text
+  
+  description      String              // Main description of request
+  
+  status           AccommodationStatus @default(PENDING)
+  lifecycleStatus  LifecycleStatus     @default(OPEN)
+  lifecycleSubstatus LifecycleSubstatus @default(PENDING)
+  
+  isLongTerm       Boolean             @default(false)
+  startDate        DateTime
+  endDate          DateTime?
+  
+  estimatedCost    Decimal?            @db.Decimal(10, 2)
+  actualCost       Decimal?            @db.Decimal(10, 2)
+  reviewDate       DateTime?
+  isExternal       Boolean             @default(false)
+  
+  decisionDate     DateTime?
+  decisionMakerId  String?
+  decisionMaker    User?               @relation("DecisionMaker", fields: [decisionMakerId], references: [id])
+  
+  costCode         String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  
+  caseId           String
+  case             Case                @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
+  @@unique([caseId, accommodationNumber])
   @@index([caseId])
   @@index([status])
+  @@index([decisionMakerId])
 }
 
 /// Tasks for case orchestration with due dates and assignees
@@ -452,6 +540,7 @@ model Meeting {
   endTime        DateTime
   allDay         Boolean           @default(false)
   color          String            @default("#3b82f6")
+  type           MeetingType       @default(OTHER)
   
   // Recurrence
   recurrenceRule String?           // RRULE format
@@ -555,4 +644,88 @@ enum CaseStatus {
   CLOSED
   ARCHIVED
   APPEAL
+}
+
+enum AccommodationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  VOID
+  RESCINDED
+}
+
+enum LifecycleStatus {
+  OPEN
+  CLOSED
+}
+
+enum LifecycleSubstatus {
+  PENDING
+  APPROVED
+  MEDICAL_NOT_SUBMITTED
+  NO_LONGER_NEEDED
+  UNABLE_TO_ACCOMMODATE
+  CANCELLED
+  INSUFFICIENT_MEDICAL
+}
+
+enum AccommodationType {
+  CHANGE_IN_FUNCTIONS
+  ENVIRONMENTAL_MODIFICATION
+  JOB_AID
+  LEAVE_OF_ABSENCE
+  PHYSICAL_ACCOMMODATION
+  SCHEDULE_MODIFICATION
+}
+
+enum MeetingType {
+  INTERACTIVE_DIALOGUE
+  FOLLOW_UP
+  CHECK_IN
+  OTHER
+}
+
+/// Detailed Error Logs for debugging with Transaction IDs
+model ErrorLog {
+  id            String   @id @default(cuid())
+  transactionId String   @unique // The ID shown to the user
+  message       String
+  stack         String?
+  path          String?
+  method        String?
+  statusCode    Int      @default(500)
+  metadata      Json?    // Any extra context (user inputs, query params)
+  userId        String?
+  timestamp     DateTime @default(now())
+
+  user          User?    @relation(fields: [userId], references: [id])
+
+  @@index([transactionId])
+  @@index([timestamp])
+  @@index([userId])
+}
+
+/// User-submitted bug reports
+model BugReport {
+  id              String   @id @default(cuid())
+  transactionId   String?  // Optional reference to a specific error
+  subject         String
+  description     String
+  
+  // Contact Info
+  reporterName    String
+  reporterEmail   String?
+  reporterPhone   String?
+  contactMethod   String?  // "EMAIL", "PHONE", "NONE"
+  
+  status          String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  userId          String?  // If authenticated
+  user            User?    @relation(fields: [userId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([transactionId])
+  @@index([status])
+  @@index([userId])
 }

@@ -42,6 +42,9 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 // Sidebar removed - handled by layout
 import { Loader2 } from 'lucide-react';
@@ -132,6 +135,11 @@ function AdminDashboardContent() {
     const [isRetentionLoading, setIsRetentionLoading] = useState(false);
     const [retentionResult, setRetentionResult] = useState<any>(null);
 
+    // Audit Filters
+    const [auditUser, setAuditUser] = useState('');
+    const [auditStartDate, setAuditStartDate] = useState('');
+    const [auditEndDate, setAuditEndDate] = useState('');
+
     // Wait, I'm replacing lines 1-141 range roughly? No, I need to insert imports and state.
 
     // Let's do imports first via Replace.
@@ -212,7 +220,13 @@ function AdminDashboardContent() {
     const fetchAuditLogs = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/admin/audit?limit=50');
+            const params = new URLSearchParams();
+            if (auditUser) params.append('userId', auditUser);
+            if (auditStartDate) params.append('startDate', auditStartDate);
+            if (auditEndDate) params.append('endDate', auditEndDate);
+            params.append('limit', '100');
+
+            const res = await fetch(`/api/admin/audit?${params.toString()}`);
             if (res.ok) {
                 const data = await res.json();
                 setAuditLogs(data.logs);
@@ -222,6 +236,100 @@ function AdminDashboardContent() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Trigger fetch when filters change (debounced or effect-driven? Effect is safer if simple)
+    useEffect(() => {
+        if (activeTab === 'audit') fetchAuditLogs();
+    }, [auditUser, auditStartDate, auditEndDate]);
+
+    const handleAuditExportPDF = async () => {
+        try {
+            // Fetch specific export data
+            const params = new URLSearchParams();
+            if (auditUser) params.append('userId', auditUser);
+            if (auditStartDate) params.append('startDate', auditStartDate);
+            if (auditEndDate) params.append('endDate', auditEndDate);
+
+            const res = await fetch(`/api/audit-logs/export?${params.toString()}`);
+            if (!res.ok) throw new Error("Failed to fetch export data");
+            const exportLogs: AuditLogEntry[] = await res.json();
+
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text('System Audit Log', 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+
+            const tableData = exportLogs.map(log => [
+                new Date(log.timestamp).toLocaleString(),
+                log.user?.name || 'Unknown',
+                log.action,
+                `${log.entityType || '-'}`,
+                formatAuditDetails(log)
+            ]);
+
+            autoTable(doc, {
+                head: [['Date', 'User', 'Action', 'Entity', 'Details']],
+                body: tableData,
+                startY: 40,
+                styles: { fontSize: 8 },
+                columnStyles: { 4: { cellWidth: 80 } }
+            });
+            doc.save(`audit_log_${Date.now()}.pdf`);
+        } catch (e) {
+            console.error(e);
+            alert('Export failed');
+        }
+    };
+
+    const handleAuditExportExcel = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (auditUser) params.append('userId', auditUser);
+            if (auditStartDate) params.append('startDate', auditStartDate);
+            if (auditEndDate) params.append('endDate', auditEndDate);
+
+            const res = await fetch(`/api/audit-logs/export?${params.toString()}`);
+            if (!res.ok) throw new Error("Failed to fetch export data");
+            const exportLogs: AuditLogEntry[] = await res.json();
+
+            const wsData = exportLogs.map(log => ({
+                'Date/Time': new Date(log.timestamp).toLocaleString(),
+                'User': log.user?.name || log.userId,
+                'Email': log.user?.email || '',
+                'Action': log.action,
+                'Entity Type': log.entityType,
+                'Details': formatAuditDetails(log),
+                'Raw Metadata': JSON.stringify(log.metadata || {})
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Audit Logs");
+            XLSX.writeFile(wb, `Audit_Logs_${Date.now()}.xlsx`);
+        } catch (e) {
+            console.error(e);
+            alert('Export failed');
+        }
+    };
+
+    const formatAuditDetails = (log: any) => {
+        if (log.oldValue && log.newValue) {
+            const oldV = log.oldValue.length > 20 ? log.oldValue.substring(0, 20) + '...' : log.oldValue;
+            const newV = log.newValue.length > 20 ? log.newValue.substring(0, 20) + '...' : log.newValue;
+            return `${log.field || 'Change'}: ${oldV} -> ${newV}`;
+        }
+        try {
+            if (typeof log.metadata === 'string') {
+                const parsed = JSON.parse(log.metadata);
+                return Object.entries(parsed).map(([k, v]) => `${k}:${v}`).join(', ');
+            }
+            if (typeof log.metadata === 'object' && log.metadata) {
+                return Object.entries(log.metadata).map(([k, v]) => `${k}:${v}`).join(', ');
+            }
+        } catch { }
+        return log.details || '-';
     };
 
     // Fetch Inventory
@@ -716,51 +824,100 @@ function AdminDashboardContent() {
 
                 {/* AUDIT TAB */}
                 {activeTab === 'audit' && (
-                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 dark:bg-gray-800/50">
-                                <tr>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Timestamp</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">User</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Action</th>
-                                    <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                {auditLogs.map(log => (
-                                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                        <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
-                                            {format(new Date(log.timestamp), 'MMM d, HH:mm:ss')}
-                                        </td>
-                                        <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                                            {log.user?.name || log.userId || 'Unknown'}
-                                        </td>
-                                        <td className="px-6 py-3">
-                                            <span className="px-2 py-0.5 rounded text-xs font-mono bg-gray-100 dark:bg-gray-800">
-                                                {log.action} {log.entityType}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                            {(() => {
-                                                try {
-                                                    const meta = JSON.parse(log.metadata);
-                                                    // Handle known action types for cleaner display
-                                                    if (log.action === 'REVEAL_SSN' && meta.ip) return `IP: ${meta.ip}`;
-                                                    if (meta.action === 'add_note') return 'Added a note';
+                    <div className="space-y-4">
+                        {/* Filters & Actions */}
+                        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 flex flex-col md:flex-row gap-4 items-end">
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1">User</label>
+                                    <select
+                                        className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                        value={auditUser}
+                                        onChange={e => setAuditUser(e.target.value)}
+                                    >
+                                        <option value="">All Users</option>
+                                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1">Start Date</label>
+                                    <input
+                                        type="date"
+                                        className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                        value={auditStartDate}
+                                        onChange={e => setAuditStartDate(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-500 mb-1">End Date</label>
+                                    <input
+                                        type="date"
+                                        className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                        value={auditEndDate}
+                                        onChange={e => setAuditEndDate(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={handleAuditExportExcel}
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-2 text-xs font-medium transition-colors"
+                                >
+                                    <FileText className="w-4 h-4" /> Excel
+                                </button>
+                                <button
+                                    onClick={handleAuditExportPDF}
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center gap-2 text-xs font-medium transition-colors"
+                                >
+                                    <Download className="w-4 h-4" /> PDF
+                                </button>
+                            </div>
+                        </div>
 
-                                                    // Fallback: format key-values
-                                                    return Object.entries(meta)
-                                                        .map(([k, v]) => `${k}: ${v}`)
-                                                        .join(', ');
-                                                } catch (e) {
-                                                    return log.metadata;
-                                                }
-                                            })()}
-                                        </td>
+                        {/* Table */}
+                        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-50 dark:bg-gray-800/50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Timestamp</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">User</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Action</th>
+                                        <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    {auditLogs.length > 0 ? auditLogs.map(log => (
+                                        <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                                                {format(new Date(log.timestamp), 'MMM d, HH:mm:ss')}
+                                            </td>
+                                            <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                                                {log.user?.name || log.userId || 'Unknown'}
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                <span className={cn("px-2 py-0.5 rounded text-xs font-mono border",
+                                                    log.action.includes('DELETE') ? "bg-red-50 text-red-600 border-red-100" :
+                                                        log.action.includes('CREATE') ? "bg-green-50 text-green-600 border-green-100" :
+                                                            "bg-gray-100 text-gray-600 border-gray-200"
+                                                )}>
+                                                    {log.action}
+                                                </span>
+                                                {log.entityType && <span className="ml-2 text-xs text-gray-400">{log.entityType}</span>}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs break-all">
+                                                {formatAuditDetails(log)}
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
+                                                No audit logs found for the selected filters.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 

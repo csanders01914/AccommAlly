@@ -42,24 +42,43 @@ export async function POST(request: NextRequest) {
         // Check if DCN exists (highly unlikely with ms precision, but good practice)
         // Or assume unique for now.
 
-        const document = await prisma.document.create({
+        const newDoc = await prisma.document.create({
             data: {
                 fileName: file.name,
-                fileType: file.type || 'application/octet-stream',
+                fileType: file.type,
                 fileSize: file.size,
                 fileData: buffer,
                 documentControlNumber: dcn,
-                category: category,
+                category: category || 'OTHER',
                 caseId: caseId,
-                uploadedById: session.id,
-            },
-            select: {
-                id: true,
-                fileName: true,
-                documentControlNumber: true,
-                createdAt: true
+                uploadedById: session.id
             }
         });
+
+        // Audit Log: Document Uploaded
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Document',
+                entityId: newDoc.id,
+                action: 'CREATE', // or UPLOAD
+                userId: session.id,
+                metadata: JSON.stringify({
+                    fileName: file.name,
+                    fileSize: file.size,
+                    caseId: caseId
+                })
+            }
+        });
+        // The select block was part of the original document.create call.
+        // To maintain the original return structure, we need to fetch the selected fields
+        // from newDoc or adjust the return. Assuming the original intent was to return
+        // these fields, we'll construct the return object based on newDoc.
+        const document = {
+            id: newDoc.id,
+            fileName: newDoc.fileName,
+            documentControlNumber: newDoc.documentControlNumber,
+            createdAt: newDoc.createdAt // Assuming createdAt is automatically added by Prisma
+        };
 
         return NextResponse.json(document);
 

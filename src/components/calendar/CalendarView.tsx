@@ -18,7 +18,7 @@ import {
     useSensors
 } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
-import { CreateTaskModal } from '../CreateTaskModal';
+import { AddTaskModal } from '../AddTaskModal';
 
 // --- Types ---
 type Task = {
@@ -245,10 +245,29 @@ export function CalendarView() {
                 </DragOverlay>
             </DndContext>
 
-            <CreateTaskModal
+            <AddTaskModal
                 isOpen={isTaskModalOpen}
                 onClose={() => setIsTaskModalOpen(false)}
-                onTaskCreated={fetchTasks}
+                onSubmit={async (data) => {
+                    try {
+                        const res = await fetch('/api/tasks', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ...data,
+                                dueDate: data.dueDate.toISOString()
+                            })
+                        });
+
+                        if (res.ok) {
+                            fetchTasks();
+                        } else {
+                            console.error('Failed to create task');
+                        }
+                    } catch (error) {
+                        console.error('Error creating task:', error);
+                    }
+                }}
             />
         </div>
     );

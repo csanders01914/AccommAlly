@@ -14,7 +14,8 @@ import {
     Upload,
     Download,
     Eye,
-    Trash2,
+    Copy,
+    Edit3,
     MoreHorizontal,
     Search,
     User,
@@ -26,7 +27,12 @@ import {
     FolderOpen,
     EyeOff,
     X,
-    Shield
+    Trash2,
+    Shield,
+    Link as LinkIcon,
+    Table,
+    File,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { User as UserType, Case, Note, Task, Document } from '@prisma/client';
@@ -34,6 +40,7 @@ import { AddNoteData } from './AddNoteModal';
 import AddNoteModal from './AddNoteModal';
 import GenerateDecisionModal from './GenerateDecisionModal';
 import { TimelineView } from './TimelineView';
+import { DecisioningTab } from './case/DecisioningTab';
 import dynamic from 'next/dynamic';
 const DocumentViewer = dynamic(() => import('./DocumentViewer'), { ssr: false });
 import { DownloadOptionsModal } from './DownloadOptionsModal';
@@ -45,6 +52,8 @@ import PortalMessagesSection from './PortalMessagesSection';
 import { EditCaseModal, EditCaseData } from './EditCaseModal';
 import { AddContactModal, AddContactData } from './AddContactModal';
 import { CaseTasksTable } from './CaseTasksTable';
+import EditNoteModal from './EditNoteModal';
+import LinkClaimsModal from './LinkClaimsModal';
 
 // Local Types
 interface Contact {
@@ -86,6 +95,8 @@ type ExtendedCase = Case & {
     accommodations: any[]; // Placeholder for relation
     medicalCondition?: string | null;
     preferredStartDate?: string | null;
+    claimant?: { id: string; claimantNumber: string };
+    claimFamily?: { id: string; name: string | null };
 };
 
 
@@ -131,6 +142,11 @@ export function CaseDetailPage({
     const [showCompletedTasks, setShowCompletedTasks] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
+    const [noteMenuOpen, setNoteMenuOpen] = useState<string | null>(null);
+
+    const [isEditNoteModalOpen, setIsEditNoteModalOpen] = useState(false);
+    const [isLinkClaimsModalOpen, setIsLinkClaimsModalOpen] = useState(false);
+    const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
     // Upload State
     const [isUploading, setIsUploading] = useState(false);
@@ -138,10 +154,6 @@ export function CaseDetailPage({
 
     const [uploadCategory, setUploadCategory] = useState<string>('OTHER');
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const [isSSNRevealed, setIsSSNRevealed] = useState(false);
-    const [decryptedSSN, setDecryptedSSN] = useState<string | null>(null);
-    const [ssnLoading, setSsnLoading] = useState(false);
     const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
     const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
@@ -149,45 +161,25 @@ export function CaseDetailPage({
             e.preventDefault();
             const nextIndex = (index + 1) % 7; // 7 tabs
             tabsRef.current[nextIndex]?.focus();
-            setActiveTab(tabsRef.current[nextIndex]?.dataset.tabid || 'dashboard');
+            const newTab = tabsRef.current[nextIndex]?.dataset.tabid || 'dashboard';
+            setActiveTab(newTab);
+            localStorage.setItem('caseActiveTab', newTab);
         } else if (e.key === 'ArrowLeft') {
             e.preventDefault();
             const nextIndex = (index - 1 + 7) % 7;
             tabsRef.current[nextIndex]?.focus();
-            setActiveTab(tabsRef.current[nextIndex]?.dataset.tabid || 'dashboard');
+            const newTab = tabsRef.current[nextIndex]?.dataset.tabid || 'dashboard';
+            setActiveTab(newTab);
+            localStorage.setItem('caseActiveTab', newTab);
         }
     };
 
-    const handleRevealSSN = async () => {
-        if (isSSNRevealed) {
-            setIsSSNRevealed(false);
-            return;
+    useEffect(() => {
+        const savedTab = localStorage.getItem('caseActiveTab');
+        if (savedTab) {
+            setActiveTab(savedTab);
         }
-
-        if (decryptedSSN) {
-            setIsSSNRevealed(true);
-            return;
-        }
-
-        setSsnLoading(true);
-        try {
-            const res = await fetch(`/api/cases/${caseId}/reveal-ssn`);
-            if (res.ok) {
-                const data = await res.json();
-                setDecryptedSSN(data.ssn);
-                setIsSSNRevealed(true);
-            } else {
-                const errText = await res.text();
-                console.error('Failed to reveal SSN', res.status, errText);
-                alert(`Failed to reveal SSN: ${res.status} ${errText}`);
-            }
-        } catch (e) {
-            console.error(e);
-            alert('Error revealing SSN');
-        } finally {
-            setSsnLoading(false);
-        }
-    };
+    }, []);
 
 
     const fetchUsers = async () => {
@@ -260,7 +252,7 @@ export function CaseDetailPage({
     };
 
     const handleDownloadDocument = (docId: string, fileName: string, fileType: string) => {
-        const doc = caseData?.documents.find(d => d.id === docId);
+        const doc = caseData?.documents.find((d: ExtendedDocument) => d.id === docId);
         if (doc) {
             setDocumentToDownload(doc);
             setIsDownloadModalOpen(true);
@@ -409,6 +401,80 @@ export function CaseDetailPage({
         }
     };
 
+    // Check if a note can be edited (within 24 hours)
+    const isNoteEditable = (createdAt: Date | string) => {
+        const created = new Date(createdAt);
+        const now = new Date();
+        const hoursDiff = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+        return hoursDiff <= 24;
+    };
+
+    const handleCopyNote = async (content: string) => {
+        try {
+            await navigator.clipboard.writeText(content);
+            // Could add a toast notification here
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+        setNoteMenuOpen(null);
+    };
+
+    const [editingNote, setEditingNote] = useState<ExtendedNote | null>(null);
+    const [editNoteContent, setEditNoteContent] = useState('');
+
+    const handleEditNote = (note: ExtendedNote) => {
+        if (!isNoteEditable(note.createdAt)) {
+            alert('Notes can only be edited within 24 hours of creation.');
+            return;
+        }
+        setEditingNote(note);
+        setIsEditNoteModalOpen(true);
+        setNoteMenuOpen(null);
+    };
+
+    const handleSaveEditNote = async (data: { id: string, content: string }) => {
+        try {
+            const res = await fetch(`/api/notes/${data.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: data.content })
+            });
+            if (res.ok) {
+                await fetchCaseData();
+            } else {
+                const errorData = await res.json();
+                alert(errorData.error || 'Failed to update note');
+            }
+        } catch (err) {
+            console.error('Error updating note:', err);
+            alert('Failed to update note');
+        }
+    };
+
+    const handleExport = async (type: 'PDF' | 'WORD' | 'EXCEL') => {
+        setIsExportMenuOpen(false);
+        try {
+            // Fetch timeline data
+            const res = await fetch(`/api/cases/${caseId}/timeline`);
+            if (!res.ok) throw new Error('Failed to fetch timeline data');
+            const data = await res.json();
+            const events = data.timeline;
+
+            const { exportToPDF, exportToExcel, exportToWord } = await import('@/lib/exportUtils');
+
+            if (type === 'PDF') {
+                exportToPDF(events, caseData!.caseNumber);
+            } else if (type === 'EXCEL') {
+                exportToExcel(events, caseData!.caseNumber);
+            } else if (type === 'WORD') {
+                await exportToWord(events, caseData!.caseNumber);
+            }
+        } catch (err) {
+            console.error('Export failed', err);
+            alert('Failed to export timeline');
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -482,7 +548,7 @@ export function CaseDetailPage({
     const now = new Date();
 
     // Filter notes - hide AUDIT notes from non-Admin/Auditor users
-    const visibleNotes = caseData.notes.filter(note => {
+    const visibleNotes = caseData.notes.filter((note: ExtendedNote) => {
         if (note.noteType === 'AUDIT') {
             return canViewAuditNotes;
         }
@@ -524,11 +590,6 @@ export function CaseDetailPage({
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
-
-    // Mask SSN logic
-    const displaySSN = isSSNRevealed
-        ? (decryptedSSN || caseData.clientSSN || 'Loading...')
-        : (caseData.clientSSN ? `***-**-${caseData.clientSSN.slice(-4)}` : '***-**-****');
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -686,7 +747,7 @@ export function CaseDetailPage({
                             <div>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">Examiner</p>
                                 <p className="font-medium text-gray-900 dark:text-white">
-                                    {(caseData.tasks.find(t => t.status !== 'COMPLETED') || caseData.tasks[0])?.assignee?.name || 'Unassigned'}
+                                    {(caseData.tasks.find((t: ExtendedTask) => t.status !== 'COMPLETED') || caseData.tasks[0])?.assignee?.name || 'Unassigned'}
                                 </p>
                             </div>
                         </div>
@@ -695,26 +756,33 @@ export function CaseDetailPage({
                                 <User className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">SSN</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Claimant ID</p>
                                 <div className="flex items-center gap-2">
-                                    <p className="font-medium text-gray-900 dark:text-white font-mono">
-                                        {displaySSN}
-                                    </p>
-                                    {isAdmin && (
-                                        <button
-                                            onClick={handleRevealSSN}
-                                            disabled={ssnLoading}
-                                            className="ml-1 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded disabled:opacity-50"
-                                            aria-label={isSSNRevealed ? "Hide Social Security Number" : "Show Social Security Number"}
-                                        >
-                                            {isSSNRevealed ? (
-                                                <EyeOff className="w-3 h-3 text-gray-500" />
-                                            ) : (
-                                                <Eye className="w-3 h-3 text-gray-500" />
-                                            )}
-                                        </button>
+                                    {caseData.claimant ? (
+                                        <a href={`/claimants/${caseData.claimant.claimantNumber}`} className="font-medium text-blue-600 dark:text-blue-400 font-mono hover:underline">
+                                            #{caseData.claimant.claimantNumber}
+                                        </a>
+                                    ) : (
+                                        <span className="font-medium text-gray-500 font-mono italic">Not Linked</span>
                                     )}
                                 </div>
+                                {caseData.claimFamily ? (
+                                    <button
+                                        onClick={() => setIsLinkClaimsModalOpen(true)}
+                                        className="mt-1 flex items-center gap-1 text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full hover:bg-green-100 transition-colors"
+                                    >
+                                        <LinkIcon className="w-3 h-3" />
+                                        {caseData.claimFamily.name || 'Family Linked'}
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setIsLinkClaimsModalOpen(true)}
+                                        className="mt-1 flex items-center gap-1 text-[10px] text-gray-400 hover:text-purple-600 hover:bg-purple-50 px-1.5 py-0.5 rounded-full transition-colors border border-dashed border-gray-300 hover:border-purple-200"
+                                    >
+                                        <Plus className="w-3 h-3" />
+                                        Link Claims
+                                    </button>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -730,7 +798,10 @@ export function CaseDetailPage({
                 </div>
 
                 {/* Navigation Tabs */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-1">
+                <div className={cn(
+                    "mx-auto px-4 sm:px-6 lg:px-8 mt-1 transition-all duration-300",
+                    ['decisioning', 'timeline', 'tasks', 'documents'].includes(activeTab) ? "max-w-full" : "max-w-7xl"
+                )}>
                     <div
                         role="tablist"
                         aria-label="Case Sections"
@@ -739,9 +810,10 @@ export function CaseDetailPage({
                         {[
                             { id: 'dashboard', label: 'Dashboard', icon: CheckSquare },
                             { id: 'notes', label: 'Notes', icon: FileText },
-                            { id: 'timeline', label: 'Timeline', icon: Clock },
+                            ...(currentUser.role === 'ADMIN' ? [{ id: 'timeline', label: 'Timeline', icon: Clock }] : []),
                             { id: 'tasks', label: 'Tasks', icon: CheckSquare },
                             { id: 'documents', label: 'Documents', icon: FolderOpen },
+                            { id: 'decisioning', label: 'Decisioning', icon: CheckSquare },
                             { id: 'portal', label: 'Portal Messages', icon: Send },
                             { id: 'contacts', label: 'Contacts', icon: BookUser },
                         ].map((tab, idx) => (
@@ -766,9 +838,9 @@ export function CaseDetailPage({
                             >
                                 <tab.icon className="w-4 h-4" />
                                 {tab.label}
-                                {tab.id === 'tasks' && caseData.tasks.filter(t => t.status !== 'COMPLETED').length > 0 && (
+                                {tab.id === 'tasks' && caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length > 0 && (
                                     <span className="ml-1.5 py-0.5 px-2 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                        {caseData.tasks.filter(t => t.status !== 'COMPLETED').length}
+                                        {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length}
                                     </span>
                                 )}
                             </button>
@@ -778,7 +850,10 @@ export function CaseDetailPage({
             </div>
 
             {/* Main Content Area */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className={cn(
+                "mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300",
+                ['decisioning', 'timeline', 'tasks', 'documents'].includes(activeTab) ? "max-w-full" : "max-w-7xl"
+            )}>
                 {/* DASHBOARD TAB */}
                 {activeTab === 'dashboard' && (
                     <div
@@ -866,7 +941,7 @@ export function CaseDetailPage({
                                 </div>
                                 <div className="flow-root">
                                     <ul className="-mb-8">
-                                        {visibleNotes.slice(0, 3).map((note, idx) => (
+                                        {visibleNotes.slice(0, 3).map((note: ExtendedNote, idx: number) => (
                                             <li key={note.id}>
                                                 <div className="relative pb-8">
                                                     {idx !== 2 && (
@@ -909,7 +984,7 @@ export function CaseDetailPage({
                                     Priority Tasks
                                 </h2>
                                 <div className="space-y-3">
-                                    {caseData.tasks.filter(t => t.status !== 'COMPLETED').slice(0, 5).map(task => (
+                                    {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED').slice(0, 5).map((task: ExtendedTask) => (
                                         <div key={task.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-start gap-3">
                                             <input
                                                 type="checkbox"
@@ -936,26 +1011,26 @@ export function CaseDetailPage({
                             </div>
 
                             {/* Client Contact Card */}
-                            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white shadow-lg">
-                                <h3 className="font-semibold text-lg mb-4">Contact Client</h3>
+                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-4">Contact Client</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                                        <Phone className="w-5 h-5" />
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <Phone className="w-5 h-5 text-gray-500" />
                                         <div>
-                                            <p className="text-xs text-indigo-200">Phone</p>
-                                            <p className="font-mono">{caseData.clientPhone || 'No number'}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+                                            <p className="font-mono text-gray-900 dark:text-white">{caseData.clientPhone || 'No number'}</p>
                                         </div>
-                                        <button className="ml-auto p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+                                        <button className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors">
                                             <Phone className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                                        <Mail className="w-5 h-5" />
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <Mail className="w-5 h-5 text-gray-500" />
                                         <div>
-                                            <p className="text-xs text-indigo-200">Email</p>
-                                            <p className="truncate max-w-[150px]">{caseData.clientEmail || 'No email'}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                                            <p className="truncate max-w-[150px] text-gray-900 dark:text-white">{caseData.clientEmail || 'No email'}</p>
                                         </div>
-                                        <button className="ml-auto p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+                                        <button className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors">
                                             <Send className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -999,7 +1074,7 @@ export function CaseDetailPage({
                                     <p className="text-gray-500 mt-1">Start by adding a new note to this case.</p>
                                 </div>
                             ) : (
-                                visibleNotes.map((note) => {
+                                visibleNotes.map((note: ExtendedNote) => {
                                     const isAuditNote = note.noteType === 'AUDIT';
                                     return (
                                         <div key={note.id} className={cn(
@@ -1030,9 +1105,41 @@ export function CaseDetailPage({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <button className="text-gray-400 hover:text-gray-600">
-                                                    <MoreHorizontal className="w-5 h-5" />
-                                                </button>
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => setNoteMenuOpen(noteMenuOpen === note.id ? null : note.id)}
+                                                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                        aria-label="Note options"
+                                                    >
+                                                        <MoreHorizontal className="w-5 h-5" />
+                                                    </button>
+                                                    {noteMenuOpen === note.id && (
+                                                        <>
+                                                            <div
+                                                                className="fixed inset-0 z-40"
+                                                                onClick={() => setNoteMenuOpen(null)}
+                                                            />
+                                                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 py-1">
+                                                                <button
+                                                                    onClick={() => handleCopyNote(note.content)}
+                                                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                                >
+                                                                    <Copy className="w-4 h-4" />
+                                                                    Copy Note
+                                                                </button>
+                                                                {isNoteEditable(note.createdAt) && (note.authorId === currentUser.id || isAdmin) && (
+                                                                    <button
+                                                                        onClick={() => handleEditNote(note)}
+                                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                                    >
+                                                                        <Edit3 className="w-4 h-4" />
+                                                                        Edit Note
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{note.content}</p>
                                             {note.attachedDocument && (
@@ -1057,16 +1164,49 @@ export function CaseDetailPage({
 
                 {/* TIMELINE TAB */}
                 {
-                    activeTab === 'timeline' && (
+                    activeTab === 'timeline' && currentUser.role === 'ADMIN' && (
                         <div className="max-w-3xl mx-auto">
                             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-8">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <button
-                                        onClick={() => setIsDecisionModalOpen(true)}
-                                        className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200"
-                                    >
-                                        Generate Decision
-                                    </button>
+                                    <div className="relative inline-block text-left">
+                                        <button
+                                            onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                                            className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 flex items-center gap-2"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                            Export
+                                            <ChevronDown className={`w-3 h-3 transition-transform ${isExportMenuOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {isExportMenuOpen && (
+                                            <>
+                                                <div className="fixed inset-0 z-10" onClick={() => setIsExportMenuOpen(false)} />
+                                                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-20 py-1 origin-top-left">
+                                                    <button
+                                                        onClick={() => handleExport('PDF')}
+                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                    >
+                                                        <File className="w-4 h-4 text-red-500" />
+                                                        Export as PDF
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleExport('WORD')}
+                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                    >
+                                                        <FileText className="w-4 h-4 text-blue-600" />
+                                                        Export as Word
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleExport('EXCEL')}
+                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                    >
+                                                        <Table className="w-4 h-4 text-green-600" />
+                                                        Export as Excel
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                     <div className="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-1">
                                         <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center">Case History & Audit Log</h2>
                                     </div>
@@ -1095,7 +1235,7 @@ export function CaseDetailPage({
                             </div>
 
                             <CaseTasksTable
-                                tasks={caseData.tasks.map(t => ({ ...t, case: { caseNumber: caseData.caseNumber } }))}
+                                tasks={caseData.tasks.map((t: ExtendedTask) => ({ ...t, case: { caseNumber: caseData.caseNumber } }))}
                                 users={users}
                                 onStatusChange={async (id, status) => { await handleTaskStatusChange(id, status); }}
                                 onReassign={handleTaskReassign}
@@ -1140,7 +1280,7 @@ export function CaseDetailPage({
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                            {caseData.documents.map((doc) => (
+                                            {caseData.documents.map((doc: ExtendedDocument) => (
                                                 <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
@@ -1223,7 +1363,7 @@ export function CaseDetailPage({
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {caseData.contacts.map((contact) => (
+                                    {caseData.contacts.map((contact: Contact) => (
                                         <div key={contact.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
                                             <div className="flex items-start justify-between">
                                                 <div>
@@ -1262,6 +1402,16 @@ export function CaseDetailPage({
                     )
                 }
 
+
+                {/* DECISIONING TAB */}
+                {
+                    activeTab === 'decisioning' && (
+                        <div className="w-full">
+                            <DecisioningTab caseId={caseId} currentUser={currentUser} />
+                        </div>
+                    )
+                }
+
                 {/* PORTAL MESSAGES TAB */}
                 {
                     activeTab === 'portal' && (
@@ -1289,6 +1439,7 @@ export function CaseDetailPage({
                 claims={[{ id: caseId, caseNumber: caseData.caseNumber }]}
                 coordinatorName={currentUser.name}
                 userRole={currentUser.role as 'ADMIN' | 'AUDITOR' | 'COORDINATOR'}
+                claimantNumber={caseData.claimant?.claimantNumber}
             />
 
             <AddTaskModal
@@ -1303,7 +1454,7 @@ export function CaseDetailPage({
                 onClose={() => setIsTransferModalOpen(false)}
                 onSubmit={handleTransferCase}
                 users={users}
-                currentOwnerName={caseData.tasks.find(t => t.status !== 'COMPLETED')?.assignee.name || 'Unknown'}
+                currentOwnerName={caseData.tasks.find((t: ExtendedTask) => t.status !== 'COMPLETED')?.assignee.name || 'Unknown'}
             />
 
             <GenerateDecisionModal
@@ -1493,6 +1644,21 @@ export function CaseDetailPage({
                 isOpen={isAddContactModalOpen}
                 onClose={() => setIsAddContactModalOpen(false)}
                 onSubmit={handleAddContact}
+            />
+
+            <EditNoteModal
+                isOpen={isEditNoteModalOpen}
+                onClose={() => setIsEditNoteModalOpen(false)}
+                initialData={editingNote ? { id: editingNote.id, content: editingNote.content } : null}
+                onSave={handleSaveEditNote}
+            />
+
+            <LinkClaimsModal
+                isOpen={isLinkClaimsModalOpen}
+                onClose={() => setIsLinkClaimsModalOpen(false)}
+                caseId={caseId}
+                currentFamily={caseData.claimFamily}
+                onSuccess={fetchCaseData}
             />
         </div >
     );

@@ -71,7 +71,7 @@ export function TaskDetailModal({
     const [priority, setPriority] = useState(task.priority);
     // Handle date string or object safely
     const initialDate = task.dueDate ? new Date(task.dueDate) : new Date();
-    const [dueDate, setDueDate] = useState(format(initialDate, "yyyy-MM-dd'T'HH:mm"));
+    const [dueDate, setDueDate] = useState(format(initialDate, "yyyy-MM-dd"));
     const [assignedToId, setAssignedToId] = useState(task.assignedTo?.id || '');
     const [loading, setLoading] = useState(false);
 
@@ -159,7 +159,7 @@ export function TaskDetailModal({
                                 <div>
                                     <label className="text-xs text-gray-500 mb-1 block">Due Date</label>
                                     <input
-                                        type="datetime-local"
+                                        type="date"
                                         value={dueDate}
                                         onChange={e => setDueDate(e.target.value)}
                                         className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm border-none focus:ring-2 focus:ring-blue-500 outline-none"
@@ -208,7 +208,7 @@ export function TaskDetailModal({
                             <div className="space-y-2 text-sm">
                                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                                     <Calendar className="w-4 h-4" />
-                                    Due: {format(new Date(task.dueDate), 'MMMM d, yyyy h:mm a')}
+                                    Due: {format(new Date(task.dueDate), 'MMMM d, yyyy')}
                                 </div>
                                 {task.case && (
                                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -247,12 +247,7 @@ export function TaskDetailModal({
                         </>
                     ) : (
                         <>
-                            <button
-                                onClick={() => onDelete(task.id)}
-                                className="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-lg text-sm flex items-center gap-2"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
+
                             <button
                                 onClick={() => setIsEditing(true)}
                                 className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm flex items-center justify-center gap-2"

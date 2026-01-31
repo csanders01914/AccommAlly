@@ -11,7 +11,7 @@ interface FormData {
     fullName: string;
     email: string;
     phone: string;
-    ssn: string;
+    birthdate: string;
     preferredContact: ContactMethod;
     accommodationType: AccommodationType | '';
     description: string;
@@ -20,6 +20,8 @@ interface FormData {
     venue: string;
     preferredStartDate: string;
     supportingDocument: File | null;
+    credentialType: 'PIN' | 'PASSPHRASE';
+    credential: string;
 }
 
 const STEPS = [
@@ -35,7 +37,7 @@ export default function AccommodationRequestPage() {
         fullName: '',
         email: '',
         phone: '',
-        ssn: '',
+        birthdate: '',
         preferredContact: 'either',
         accommodationType: '',
         description: '',
@@ -44,10 +46,14 @@ export default function AccommodationRequestPage() {
         venue: '',
         preferredStartDate: '',
         supportingDocument: null,
+        credentialType: 'PIN',
+        credential: '',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [claimNumber, setClaimNumber] = useState<string>('');
+    const [claimantNumber, setClaimantNumber] = useState<string>('');
+    const [isNewClaimant, setIsNewClaimant] = useState<boolean>(true);
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
     const handleNext = () => {
@@ -70,7 +76,20 @@ export default function AccommodationRequestPage() {
             if (!formData.email.trim()) newErrors.email = 'Email is required';
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email';
             if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-            if (formData.ssn && !/^\d{3}-\d{2}-\d{4}$/.test(formData.ssn)) newErrors.ssn = 'Invalid SSN (XXX-XX-XXXX)';
+            if (!formData.birthdate) newErrors.birthdate = 'Date of birth is required';
+
+            // Validate credential
+            if (!formData.credential.trim()) {
+                newErrors.credential = formData.credentialType === 'PIN' ? 'PIN is required' : 'Passphrase is required';
+            } else if (formData.credentialType === 'PIN') {
+                if (!/^\d{4,6}$/.test(formData.credential)) {
+                    newErrors.credential = 'PIN must be 4-6 digits';
+                }
+            } else {
+                if (formData.credential.length < 12 || formData.credential.length > 65) {
+                    newErrors.credential = 'Passphrase must be 12-65 characters';
+                }
+            }
         }
 
         if (step === 2) {
@@ -112,6 +131,8 @@ export default function AccommodationRequestPage() {
 
             const data = await response.json();
             setClaimNumber(data.caseNumber);
+            setClaimantNumber(data.claimantNumber || '');
+            setIsNewClaimant(data.isNewClaimant !== false);
             setIsSubmitted(true);
         } catch (error: any) {
             console.error(error);
@@ -145,18 +166,91 @@ export default function AccommodationRequestPage() {
                             />
                         </div>
                         <Input
-                            label="SSN (Optional)"
-                            name="ssn"
-                            value={formData.ssn}
-                            error={errors.ssn}
+                            label="Date of Birth"
+                            name="birthdate"
+                            type="date"
+                            value={formData.birthdate}
+                            error={errors.birthdate}
                             onChange={handleChange}
-                            placeholder="XXX-XX-XXXX"
-                            maxLength={11}
-                            icon={<Shield className="w-4 h-4 text-gray-400" />}
+                            required
+                            icon={<Calendar className="w-4 h-4 text-gray-400" />}
                         />
                         <Select label="Preferred Contact" name="preferredContact" value={formData.preferredContact} onChange={handleChange} options={[
                             { value: 'either', label: 'Either' }, { value: 'email', label: 'Email' }, { value: 'phone', label: 'Phone' }
                         ]} />
+
+                        {/* PIN/Passphrase Section */}
+                        <div className="pt-4 border-t border-white/10">
+                            <h3 className="text-lg font-medium text-white mb-3">Identity Verification Setup</h3>
+                            <p className="text-blue-200/70 text-sm mb-4">
+                                Create a PIN or passphrase to verify your identity when calling about your claim.
+                            </p>
+
+                            <div className="flex gap-4 mb-4">
+                                <label className={cn(
+                                    "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all",
+                                    formData.credentialType === 'PIN'
+                                        ? "border-blue-500 bg-blue-500/20 text-blue-400"
+                                        : "border-white/20 text-white/60 hover:bg-white/5"
+                                )}>
+                                    <input
+                                        type="radio"
+                                        name="credentialType"
+                                        value="PIN"
+                                        checked={formData.credentialType === 'PIN'}
+                                        onChange={handleChange}
+                                        className="sr-only"
+                                    />
+                                    <Shield className="w-4 h-4" />
+                                    PIN (4-6 digits)
+                                </label>
+                                <label className={cn(
+                                    "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all",
+                                    formData.credentialType === 'PASSPHRASE'
+                                        ? "border-blue-500 bg-blue-500/20 text-blue-400"
+                                        : "border-white/20 text-white/60 hover:bg-white/5"
+                                )}>
+                                    <input
+                                        type="radio"
+                                        name="credentialType"
+                                        value="PASSPHRASE"
+                                        checked={formData.credentialType === 'PASSPHRASE'}
+                                        onChange={handleChange}
+                                        className="sr-only"
+                                    />
+                                    <FileText className="w-4 h-4" />
+                                    Passphrase
+                                </label>
+                            </div>
+
+                            {formData.credentialType === 'PIN' ? (
+                                <Input
+                                    label="Your PIN"
+                                    name="credential"
+                                    type="password"
+                                    value={formData.credential}
+                                    error={errors.credential}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Enter 4-6 digit PIN"
+                                    maxLength={6}
+                                    icon={<Shield className="w-4 h-4 text-gray-400" />}
+                                />
+                            ) : (
+                                <Input
+                                    label="Your Passphrase"
+                                    name="credential"
+                                    type="password"
+                                    value={formData.credential}
+                                    error={errors.credential}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Enter 12-65 character passphrase"
+                                    maxLength={65}
+                                    icon={<Shield className="w-4 h-4 text-gray-400" />}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -208,10 +302,11 @@ export default function AccommodationRequestPage() {
                         <ReviewRow label="Name" value={formData.fullName} />
                         <ReviewRow label="Email" value={formData.email} />
                         <ReviewRow label="Phone" value={formData.phone} />
-                        <ReviewRow label="SSN" value={formData.ssn ? 'Provided' : '-'} />
+                        <ReviewRow label="Date of Birth" value={formData.birthdate} />
                         <ReviewRow label="Type" value={formData.accommodationType} />
                         <ReviewRow label="Description" value={formData.description} />
                         <ReviewRow label="Document" value={formData.supportingDocument?.name || 'None'} />
+                        <ReviewRow label="Verification" value={formData.credentialType === 'PIN' ? 'PIN Set' : 'Passphrase Set'} />
                     </div>
                     <p className="text-blue-200/70 text-sm">By submitting, you acknowledge that this information is accurate.</p>
                 </div>
@@ -230,20 +325,12 @@ export default function AccommodationRequestPage() {
         return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
     };
 
-    const formatSSN = (val: string) => {
-        if (!val) return val;
-        const ssn = val.replace(/[^\d]/g, "");
-        const ssnLen = ssn.length;
-        if (ssnLen < 4) return ssn;
-        if (ssnLen < 6) return `${ssn.slice(0, 3)}-${ssn.slice(3)}`;
-        return `${ssn.slice(0, 3)}-${ssn.slice(3, 5)}-${ssn.slice(5, 9)}`;
-    };
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         let { name, value } = e.target;
 
         if (name === 'phone') value = formatPhone(value);
-        if (name === 'ssn') value = formatSSN(value);
 
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name as keyof FormData]) setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -264,11 +351,34 @@ export default function AccommodationRequestPage() {
                         <CheckCircle className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-2">Request Submitted!</h1>
-                    <p className="text-blue-200 mb-6">Your Claim Number:</p>
-                    <div className="bg-white/20 rounded-lg p-4 mb-6">
-                        <code className="text-2xl font-bold text-white tracking-widest">{claimNumber}</code>
+
+                    <div className="space-y-4 mb-6">
+                        <div>
+                            <p className="text-blue-200 text-sm">Claim Number</p>
+                            <div className="bg-white/20 rounded-lg p-3">
+                                <code className="text-xl font-bold text-white tracking-widest">{claimNumber}</code>
+                            </div>
+                        </div>
+
+                        {claimantNumber && (
+                            <div>
+                                <p className="text-blue-200 text-sm">Claimant ID</p>
+                                <div className="bg-blue-500/20 rounded-lg p-3 border border-blue-500/30">
+                                    <code className="text-xl font-bold text-blue-400 tracking-widest">{claimantNumber}</code>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    <p className="text-sm text-blue-200/70">Please save this number to track your request.</p>
+
+                    <div className="bg-white/5 rounded-lg p-4 text-left">
+                        <p className="text-sm text-blue-200/90">
+                            {isNewClaimant ? (
+                                <><strong>Important:</strong> Save your Claimant ID and PIN/passphrase. You\'ll need them to verify your identity when calling about your claim.</>
+                            ) : (
+                                <>Your case has been linked to your existing Claimant ID. Use your previously set PIN/passphrase for verification.</>
+                            )}
+                        </p>
+                    </div>
                 </div>
             </div>
         );

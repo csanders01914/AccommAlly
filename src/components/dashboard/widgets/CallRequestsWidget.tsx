@@ -14,10 +14,14 @@ export interface CallRequestProps {
     urgent: boolean;
     createdAt: string;
     scheduledFor?: string | null;
+    caseNumber?: string;
+    clientName?: string;
+    clientPhone?: string;
     case?: {
         id: string;
         caseNumber: string;
         clientName: string;
+        clientPhone?: string;
     } | null;
 }
 
@@ -139,6 +143,15 @@ function CallDetailModal({
 
     // Completion state
     const [returnNote, setReturnNote] = useState('');
+    const [phoneSelection, setPhoneSelection] = useState<'CASE' | 'REQUEST' | 'CUSTOM'>('CASE');
+    const [customPhone, setCustomPhone] = useState('');
+
+    const getSelectedPhone = () => {
+        if (phoneSelection === 'CASE') return call.case?.clientPhone || '';
+        if (phoneSelection === 'REQUEST') return call.phoneNumber || '';
+        return customPhone;
+    };
+
 
     const handleSave = async () => {
         setLoading(true);
@@ -177,8 +190,10 @@ function CallDetailModal({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     status: 'COMPLETED',
-                    note: returnNote
+                    note: returnNote,
+                    phoneNumberUsed: getSelectedPhone()
                 })
+
             });
 
             if (res.ok) {
@@ -307,8 +322,61 @@ function CallDetailModal({
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4 text-green-600" />
-                                Return Call Notes
+                                Return Call Details
                             </div>
+
+                            {/* Phone Selection */}
+                            <div className="mb-4 space-y-2">
+                                <label className="text-xs text-gray-500 font-medium">Number Called</label>
+                                <div className="space-y-2">
+                                    {call.case?.clientPhone && (
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="phoneSelection"
+                                                checked={phoneSelection === 'CASE'}
+                                                onChange={() => setPhoneSelection('CASE')}
+                                                className="text-green-600 focus:ring-green-500"
+                                            />
+                                            <span>Case Phone: {call.case.clientPhone}</span>
+                                        </label>
+                                    )}
+                                    {call.phoneNumber && call.phoneNumber !== call.case?.clientPhone && (
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="phoneSelection"
+                                                checked={phoneSelection === 'REQUEST'}
+                                                onChange={() => setPhoneSelection('REQUEST')}
+                                                className="text-green-600 focus:ring-green-500"
+                                            />
+                                            <span>Request Phone: {call.phoneNumber}</span>
+                                        </label>
+                                    )}
+                                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="phoneSelection"
+                                            checked={phoneSelection === 'CUSTOM'}
+                                            onChange={() => setPhoneSelection('CUSTOM')}
+                                            className="text-green-600 focus:ring-green-500"
+                                        />
+                                        <span>Other Number</span>
+                                    </label>
+                                    {phoneSelection === 'CUSTOM' && (
+                                        <input
+                                            type="text"
+                                            value={customPhone}
+                                            onChange={(e) => setCustomPhone(e.target.value)}
+                                            placeholder="Enter phone number..."
+                                            className="ml-6 w-full max-w-[200px] px-2 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-green-500 outline-none"
+                                        />
+                                    )}
+                                </div>
+                            </div>
+
+                            <label className="text-xs text-gray-500 font-medium mb-1 block">Notes</label>
+
                             <textarea
                                 value={returnNote}
                                 onChange={e => setReturnNote(e.target.value)}

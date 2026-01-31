@@ -15,7 +15,7 @@ async function inspectMessages() {
             }
         });
 
-        messages.forEach(m => {
+        messages.forEach((m: any) => {
             console.log(`ID: ${m.id}`);
             console.log(`Subject: ${m.subject}`);
             console.log(`Sender: ${m.sender?.name} (${m.senderId})`);

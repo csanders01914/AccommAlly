@@ -90,6 +90,19 @@ export async function PATCH(
             }
         });
 
+        // Audit Log: Meeting Updated
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Meeting',
+                entityId: meeting.id,
+                action: 'UPDATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    changes: Object.keys(updateData)
+                })
+            }
+        });
+
         return NextResponse.json(meeting);
 
     } catch (error) {
@@ -110,6 +123,17 @@ export async function DELETE(
         }
 
         const { id } = await params;
+
+        // Audit Log: Meeting Deleted
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Meeting',
+                entityId: id,
+                action: 'DELETE',
+                userId: session.id,
+                metadata: JSON.stringify({ action: 'delete_meeting' })
+            }
+        });
 
         await prisma.meeting.delete({ where: { id } });
 

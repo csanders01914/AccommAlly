@@ -77,6 +77,19 @@ export async function PATCH(
             }
         });
 
+        // Audit Log: Task Updated
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Task',
+                entityId: updatedTask.id,
+                action: 'UPDATE',
+                userId: session.id,
+                metadata: JSON.stringify({
+                    changes: body
+                })
+            }
+        });
+
         // Auto-save note to case when task is completed
         if (isBeingCompleted && task.caseId) {
             const completedDate = new Date().toLocaleString('en-US', {
@@ -134,6 +147,17 @@ export async function DELETE(
         if (task.createdById !== session.id && session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
+
+        // Audit Log: Task Deleted
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Task',
+                entityId: id,
+                action: 'DELETE',
+                userId: session.id,
+                metadata: JSON.stringify({ action: 'delete_task', title: task.title })
+            }
+        });
 
         await prisma.task.delete({ where: { id } });
 

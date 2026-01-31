@@ -59,6 +59,17 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Audit Log: Client Created
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Client',
+                entityId: client.id,
+                action: 'CREATE',
+                userId: session.id,
+                metadata: JSON.stringify({ name: client.name, code: client.code })
+            }
+        });
+
         return NextResponse.json(client);
     } catch (error: any) {
         console.error('Error creating client:', error);
@@ -86,6 +97,17 @@ export async function DELETE(req: NextRequest) {
         await prisma.client.update({
             where: { id },
             data: { active: false }
+        });
+
+        // Audit Log: Client Deleted
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Client',
+                entityId: id,
+                action: 'DELETE',
+                userId: session.id,
+                metadata: JSON.stringify({ action: 'soft_delete_client' })
+            }
         });
 
         return NextResponse.json({ success: true });

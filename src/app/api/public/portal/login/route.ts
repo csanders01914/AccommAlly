@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
             where: {
                 OR: [
                     { caseNumber: { equals: identifier, mode: 'insensitive' } },
-                    { claimantId: identifier }
+                    { claimantRef: identifier }
                 ]
             }
         });
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
         // Generate Portal Token
         const token = await new SignJWT({
-            claimantId: targetCase.claimantId,
+            claimantId: targetCase.claimantRef,
             caseId: targetCase.id,
             role: 'CLAIMANT'
         })
@@ -52,9 +52,11 @@ export async function POST(request: NextRequest) {
             .sign(SECRET_KEY);
 
         const cookieStore = await cookies();
+        const isSecure = request.nextUrl.protocol === 'https:';
+
         cookieStore.set("portal_token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: isSecure,
             sameSite: "lax",
             path: "/",
             maxAge: 60 * 60, // 1 hour

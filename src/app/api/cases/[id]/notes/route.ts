@@ -151,7 +151,7 @@ export async function POST(
         if (createTask && taskDescription) {
             await prisma.task.create({
                 data: {
-                    title: 'Follow-up Task', // Could be dynamic
+                    title: taskDescription.length > 50 ? taskDescription.substring(0, 47) + '...' : taskDescription, // Use description as title
                     description: taskDescription,
                     status: 'PENDING',
                     priority: 'MEDIUM',

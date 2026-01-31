@@ -3,7 +3,11 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || "default_dev_secret_key_change_me");
+const rawSecret = process.env.JWT_SECRET;
+if (!rawSecret) {
+    console.warn("SECURITY WARNING: Using default JWT secret. Set JWT_SECRET in .env");
+}
+const SECRET_KEY = new TextEncoder().encode(rawSecret || "default_dev_secret_key_change_me");
 const ALG = "HS256";
 
 export async function signToken(payload: Record<string, unknown>) {
@@ -40,13 +44,18 @@ export async function getSession() {
     return await verifyToken(token);
 }
 
-export async function loginUser(userData: { id: string; email: string; role: string; name?: string }) {
+export async function loginUser(userData: { id: string; email: string; role: string; name?: string; isSecure?: boolean }) {
     const token = await signToken(userData);
     const cookieStore = await cookies();
 
+    // Default to strict production check if isSecure is undefined
+    const useSecureCookie = userData.isSecure !== undefined
+        ? userData.isSecure
+        : process.env.NODE_ENV === "production";
+
     cookieStore.set("session_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: useSecureCookie,
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 8, // 8 hours

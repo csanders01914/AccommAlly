@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { generateClaimNumber, generateClaimantId, type ClaimType } from '@/lib/generateCaseNumber';
+import { generateClaimNumber, type ClaimType } from '@/lib/generateCaseNumber';
 import { encrypt, hash, decrypt } from '@/lib/encryption';
+import { getOrCreateClaimant, validatePin, validatePassphrase } from '@/lib/claimant';
 import { z } from 'zod';
 
 
@@ -9,6 +10,7 @@ const CaseSchema = z.object({
     fullName: z.string().min(1, "Full name is required"),
     email: z.string().email("Invalid email"),
     phone: z.string().min(10, "Phone number must be at least 10 digits"),
+    birthdate: z.string().min(1, "Date of birth is required"),
     preferredContact: z.enum(['email', 'phone', 'either']).optional().default('either'),
     accommodationType: z.string().min(1, "Accommodation type is required"),
     description: z.string().min(1, "Description is required"),
@@ -16,7 +18,8 @@ const CaseSchema = z.object({
     program: z.string().optional(),
     venue: z.string().optional(),
     preferredStartDate: z.string().optional(),
-    ssn: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, "Invalid SSN format").optional(),
+    credentialType: z.enum(['PIN', 'PASSPHRASE']).default('PIN'),
+    credential: z.string().min(1, "Credential is required"),
 });
 
 /**
@@ -109,6 +112,7 @@ export async function POST(request: NextRequest) {
                 fullName: formData.get('fullName') as string,
                 email: formData.get('email') as string,
                 phone: formData.get('phone') as string,
+                birthdate: formData.get('birthdate') as string,
                 preferredContact: (formData.get('preferredContact') as string) || 'either',
                 accommodationType: formData.get('accommodationType') as string,
                 description: formData.get('description') as string,
@@ -116,7 +120,8 @@ export async function POST(request: NextRequest) {
                 program: (formData.get('program') as string) || undefined,
                 venue: (formData.get('venue') as string) || undefined,
                 preferredStartDate: (formData.get('preferredStartDate') as string) || undefined,
-                ssn: (formData.get('ssn') as string) || undefined,
+                credentialType: (formData.get('credentialType') as string) || 'PIN',
+                credential: formData.get('credential') as string,
             };
 
             const fileField = formData.get('supportingDocument');
@@ -136,7 +141,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { fullName, email, phone, preferredContact, accommodationType, description, reason, program, venue, preferredStartDate, ssn } = result.data;
+        const { fullName, email, phone, birthdate, preferredContact, accommodationType, description, reason, program, venue, preferredStartDate, credentialType, credential } = result.data;
+
+        // Validate credential format
+        if (credentialType === 'PIN' && !validatePin(credential)) {
+            return NextResponse.json(
+                { error: 'Validation Error', details: [{ message: 'PIN must be 4-6 digits' }] },
+                { status: 400 }
+            );
+        }
+        if (credentialType === 'PASSPHRASE' && !validatePassphrase(credential)) {
+            return NextResponse.json(
+                { error: 'Validation Error', details: [{ message: 'Passphrase must be 12-65 characters' }] },
+                { status: 400 }
+            );
+        }
 
         // Map accommodation type to claim type
         const typeMap: Record<string, ClaimType> = {
@@ -185,6 +204,17 @@ export async function POST(request: NextRequest) {
             createdById = newUser.id;
         }
 
+        // Auto-match or create claimant
+        const birthdateObj = new Date(birthdate);
+        const { claimant, isNew: isNewClaimant } = await getOrCreateClaimant({
+            name: fullName,
+            birthdate: birthdateObj,
+            email,
+            phone,
+            credentialType: credentialType as 'PIN' | 'PASSPHRASE',
+            credential,
+        });
+
         // Accommodation type labels for title
         const accommodationTypeLabels: Record<string, string> = {
             equipment: 'Equipment Modification',
@@ -199,33 +229,15 @@ export async function POST(request: NextRequest) {
         const encryptedEmail = email ? encrypt(email) : null;
         const encryptedPhone = phone ? encrypt(phone) : null;
 
-        // Split SSN encryption
-        let encryptedSSNPrefix = null;
-        let encryptedSSNSuffix = null;
-
-        if (ssn) {
-            const cleanSSN = ssn.replace(/[^a-zA-Z0-9]/g, '');
-            if (cleanSSN.length >= 5) {
-                encryptedSSNPrefix = encrypt(cleanSSN.slice(0, 5));
-                encryptedSSNSuffix = encrypt(cleanSSN.slice(5));
-            } else {
-                encryptedSSNSuffix = encrypt(cleanSSN);
-            }
-        }
-
         const newCase = await prisma.case.create({
             data: {
                 caseNumber,
-                claimantId: generateClaimantId(),
                 clientName: fullName,
                 clientEmail: encryptedEmail,
                 clientEmailHash: email ? hash(email) : null,
                 clientPhone: encryptedPhone,
                 clientPhoneHash: phone ? hash(phone) : null,
-                clientSSN: ssn ? encrypt(ssn) : null, // Backwards compatibility
-                clientSSNPrefix: encryptedSSNPrefix,
-                clientSSNSuffix: encryptedSSNSuffix,
-                clientSSNHash: ssn ? hash(ssn) : null,
+                clientBirthdate: birthdateObj,
                 title: accommodationTypeLabels[accommodationType] || 'Accommodation Request',
                 description: description,
                 medicalCondition: reason,
@@ -236,6 +248,7 @@ export async function POST(request: NextRequest) {
                 program,
                 venue,
                 preferredStartDate,
+                claimantRef: claimant.id,
             },
         });
 
@@ -358,6 +371,8 @@ export async function POST(request: NextRequest) {
             success: true,
             caseNumber: newCase.caseNumber,
             caseId: newCase.id,
+            claimantNumber: claimant.claimantNumber,
+            isNewClaimant,
         });
 
     } catch (error) {
@@ -488,23 +503,6 @@ export async function GET(request: NextRequest) {
                 createdAt: doc.createdAt,
                 uploadedBy: doc.uploadedBy,
             })),
-            clientSSN: (() => {
-                if (c.clientSSNSuffix) {
-                    try {
-                        const suffix = decrypt(c.clientSSNSuffix);
-                        if (suffix && suffix.trim().length > 0) return `***-**-${suffix}`;
-                    } catch (e) { }
-                }
-                if (c.clientSSN) {
-                    try {
-                        const dec = decrypt(c.clientSSN);
-                        const clean = dec.replace(/[^a-zA-Z0-9]/g, '');
-                        const last4 = clean.length > 4 ? clean.slice(-4) : clean;
-                        return `***-**-${last4 || '0000'}`;
-                    } catch (e) { }
-                }
-                return undefined;
-            })(),
         }));
 
         return NextResponse.json(transformedCases);

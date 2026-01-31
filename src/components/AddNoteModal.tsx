@@ -15,6 +15,7 @@ import {
     CheckSquare,
     Shield
 } from 'lucide-react';
+import VerifyIdentityModal from './VerifyIdentityModal';
 
 // ============================================
 // TYPES
@@ -47,6 +48,7 @@ interface AddNoteModalProps {
     claims?: ClaimOption[];
     coordinatorName?: string;
     userRole?: 'ADMIN' | 'AUDITOR' | 'COORDINATOR';
+    claimantNumber?: string | null;
 }
 
 // ============================================
@@ -73,6 +75,7 @@ export function AddNoteModal({
     claims = [],
     coordinatorName = 'Coordinator',
     userRole,
+    claimantNumber,
 }: AddNoteModalProps) {
     const [content, setContent] = useState('');
     const [noteType, setNoteType] = useState<NoteType>('GENERAL');
@@ -84,6 +87,11 @@ export function AddNoteModal({
     const [taskDescription, setTaskDescription] = useState('');
     const [taskDueDate, setTaskDueDate] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    // Verification state
+    const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [verificationMethod, setVerificationMethod] = useState<string | null>(null);
 
     const modalRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -105,8 +113,20 @@ export function AddNoteModal({
 
             // Focus textarea after modal opens
             setTimeout(() => textareaRef.current?.focus(), 100);
+
+            setIsVerified(false);
+            setVerificationMethod(null);
         }
     }, [isOpen, claims]);
+
+    const handleVerificationComplete = (method: 'PIN' | 'PASSPHRASE') => {
+        setIsVerified(true);
+        setVerificationMethod(method);
+        // Append verification status to note content
+        const timestamp = new Date().toLocaleTimeString();
+        const verificationText = `\n\n[Identity Verified via ${method} at ${timestamp}]`;
+        setContent(prev => prev + verificationText);
+    };
 
     // Handle Escape key
     useEffect(() => {
@@ -140,8 +160,10 @@ export function AddNoteModal({
         if (showReturnCall && returnCallDate) {
             const dateTime = returnCallTime
                 ? new Date(`${returnCallDate}T${returnCallTime}`)
-                : new Date(returnCallDate);
+                : new Date(`${returnCallDate}T09:00:00`); // Default to 9 AM if no time
+
             data.returnCallDate = dateTime;
+            data.setReturnCall = true;
         }
 
         // Add task if set
@@ -228,6 +250,36 @@ export function AddNoteModal({
                                 </p>
                             )}
                         </div>
+
+                        {/* Verification Button (Phone Call Only) */}
+                        {noteType === 'PHONE_CALL' && claimantNumber && (
+                            <div className="md:col-span-2 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800 flex items-center justify-between">
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <Shield className="w-4 h-4 text-blue-600" />
+                                        Identity Verification
+                                    </h3>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {isVerified
+                                            ? `Identity verified using ${verificationMethod}`
+                                            : "Verify caller identity before proceeding with sensitive info."}
+                                    </p>
+                                </div>
+                                {isVerified ? (
+                                    <span className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg text-sm font-medium">
+                                        <CheckSquare className="w-4 h-4" />
+                                        Verified
+                                    </span>
+                                ) : (
+                                    <button
+                                        onClick={() => setIsVerifyModalOpen(true)}
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                                    >
+                                        Verify Identity
+                                    </button>
+                                )}
+                            </div>
+                        )}
 
                         {/* Claim Number Selection */}
                         {claims.length > 0 && (
@@ -330,7 +382,7 @@ export function AddNoteModal({
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs text-gray-500 mb-1">Time (optional)</label>
+                                        <label className="block text-xs text-gray-500 mb-1">Time</label>
                                         <input
                                             type="time"
                                             value={returnCallTime}
@@ -403,6 +455,15 @@ export function AddNoteModal({
                     </button>
                 </div>
             </div>
+
+            {claimantNumber && (
+                <VerifyIdentityModal
+                    isOpen={isVerifyModalOpen}
+                    onClose={() => setIsVerifyModalOpen(false)}
+                    claimantNumber={claimantNumber}
+                    onVerified={handleVerificationComplete}
+                />
+            )}
         </div>
     );
 }

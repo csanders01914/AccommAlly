@@ -113,6 +113,7 @@ export function TimelineView({ caseId }: TimelineViewProps) {
                             </time>
                         </div>
 
+
                         <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                             {event.entityType === 'Note' && event.action === 'CREATE' ? (
                                 <span className="italic">"Added a new note..."</span>
@@ -120,6 +121,29 @@ export function TimelineView({ caseId }: TimelineViewProps) {
                                 <span>{event.details || 'System update'}</span>
                             )}
                         </div>
+
+                        {/* Detailed Field Changes */}
+                        {event.raw && event.raw.field && (
+                            <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 text-xs border border-gray-100 dark:border-gray-800">
+                                <span className="block text-gray-400 uppercase tracking-wider text-[10px] mb-1 font-semibold">
+                                    {event.raw.field} Change
+                                </span>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="border-r border-gray-200 dark:border-gray-700 pr-2">
+                                        <span className="block text-gray-400 mb-0.5">From</span>
+                                        <span className="text-red-500 line-through decoration-red-500/50 block truncate" title={event.raw.oldValue || 'Empty'}>
+                                            {event.raw.oldValue || <span className="italic opacity-50">Empty</span>}
+                                        </span>
+                                    </div>
+                                    <div className="pl-2">
+                                        <span className="block text-gray-400 mb-0.5">To</span>
+                                        <span className="text-green-600 font-medium block truncate" title={event.raw.newValue || 'Empty'}>
+                                            {event.raw.newValue || <span className="italic opacity-50">Empty</span>}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="mt-3 flex items-center gap-2 text-xs text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-2">
                             <User className="w-3 h-3" />

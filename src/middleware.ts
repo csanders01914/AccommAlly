@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
 
         if (!session) {
             // Redirect to login with return URL
-            const url = new URL("/login", request.url);
+            const url = new URL("/", request.url);
             url.searchParams.set("callbackUrl", pathname);
             return NextResponse.redirect(url);
         }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { decrypt } from '@/lib/encryption';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
@@ -42,14 +43,39 @@ export async function GET(request: NextRequest) {
                     select: { id: true, fileName: true, createdAt: true, category: true }
                 },
                 accommodations: {
-                    select: { type: true, status: true, request: true }
+                    select: { type: true, status: true, description: true }
+                },
+                tasks: {
+                    where: { status: { not: 'COMPLETED' } },
+                    take: 1,
+                    include: {
+                        assignedTo: {
+                            select: { name: true }
+                        }
+                    }
                 }
             }
         });
 
         if (!caseData) return NextResponse.json({ error: 'Case not found' }, { status: 404 });
 
-        return NextResponse.json(caseData);
+        // Determine active examiner from tasks (matches Admin UI logic)
+        // If no active task, fall back to case creator
+        const activeTask = caseData.tasks[0];
+        const rawExaminerName = activeTask?.assignedTo?.name || caseData.createdBy?.name || 'Unassigned';
+
+        // Decrypt sensitive data
+        const decryptedData = {
+            ...caseData,
+            clientName: decrypt(caseData.clientName),
+            createdBy: {
+                name: decrypt(rawExaminerName)
+            },
+            // Remove tasks from response to keep it clean (internal use only)
+            tasks: undefined
+        };
+
+        return NextResponse.json(decryptedData);
 
     } catch (error) {
         console.error("Portal Data Error:", error);
