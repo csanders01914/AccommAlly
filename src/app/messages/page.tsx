@@ -933,6 +933,33 @@ function MessageDetail({
                     />
                 </div>
 
+                {/* Attachments */}
+                {message.attachments && message.attachments.length > 0 && (
+                    <div className="px-6 pb-4">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Attachments
+                        </p>
+                        <div className="space-y-1">
+                            {message.attachments.map(att => (
+                                <a
+                                    key={att.id}
+                                    href={`/api/messages/${message.id}/attachments/${att.id}`}
+                                    download={att.filename}
+                                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm"
+                                >
+                                    <Paperclip className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                    <span className="text-gray-700 dark:text-gray-300 truncate">{att.filename}</span>
+                                    <span className="text-gray-400 text-xs ml-auto flex-shrink-0">
+                                        {att.size < 1024 * 1024
+                                            ? `${(att.size / 1024).toFixed(0)} KB`
+                                            : `${(att.size / (1024 * 1024)).toFixed(1)} MB`}
+                                    </span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Quick Reply */}
                 <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
                     <button
