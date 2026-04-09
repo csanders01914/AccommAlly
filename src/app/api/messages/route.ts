@@ -74,7 +74,8 @@ export async function GET(request: NextRequest) {
             include: {
                 sender: { select: { id: true, name: true, email: true } },
                 recipient: { select: { id: true, name: true, email: true } },
-                case: { select: { id: true, caseNumber: true, clientName: true } }
+                case: { select: { id: true, caseNumber: true, clientName: true } },
+                attachments: { select: { id: true, filename: true, size: true, mimeType: true } },
             }
         });
 
@@ -116,7 +117,8 @@ export async function GET(request: NextRequest) {
                 id: m.case.id,
                 caseNumber: m.case.caseNumber,
                 clientName: decrypt(m.case.clientName)
-            } : null
+            } : null,
+            attachments: (m as any).attachments ?? [],
         }));
 
         return NextResponse.json(formattedMessages);
