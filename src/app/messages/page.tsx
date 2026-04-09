@@ -1,4 +1,8 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
+import DOMPurify from 'dompurify';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { LoadTemplateModal } from '@/components/modals/LoadTemplateModal';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -26,7 +30,8 @@ import {
     Folder,
     MoreHorizontal,
     Settings,
-    Filter
+    Filter,
+    FileText
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -131,7 +136,7 @@ function MessagesContent() {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const res = await fetch('/api/auth/me');
+                const res = await apiFetch('/api/auth/me');
                 if (!res.ok) {
                     router.push('/');
                     return;
@@ -141,7 +146,7 @@ function MessagesContent() {
 
                 // Fetch unread count
                 try {
-                    const unreadRes = await fetch('/api/messages/unread-count', { cache: 'no-store' });
+                    const unreadRes = await apiFetch('/api/messages/unread-count', { cache: 'no-store' });
                     if (unreadRes.ok) {
                         const { count } = await unreadRes.json();
                         console.log('API Count:', count);
@@ -153,7 +158,7 @@ function MessagesContent() {
 
                 // Fetch custom folders
                 try {
-                    const foldersRes = await fetch('/api/messages/folders');
+                    const foldersRes = await apiFetch('/api/messages/folders');
                     if (foldersRes.ok) {
                         const foldersData = await foldersRes.json();
                         setFolders(foldersData);
@@ -219,8 +224,8 @@ function MessagesContent() {
     const fetchUsersAndCases = async () => {
         try {
             const [usersRes, casesRes] = await Promise.all([
-                fetch('/api/admin/users'),
-                fetch('/api/cases/search')
+                apiFetch('/api/admin/users'),
+                apiFetch('/api/cases/search')
             ]);
             if (usersRes.ok) {
                 const data = await usersRes.json();
@@ -262,7 +267,7 @@ function MessagesContent() {
                 setUnreadCount(prev => Math.max(0, prev - 1));
 
                 // Update folder counts
-                const foldersRes = await fetch('/api/messages/folders');
+                const foldersRes = await apiFetch('/api/messages/folders');
                 if (foldersRes.ok) setFolders(await foldersRes.json());
             } catch (e) {
                 console.error(e);
@@ -366,7 +371,7 @@ function MessagesContent() {
         }
 
         try {
-            const res = await fetch('/api/messages', {
+            const res = await apiFetch('/api/messages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -452,7 +457,7 @@ function MessagesContent() {
                 }
 
                 // Refresh folders to update counts
-                const foldersRes = await fetch('/api/messages/folders');
+                const foldersRes = await apiFetch('/api/messages/folders');
                 if (foldersRes.ok) setFolders(await foldersRes.json());
             } else {
                 console.error('Failed to move message');
@@ -480,11 +485,11 @@ function MessagesContent() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="flex min-h-screen app-background">
             {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
             <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
                 {/* Header */}
-                <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 flex items-center justify-between">
+                <div className="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/20 dark:border-gray-800/30 p-4 rounded-2xl mx-6 mt-6 mb-2 shadow-lg flex items-center justify-between transition-all">
                     <div className="flex items-center gap-3">
 
                         <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -509,9 +514,10 @@ function MessagesContent() {
                     </div>
                 </div>
 
-                <div className="flex flex-1 overflow-hidden">
-                    {/* Sidebar */}
-                    <div className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+                {/* Main Content Area - Unified Glassmorphic Container */}
+                <div className="flex flex-1 overflow-hidden mx-6 mb-6 bg-white/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm">
+                    {/* Sidebar (Folders) */}
+                    <div className="w-56 bg-transparent border-r border-white/10 dark:border-gray-700/30 flex flex-col">
                         <div className="p-3 space-y-1">
                             <SidebarButton
                                 icon={Inbox}
@@ -594,12 +600,12 @@ function MessagesContent() {
                         </div>
 
                         {/* Custom Folders Section */}
-                        <div className="flex-1 border-t border-gray-100 dark:border-gray-800">
+                        <div className="flex-1 border-t border-white/10 dark:border-gray-700/30">
                             <div className="p-3 pb-1 flex items-center justify-between">
                                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Folders</span>
                                 <button
                                     onClick={() => setShowCreateFolderModal(true)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-400 hover:text-gray-600"
+                                    className="p-1 hover:bg-white/20 dark:hover:bg-gray-700/50 rounded text-gray-400 hover:text-gray-600 transition-colors"
                                     title="Create folder"
                                 >
                                     <FolderPlus className="w-4 h-4" />
@@ -631,15 +637,15 @@ function MessagesContent() {
                                             className={cn(
                                                 "w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm border border-transparent",
                                                 activeBox === 'folder' && activeFolderId === folder.id
-                                                    ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300"
-                                                    : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800",
-                                                dragOverFolderId === folder.id && "bg-blue-100 border-blue-300 dark:bg-blue-900/40"
+                                                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
+                                                    : "text-gray-600 hover:bg-white/10 dark:text-gray-400 dark:hover:bg-gray-700/50",
+                                                dragOverFolderId === folder.id && "bg-blue-500/20 border-blue-500/30"
                                             )}
                                         >
                                             <Folder className="w-4 h-4" style={{ color: folder.color }} />
                                             <span className="truncate flex-1">{folder.name}</span>
                                             {(folder._count?.messages ?? 0) > 0 && (
-                                                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 px-1.5 py-0.5 rounded-full">
+                                                <span className="text-xs bg-white/20 dark:bg-gray-700/50 text-gray-500 px-1.5 py-0.5 rounded-full">
                                                     {folder._count?.messages}
                                                 </span>
                                             )}
@@ -651,9 +657,9 @@ function MessagesContent() {
                     </div>
 
                     {/* Message List */}
-                    <div className="w-80 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col">
+                    <div className="w-80 border-r border-white/10 dark:border-gray-700/30 bg-transparent flex flex-col">
                         {/* Search */}
-                        <div className="p-3 border-b border-gray-100 dark:border-gray-800">
+                        <div className="p-3 border-b border-white/10 dark:border-gray-700/30">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
@@ -661,7 +667,7 @@ function MessagesContent() {
                                     placeholder="Search messages..."
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-2 bg-white/40 dark:bg-gray-900/40 border border-white/20 dark:border-gray-700/30 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none placeholder-gray-500"
                                 />
                             </div>
                         </div>
@@ -671,9 +677,9 @@ function MessagesContent() {
                             {isLoading ? (
                                 <div className="p-8 text-center text-gray-400">Loading...</div>
                             ) : filteredMessages.length === 0 ? (
-                                <div className="p-8 text-center text-gray-400">No messages</div>
+                                <div className="p-8 text-center text-gray-600 dark:text-gray-400 font-medium">No messages</div>
                             ) : (
-                                <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                                <ul className="divide-y divide-white/10 dark:divide-gray-700/30">
                                     {filteredMessages.map(msg => (
                                         <MessageListItem
                                             key={msg.id}
@@ -690,7 +696,7 @@ function MessagesContent() {
                     </div>
 
                     {/* Reading Pane */}
-                    <div className="flex-1 bg-gray-50 dark:bg-gray-950 overflow-y-auto">
+                    <div className="flex-1 bg-white/5 dark:bg-gray-900/20 overflow-y-auto">
                         {isComposeOpen ? (
                             <ComposeView
                                 mode={composeMode}
@@ -714,10 +720,11 @@ function MessagesContent() {
                                 onAddToCalendar={() => handleAddToCalendar(selectedMessage)}
                             />
                         ) : (
-                            <div className="h-full flex items-center justify-center text-gray-400">
-                                <div className="text-center">
-                                    <Mail className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                    <p>Select a message to read</p>
+                            <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
+                                <div className="text-center p-8 bg-white/20 dark:bg-black/20 rounded-2xl backdrop-blur-sm border border-white/10 shadow-sm">
+                                    <Mail className="w-12 h-12 mx-auto mb-3 opacity-80" />
+                                    <p className="text-lg font-medium text-gray-700 dark:text-gray-200">Select a message to read</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Click on a message from the list to view details</p>
                                 </div>
                             </div>
                         )}
@@ -743,7 +750,7 @@ function MessagesContent() {
                     onSuccess={async () => {
                         // Refresh folders
                         try {
-                            const res = await fetch('/api/messages/folders');
+                            const res = await apiFetch('/api/messages/folders');
                             if (res.ok) {
                                 const data = await res.json();
                                 setFolders(data);
@@ -802,7 +809,7 @@ function MessageDetail({
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden">
                 {/* External Email Warning Banner */}
                 {isExternalInbound && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
@@ -895,9 +902,14 @@ function MessageDetail({
 
                 {/* Body */}
                 <div className="p-6">
-                    <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
-                        {message.body}
-                    </div>
+                    <div
+                        className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                            __html: typeof window !== 'undefined'
+                                ? DOMPurify.sanitize(message.body)
+                                : message.body,
+                        }}
+                    />
                 </div>
 
                 {/* Quick Reply */}
@@ -937,9 +949,16 @@ function ComposeView({
     const modalTitle = mode === 'reply' ? 'Reply' : mode === 'forward' ? 'Forward' : 'New Message';
     const filteredUsers = users.filter(u => u.id !== currentUserId);
 
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
+
+    function handleTemplateLoad(html: string) {
+        if (data.body && !confirm('Replace the current message body with the template?')) return;
+        onChange({ ...data, body: html });
+    }
+
     return (
-        <div className="h-full flex flex-col bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+        <div className="h-full flex flex-col bg-transparent border-l border-white/10 dark:border-gray-700/30">
+            <div className="p-4 border-b border-white/10 dark:border-gray-700/30 flex justify-between items-center bg-white/10 dark:bg-gray-800/30">
                 <h2 className="text-lg font-bold flex items-center gap-2">
                     {mode === 'reply' && <Reply className="w-4 h-4" />}
                     {mode === 'forward' && <Forward className="w-4 h-4" />}
@@ -1027,13 +1046,30 @@ function ComposeView({
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium mb-1 text-gray-500">Message</label>
-                    <textarea
-                        value={data.body}
-                        onChange={e => onChange({ ...data, body: e.target.value })}
+                    <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-medium text-gray-500">Message</label>
+                        <button
+                            type="button"
+                            onClick={() => setShowTemplateModal(true)}
+                            className="text-xs text-indigo-500 hover:text-indigo-400 flex items-center gap-1"
+                        >
+                            <FileText className="w-3 h-3" /> Load Template
+                        </button>
+                    </div>
+                    <RichTextEditor
+                        content={data.body}
+                        onChange={body => onChange({ ...data, body })}
                         placeholder="Write your message..."
-                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 h-48 text-sm resize-none"
+                        minHeight="12rem"
                     />
+                    {showTemplateModal && (
+                        <LoadTemplateModal
+                            onClose={() => setShowTemplateModal(false)}
+                            onLoad={handleTemplateLoad}
+                            linkedCaseId={data.caseId || undefined}
+                            cases={cases}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -1091,8 +1127,8 @@ function SidebarButton({ icon: Icon, label, count, active, onClick, onDrop, onDr
             className={cn(
                 "w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm",
                 active
-                    ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300"
-                    : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-sm border border-indigo-500/20"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-gray-700/50"
             )}
         >
             <Icon className="w-4 h-4" />
@@ -1145,8 +1181,8 @@ function MessageListItem({
             onDragStart={handleDragStart}
             className={cn(
                 "p-3 cursor-pointer transition-colors relative group cursor-grab active:cursor-grabbing",
-                isSelected ? "bg-blue-50 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-800",
-                !message.isRead && activeBox !== 'sent' ? "bg-indigo-50/50 dark:bg-indigo-900/10" : ""
+                isSelected ? "bg-indigo-500/10 dark:bg-indigo-500/20 backdrop-blur-sm border-l-2 border-indigo-500" : "hover:bg-white/10 dark:hover:bg-gray-800/30",
+                !message.isRead && activeBox !== 'sent' ? "bg-indigo-500/5 dark:bg-indigo-900/20" : ""
             )}
         >
             <div className="flex items-start gap-2">
@@ -1173,11 +1209,11 @@ function MessageListItem({
                     </div>
                     <h4 className={cn(
                         "text-xs mb-0.5 truncate",
-                        !message.isRead && activeBox !== 'sent' ? "font-semibold text-gray-800" : "text-gray-600 dark:text-gray-400"
+                        !message.isRead && activeBox !== 'sent' ? "font-semibold text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
                     )}>
                         {message.subject || '(No Subject)'}
                     </h4>
-                    <p className="text-xs text-gray-500 line-clamp-1">{message.body}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">{message.body}</p>
                 </div>
             </div>
         </li>
