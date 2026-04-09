@@ -110,7 +110,9 @@ export async function POST(request: NextRequest) {
                 name: true,
                 description: true,
                 variableMappings: true,
+                createdByAdminId: true,
                 createdAt: true,
+                updatedAt: true,
             },
         });
 
