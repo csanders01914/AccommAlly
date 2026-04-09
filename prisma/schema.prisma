@@ -494,6 +494,7 @@ model Message {
   sender             User?                     @relation("SentMessages", fields: [senderId], references: [id])
   tenant             Tenant                    @relation(fields: [tenantId], references: [id])
   folderAssignments  MessageFolderAssignment[]
+  attachments        MessageAttachment[]
 
   @@index([tenantId])
   @@index([senderId])
@@ -842,4 +843,17 @@ enum MeetingType {
   FOLLOW_UP
   CHECK_IN
   OTHER
+}
+
+model MessageAttachment {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  filename  String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
 }
