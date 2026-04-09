@@ -149,7 +149,6 @@ function MessagesContent() {
                     const unreadRes = await apiFetch('/api/messages/unread-count', { cache: 'no-store' });
                     if (unreadRes.ok) {
                         const { count } = await unreadRes.json();
-                        console.log('API Count:', count);
                         setUnreadCount(count);
                     }
                 } catch (e) {
@@ -905,9 +904,7 @@ function MessageDetail({
                     <div
                         className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed"
                         dangerouslySetInnerHTML={{
-                            __html: typeof window !== 'undefined'
-                                ? DOMPurify.sanitize(message.body)
-                                : message.body,
+                            __html: DOMPurify.sanitize(message.body),
                         }}
                     />
                 </div>

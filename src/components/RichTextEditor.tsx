@@ -34,9 +34,10 @@ export function RichTextEditor({
         },
     });
 
-    // Sync content when parent updates it (e.g. template loaded)
+    // Sync content when parent updates it (e.g. template loaded).
+    // Skip when the editor is focused to avoid resetting the cursor during typing.
     useEffect(() => {
-        if (!editor) return;
+        if (!editor || editor.isFocused) return;
         const current = editor.getHTML();
         if (content !== current) {
             editor.commands.setContent(content, { emitUpdate: false });

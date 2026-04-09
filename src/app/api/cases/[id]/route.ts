@@ -167,6 +167,9 @@ export async function PATCH(
         return NextResponse.json(updatedCase);
 
     } catch (error) {
+        if (error instanceof Error && 'code' in error && (error as { code: string }).code === 'P2025') {
+            return NextResponse.json({ error: 'Case not found' }, { status: 404 });
+        }
         console.error('Error updating case:', error);
         return NextResponse.json(
             { error: 'Failed to update case' },

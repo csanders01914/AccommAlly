@@ -155,15 +155,31 @@ export function CaseDetailPage({
     );
     const [savingMedDue, setSavingMedDue] = useState(false);
 
+    // Re-sync medical due date when caseData is loaded or refreshed
+    useEffect(() => {
+        setMedicalDueDate(
+            caseData?.medicalDueDate ? caseData.medicalDueDate.toString().split('T')[0] : ''
+        );
+    }, [caseData?.medicalDueDate]);
+
     async function saveMedicalDueDate(value: string) {
+        const previous = medicalDueDate;
+        setMedicalDueDate(value);
         setSavingMedDue(true);
         try {
-            await fetch(`/api/cases/${caseData?.id}`, {
+            const res = await fetch(`/api/cases/${caseData?.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ medicalDueDate: value || null }),
             });
-            setMedicalDueDate(value);
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to save date');
+            }
+        } catch (err) {
+            console.error('Failed to save medical due date:', err);
+            setMedicalDueDate(previous);
+            alert('Failed to save medical due date');
         } finally {
             setSavingMedDue(false);
         }

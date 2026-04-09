@@ -1,23 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSuperAdminSession } from '@/lib/super-admin-auth';
-import { cookies } from 'next/headers';
 import mammoth from 'mammoth';
+import { requireSuperAdmin } from '@/lib/require-super-admin';
 
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const MAX_SIZE = 10 * 1024 * 1024;
-
-async function requireSuperAdmin() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('super_admin_token')?.value;
-    const session = await getSuperAdminSession(token);
-    if (!session) return null;
-    const admin = await prisma.superAdmin.findUnique({
-        where: { id: session.id },
-        select: { id: true, active: true },
-    });
-    return admin?.active ? session : null;
-}
 
 /**
  * GET /api/super-admin/document-templates/[id]
@@ -96,7 +83,10 @@ export async function PUT(
                 return NextResponse.json({ error: 'Only .docx files are accepted.' }, { status: 400 });
             }
             const buffer = Buffer.from(await file.arrayBuffer());
-            const { value: htmlContent } = await mammoth.convertToHtml({ buffer });
+            const { value: htmlContent, messages: conversionWarnings } = await mammoth.convertToHtml({ buffer });
+            if (conversionWarnings.length > 0) {
+                console.warn('Mammoth conversion warnings:', conversionWarnings);
+            }
             updateData.originalFile = buffer;
             updateData.htmlContent = htmlContent;
         }

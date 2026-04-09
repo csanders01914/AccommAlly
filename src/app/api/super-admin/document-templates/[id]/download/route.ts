@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSuperAdminSession } from '@/lib/super-admin-auth';
-import { cookies } from 'next/headers';
-
-async function requireSuperAdmin() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('super_admin_token')?.value;
-    const session = await getSuperAdminSession(token);
-    if (!session) return null;
-    const admin = await prisma.superAdmin.findUnique({
-        where: { id: session.id },
-        select: { id: true, active: true },
-    });
-    return admin?.active ? session : null;
-}
+import { requireSuperAdmin } from '@/lib/require-super-admin';
 
 /**
  * GET /api/super-admin/document-templates/[id]/download

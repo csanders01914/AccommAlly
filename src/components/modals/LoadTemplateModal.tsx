@@ -94,11 +94,12 @@ export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: Load
                                 ))}
                             </select>
                         )}
-                        {selectedTemplateId && templates.find(t => t.id === selectedTemplateId)?.description && (
-                            <p className="text-xs text-gray-400 mt-1">
-                                {templates.find(t => t.id === selectedTemplateId)!.description}
-                            </p>
-                        )}
+                        {selectedTemplateId && (() => {
+                            const selected = templates.find(t => t.id === selectedTemplateId);
+                            return selected?.description ? (
+                                <p className="text-xs text-gray-400 mt-1">{selected.description}</p>
+                            ) : null;
+                        })()}
                     </div>
 
                     {!linkedCaseId && (

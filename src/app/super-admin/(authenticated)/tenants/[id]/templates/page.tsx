@@ -10,6 +10,8 @@ import {
 } from '@/lib/document-templates';
 import type { TemplateField, VariableMapping } from '@/lib/document-templates';
 
+type FormMapping = VariableMapping & { _id: string };
+
 interface Template {
     id: string;
     name: string;
@@ -40,7 +42,7 @@ export default function TemplatesPage() {
     const [formName, setFormName] = useState('');
     const [formDescription, setFormDescription] = useState('');
     const [formFile, setFormFile] = useState<File | null>(null);
-    const [formMappings, setFormMappings] = useState<VariableMapping[]>([]);
+    const [formMappings, setFormMappings] = useState<FormMapping[]>([]);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState('');
 
@@ -75,7 +77,7 @@ export default function TemplatesPage() {
         setFormName(t.name);
         setFormDescription(t.description ?? '');
         setFormFile(null);
-        setFormMappings(t.variableMappings ?? []);
+        setFormMappings((t.variableMappings ?? []).map(m => ({ ...m, _id: crypto.randomUUID() })));
         setFormError('');
         setShowForm(true);
     }
@@ -90,7 +92,7 @@ export default function TemplatesPage() {
             const fd = new FormData();
             fd.append('name', formName.trim());
             fd.append('description', formDescription.trim());
-            fd.append('variableMappings', JSON.stringify(formMappings));
+            fd.append('variableMappings', JSON.stringify(formMappings.map(({ _id, ...m }) => m)));
             fd.append('tenantId', tenantId);
             if (formFile) fd.append('file', formFile);
 
@@ -124,7 +126,7 @@ export default function TemplatesPage() {
     }
 
     function addMappingRow() {
-        setFormMappings(prev => [...prev, { trigger: '', field: 'CLAIMANT_NAME' }]);
+        setFormMappings(prev => [...prev, { trigger: '', field: 'CLAIMANT_NAME', _id: crypto.randomUUID() }]);
     }
 
     function updateMapping(index: number, key: keyof VariableMapping, value: string) {
@@ -274,7 +276,7 @@ export default function TemplatesPage() {
                                 </div>
                                 <div className="space-y-2">
                                     {formMappings.map((m, i) => (
-                                        <div key={i} className="flex gap-2 items-center">
+                                        <div key={m._id} className="flex gap-2 items-center">
                                             <input
                                                 type="text"
                                                 value={m.trigger}

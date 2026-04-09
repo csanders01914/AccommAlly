@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
-import { applyTemplate } from '@/lib/document-templates';
-import type { VariableMapping, CaseTemplateData } from '@/lib/document-templates';
+import { applyTemplate, TEMPLATE_FIELDS } from '@/lib/document-templates';
+import type { VariableMapping, TemplateField, CaseTemplateData } from '@/lib/document-templates';
 
 /**
  * POST /api/document-templates/[id]/apply
@@ -72,7 +72,13 @@ export async function POST(
             })),
         };
 
-        const mappings = template.variableMappings as VariableMapping[];
+        const rawMappings = Array.isArray(template.variableMappings) ? template.variableMappings : [];
+        const mappings = (rawMappings as VariableMapping[]).filter(
+            (m): m is VariableMapping =>
+                typeof m === 'object' && m !== null &&
+                typeof (m as VariableMapping).trigger === 'string' &&
+                TEMPLATE_FIELDS.includes((m as VariableMapping).field as TemplateField)
+        );
         const html = applyTemplate(template.htmlContent, mappings, templateData);
 
         return NextResponse.json({ html });
