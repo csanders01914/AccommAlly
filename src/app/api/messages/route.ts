@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt, hash } from '@/lib/encryption';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { searchParams } = new URL(request.url);
@@ -123,11 +128,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+        if (error) return error;
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const body = await request.json();
-        const { recipientId, subject, body: contentBody, caseId, replyToId, forwardedFromId, isExternal, externalEmail, externalName } = body;
+        const formData = await request.formData();
+        const recipientId = formData.get('recipientId') as string | null;
+        const subject = formData.get('subject') as string | null;
+        const contentBody = formData.get('body') as string | null;
+        const caseId = formData.get('caseId') as string | null;
+        const replyToId = formData.get('replyToId') as string | null;
+        const forwardedFromId = formData.get('forwardedFromId') as string | null;
+        const isExternal = formData.get('isExternal') === 'true';
+        const externalEmail = formData.get('externalEmail') as string | null;
+        const externalName = formData.get('externalName') as string | null;
+        const attachmentFiles = formData.getAll('attachments') as File[];
 
         // Validation
         if (isExternal) {
@@ -140,22 +155,35 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // Attachment validation
+        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+        const realAttachments = attachmentFiles.filter(f => f.size > 0);
+        if (realAttachments.length > 10) {
+            return NextResponse.json({ error: 'Maximum 10 attachments per message' }, { status: 400 });
+        }
+        for (const file of realAttachments) {
+            if (file.size > MAX_FILE_SIZE) {
+                return NextResponse.json({ error: `File "${file.name}" exceeds 10MB limit` }, { status: 400 });
+            }
+        }
+
         let encryptedEmail = null;
         let emailHash = null;
         let encryptedName = null;
 
         if (isExternal) {
-            encryptedEmail = encrypt(externalEmail);
-            emailHash = hash(externalEmail);
-            encryptedName = encrypt(externalName);
+            encryptedEmail = encrypt(externalEmail!);
+            emailHash = hash(externalEmail!);
+            encryptedName = encrypt(externalName!);
         }
 
         const message = await prisma.message.create({
             data: {
                 senderId: session.id,
+                tenantId: session.tenantId,
                 recipientId: isExternal ? null : recipientId,
                 subject: subject || null,
-                content: encrypt(contentBody),  // Encrypt content before saving
+                content: encrypt(contentBody!),
                 caseId: caseId || null,
                 replyToId: replyToId || null,
                 forwardedFromId: forwardedFromId || null,
@@ -164,29 +192,42 @@ export async function POST(request: NextRequest) {
                 externalEmail: encryptedEmail,
                 externalEmailHash: emailHash,
                 externalName: encryptedName,
-                direction: isExternal ? 'OUTBOUND' : 'INTERNAL'
-            }
+                direction: isExternal ? 'OUTBOUND' : 'INTERNAL',
+            },
         });
 
-        // Audit Log: Message Sent
+        // Save attachments
+        if (realAttachments.length > 0) {
+            const attachmentData = await Promise.all(
+                realAttachments.map(async f => ({
+                    messageId: message.id,
+                    filename: f.name,
+                    mimeType: f.type || 'application/octet-stream',
+                    size: f.size,
+                    data: Buffer.from(await f.arrayBuffer()),
+                }))
+            );
+            await prisma.messageAttachment.createMany({ data: attachmentData });
+        }
+
+        // Audit log
         await prisma.auditLog.create({
             data: {
                 entityType: 'Message',
                 entityId: message.id,
-                action: 'CREATE', // or SEND_MESSAGE
+                action: 'CREATE',
                 userId: session.id,
                 metadata: JSON.stringify({
                     recipientId: isExternal ? 'EXTERNAL' : recipientId,
                     subject: subject || 'No Subject',
-                    caseId: caseId
-                })
-            }
+                    caseId: caseId,
+                    attachmentCount: realAttachments.length,
+                }),
+            },
         });
 
-        // Apply Inbound Rules for the recipient (if internal)
+        // Apply inbound rules
         if (!isExternal && recipientId) {
-            // We can run this asynchronously without awaiting if we want faster response,
-            // or await to ensure consistency. Await is safer for now.
             try {
                 const { applyInboundRules } = await import('@/lib/rules');
                 await applyInboundRules(message.id, recipientId);
