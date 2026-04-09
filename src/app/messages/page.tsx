@@ -31,7 +31,8 @@ import {
     MoreHorizontal,
     Settings,
     Filter,
-    FileText
+    FileText,
+    Paperclip,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -64,6 +65,7 @@ interface Message {
     externalEmail?: string;
     direction?: 'INBOUND' | 'OUTBOUND';
     case?: { id: string; caseNumber: string; clientName?: string } | null;
+    attachments?: { id: string; filename: string; size: number; mimeType: string }[];
 }
 
 interface Case {
@@ -114,6 +116,8 @@ function MessagesContent() {
         externalEmail: '',
         externalName: ''
     });
+
+    const [pendingAttachments, setPendingAttachments] = useState<File[]>([]);
 
     // User data
     const [currentUser, setCurrentUser] = useState<UserData | null>(null);
@@ -369,36 +373,53 @@ function MessagesContent() {
             return;
         }
 
+        // Validate attachments client-side
+        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+        if (pendingAttachments.length > 10) {
+            alert('Maximum 10 attachments per message');
+            return;
+        }
+        for (const file of pendingAttachments) {
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`File "${file.name}" exceeds the 10MB limit`);
+                return;
+            }
+        }
+
         try {
-            const res = await apiFetch('/api/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    recipientId: composeData.recipientId,
-                    subject: composeData.subject,
-                    body: composeData.body,
-                    caseId: composeData.caseId || undefined,
-                    replyToId: composeData.replyToId || undefined,
-                    forwardedFromId: composeData.forwardedFromId || undefined,
-                    isExternal: composeData.isExternal,
-                    externalEmail: composeData.externalEmail,
-                    externalName: composeData.externalName
-                })
-            });
+            const fd = new FormData();
+            fd.append('recipientId', composeData.recipientId || '');
+            fd.append('subject', composeData.subject || '');
+            fd.append('body', composeData.body);
+            fd.append('caseId', composeData.caseId || '');
+            fd.append('replyToId', composeData.replyToId || '');
+            fd.append('forwardedFromId', composeData.forwardedFromId || '');
+            fd.append('isExternal', String(composeData.isExternal));
+            fd.append('externalEmail', composeData.externalEmail || '');
+            fd.append('externalName', composeData.externalName || '');
+            for (const file of pendingAttachments) {
+                fd.append('attachments', file);
+            }
+
+            // Do NOT pass Content-Type header — browser sets multipart boundary automatically for FormData
+            const res = await apiFetch('/api/messages', { method: 'POST', body: fd });
 
             if (res.ok) {
                 setIsComposeOpen(false);
                 setComposeData({
                     recipientId: '', subject: '', body: '', caseId: '', replyToId: '', forwardedFromId: '',
-                    isExternal: false, externalEmail: '', externalName: ''
+                    isExternal: false, externalEmail: '', externalName: '',
                 });
+                setPendingAttachments([]);
                 setComposeMode('new');
                 if (activeBox === 'sent') fetchMessages();
             } else {
-                alert('Failed to send message');
+                const data = await res.json();
+                alert(data.error || 'Failed to send message');
             }
         } catch (e) {
             console.error(e);
+            alert('Failed to send message');
         }
     };
 
@@ -705,7 +726,10 @@ function MessagesContent() {
                                 currentUserId={currentUser?.id || ''}
                                 onChange={setComposeData}
                                 onSend={handleSend}
-                                onClose={() => { setIsComposeOpen(false); setComposeMode('new'); }}
+                                onClose={() => { setIsComposeOpen(false); setComposeMode('new'); setPendingAttachments([]); }}
+                                pendingAttachments={pendingAttachments}
+                                onAttach={files => setPendingAttachments(prev => [...prev, ...files])}
+                                onRemoveAttachment={filename => setPendingAttachments(prev => prev.filter(f => f.name !== filename))}
                             />
                         ) : selectedMessage ? (
                             <MessageDetail
@@ -932,7 +956,10 @@ function ComposeView({
     currentUserId,
     onChange,
     onSend,
-    onClose
+    onClose,
+    pendingAttachments,
+    onAttach,
+    onRemoveAttachment,
 }: {
     mode: 'new' | 'reply' | 'forward';
     data: ComposeData;
@@ -942,15 +969,25 @@ function ComposeView({
     onChange: (data: ComposeData) => void;
     onSend: () => void;
     onClose: () => void;
+    pendingAttachments: File[];
+    onAttach: (files: File[]) => void;
+    onRemoveAttachment: (filename: string) => void;
 }) {
     const modalTitle = mode === 'reply' ? 'Reply' : mode === 'forward' ? 'Forward' : 'New Message';
     const filteredUsers = users.filter(u => u.id !== currentUserId);
 
     const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-    function handleTemplateLoad(html: string) {
+    function handleTemplateLoad(html: string, caseId: string) {
         if (data.body && !confirm('Replace the current message body with the template?')) return;
-        onChange({ ...data, body: html });
+
+        // Extract subject from first heading, falling back to first paragraph text
+        const headingMatch = html.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
+        const paraMatch = html.match(/<p[^>]*>(.*?)<\/p>/i);
+        const rawSubject = (headingMatch?.[1] ?? paraMatch?.[1] ?? '').replace(/<[^>]+>/g, '').trim();
+        const subject = rawSubject.length > 120 ? rawSubject.slice(0, 120) : rawSubject;
+
+        onChange({ ...data, body: html, isExternal: true, recipientId: '', subject: subject || data.subject, caseId: caseId || data.caseId });
     }
 
     return (
@@ -1058,7 +1095,30 @@ function ComposeView({
                         onChange={body => onChange({ ...data, body })}
                         placeholder="Write your message..."
                         minHeight="12rem"
+                        onAttach={onAttach}
                     />
+                    {pendingAttachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {pendingAttachments.map(file => (
+                                <div
+                                    key={file.name}
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-700 dark:text-gray-300"
+                                >
+                                    <Paperclip className="w-3 h-3 flex-shrink-0" />
+                                    <span className="max-w-[140px] truncate">{file.name}</span>
+                                    <span className="text-gray-400">({(file.size / 1024).toFixed(0)} KB)</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => onRemoveAttachment(file.name)}
+                                        className="text-gray-400 hover:text-red-500 ml-0.5"
+                                        title="Remove attachment"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     {showTemplateModal && (
                         <LoadTemplateModal
                             onClose={() => setShowTemplateModal(false)}
