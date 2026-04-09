@@ -44,6 +44,18 @@ export interface CaseTemplateData {
     accommodations: AccommodationData[];
 }
 
+/**
+ * Apply template variable substitution to an HTML string.
+ *
+ * Two phases:
+ * 1. Custom mappings — each trigger string is replaced with the resolved case field value.
+ * 2. Built-in AR1–AR10 slots — accommodation placeholders filled from OPEN accommodations
+ *    sorted by startDate ascending (up to 10). Missing slots become empty strings.
+ *
+ * @remarks
+ * If a resolved value contains another trigger string, that trigger will also be replaced
+ * when its mapping is processed. This is acceptable behaviour for typical letter templates.
+ */
 export function applyTemplate(
     htmlContent: string,
     mappings: VariableMapping[],
@@ -80,5 +92,9 @@ function resolveField(field: TemplateField, caseData: CaseTemplateData): string 
         case 'MEDICAL_DUE_DATE': return caseData.medicalDueDate ? format(caseData.medicalDueDate, 'MM/dd/yyyy') : '';
         case 'CASE_NUMBER': return caseData.caseNumber;
         case 'CLAIMANT_EMAIL': return caseData.clientEmail ?? '';
+        default: {
+            const _exhaustive: never = field;
+            throw new Error(`Unhandled TemplateField: ${_exhaustive}`);
+        }
     }
 }
