@@ -7,102 +7,172 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Tenant represents a workspace/organization in the WaaS platform
+model Tenant {
+  id                    String                 @id @default(cuid())
+  name                  String
+  slug                  String                 @unique
+  domain                String?                @unique
+  status                TenantStatus           @default(ACTIVE)
+  planId                String?
+  subscriptionPlan      SubscriptionPlan?      @relation(fields: [planId], references: [id])
+  plan                  String                 @default("FREE")
+  settings              Json?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  accommodations        Accommodation[]
+  annotations           Annotation[]
+  auditLogs             AuditLog[]
+  bugReports            BugReport[]
+  callRequests          CallRequest[]
+  cases                 Case[]
+  claimFamilies         ClaimFamily[]
+  claimants             Claimant[]
+  clients               Client[]
+  contacts              Contact[]
+  documentTemplates     DocumentTemplate[]
+  documents             Document[]
+  errorLogs             ErrorLog[]
+  identityVerifications IdentityVerification[]
+  inboundRules          InboundRule[]
+  inventoryItems        InventoryItem[]
+  meetings              Meeting[]
+  meetingAttendees      MeetingAttendee[]
+  messages              Message[]
+  messageFolders        MessageFolder[]
+  notes                 Note[]
+  reminders             Reminder[]
+  tasks                 Task[]
+  users                 User[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([planId])
+}
+
+model SubscriptionPlan {
+  id              String   @id @default(cuid())
+  code            String   @unique // FREE, STARTER, PRO, ENTERPRISE
+  name            String
+  maxUsers        Int      @default(5) // -1 for unlimited
+  maxActiveClaims Int      @default(10) // -1 for unlimited
+  tenants         Tenant[]
+}
+
+/// Super-Admin accounts for platform-level management (separate from tenant users)
+model SuperAdmin {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  emailHash        String    @unique
+  name             String
+  passwordHash     String
+  active           Boolean   @default(true)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastLogin        DateTime?
+
+  @@index([email])
+}
+
 /// User accounts with Role-Based Access Control (RBAC)
 model User {
-  id                String          @id @default(cuid())
-  email             String
-  emailHash         String          @unique
-  name              String
-  role              Role            @default(COORDINATOR)
-  active            Boolean         @default(true)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  username          String?         @unique
-  pronouns          String?
-  theme             String          @default("system")
-  notifications     Json?
-  preferences       Json?
-  twoFactorSecret   String?
-  twoFactorEnabled  Boolean         @default(false)
+  id                     String            @id @default(cuid())
+  tenantId               String
+  email                  String
+  emailHash              String            @unique
+  name                   String
+  role                   Role              @default(COORDINATOR)
+  active                 Boolean           @default(true)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  username               String?           @unique
+  pronouns               String?
+  theme                  String            @default("system")
+  notifications          Json?
+  preferences            Json?
+  twoFactorSecret        String?
+  twoFactorEnabled       Boolean           @default(false)
   twoFactorRecoveryCodes String[]
-  passwordHash      String?
-  lastLogin         DateTime?
-  loginAttempts     Int             @default(0)
-  lockedUntil       DateTime?
-  emailSignature    String?
-  annotations       Annotation[]
-  auditLogs         AuditLog[]
-  createdCases      Case[]          @relation("CaseCreatedBy")
-  uploadedDocuments Document[]
-  inventory         InventoryItem[]
-  receivedMessages  Message[]       @relation("ReceivedMessages")
-  sentMessages      Message[]       @relation("SentMessages")
-  notes             Note[]
-  assignedTasks     Task[]          @relation("AssignedTo")
-  createdTasks      Task[]          @relation("CreatedBy")
-  decidedAccommodations Accommodation[] @relation("DecisionMaker")
-  organizedMeetings Meeting[]       @relation("MeetingOrganizer")
-  meetingAttendances MeetingAttendee[]
-  reminders         Reminder[]
-  messageFolders    MessageFolder[]
-  inboundRules      InboundRule[]
-  errorLogs         ErrorLog[]
-  bugReports        BugReport[]
+  passwordHash           String?
+  lastLogin              DateTime?
+  loginAttempts          Int               @default(0)
+  lockedUntil            DateTime?
+  emailSignature         String?
+  decidedAccommodations  Accommodation[]   @relation("DecisionMaker")
+  annotations            Annotation[]
+  auditLogs              AuditLog[]
+  bugReports             BugReport[]
+  createdCases           Case[]            @relation("CaseCreatedBy")
+  uploadedDocuments      Document[]
+  errorLogs              ErrorLog[]
+  inboundRules           InboundRule[]
+  inventory              InventoryItem[]
+  organizedMeetings      Meeting[]         @relation("MeetingOrganizer")
+  meetingAttendances     MeetingAttendee[]
+  receivedMessages       Message[]         @relation("ReceivedMessages")
+  sentMessages           Message[]         @relation("SentMessages")
+  messageFolders         MessageFolder[]
+  notes                  Note[]
+  reminders              Reminder[]
+  assignedTasks          Task[]            @relation("AssignedTo")
+  createdTasks           Task[]            @relation("CreatedBy")
+  tenant                 Tenant            @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([email])
   @@index([role])
 }
 
 /// Client accommodation cases with unique Case Numbers
 model Case {
-  id              String          @id @default(cuid())
-  caseNumber      String          @unique
-  clientName      String
-  clientEmail     String?
-  clientEmailHash String?
-  clientPhone     String?
-  clientPhoneHash String?
-  clientBirthdate DateTime?       // For claimant matching
-  title           String
-  description     String?
-  medicalCondition String?
-  category        String?
-  program         String?
-  venue           String?
-  preferredStartDate String?
-  jobTitle        String?
-  jobFamily       String?
-  requestDate     DateTime?
-  status          CaseStatus      @default(OPEN)
-  priority        Int             @default(2)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  closedAt        DateTime?
-  createdById     String
-  accommodations  Accommodation[]
-  callRequests    CallRequest[]
-  createdBy       User            @relation("CaseCreatedBy", fields: [createdById], references: [id])
-  clientId        String?
-  client          Client?         @relation(fields: [clientId], references: [id])
-  documents       Document[]
-  inventory       InventoryItem[]
-  notes           Note[]
-  tasks           Task[]
-  meetings        Meeting[]
-  messages        Message[]
-  contacts        Contact[]
-  
-  // Claimant relation
-  claimantRef     String?
-  claimant        Claimant?       @relation(fields: [claimantRef], references: [id])
-  
-  // Claim Family relation
-  claimFamilyId   String?
-  claimFamily     ClaimFamily?    @relation(fields: [claimFamilyId], references: [id])
-  
-  // Identity verifications for this case
+  id                    String                 @id @default(cuid())
+  tenantId              String
+  caseNumber            String                 @unique
+  clientName            String
+  clientEmail           String?
+  clientEmailHash       String?
+  clientPhone           String?
+  clientPhoneHash       String?
+  clientBirthdate       DateTime?
+  title                 String
+  description           String?
+  medicalCondition      String?
+  category              String?
+  program               String?
+  venue                 String?
+  preferredStartDate    String?
+  jobTitle              String?
+  jobFamily             String?
+  requestDate           DateTime?
+  medicalDueDate        DateTime?
+  status                CaseStatus             @default(OPEN)
+  priority              Int                    @default(2)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  closedAt              DateTime?
+  createdById           String
+  clientId              String?
+  claimantRef           String?
+  claimFamilyId         String?
+  accommodations        Accommodation[]
+  callRequests          CallRequest[]
+  claimFamily           ClaimFamily?           @relation(fields: [claimFamilyId], references: [id])
+  claimant              Claimant?              @relation(fields: [claimantRef], references: [id])
+  client                Client?                @relation(fields: [clientId], references: [id])
+  createdBy             User                   @relation("CaseCreatedBy", fields: [createdById], references: [id])
+  tenant                Tenant                 @relation(fields: [tenantId], references: [id])
+  contacts              Contact[]
+  documents             Document[]
   identityVerifications IdentityVerification[]
+  inventory             InventoryItem[]
+  meetings              Meeting[]
+  messages              Message[]
+  notes                 Note[]
+  tasks                 Task[]
 
+  @@index([tenantId])
   @@index([caseNumber])
   @@index([clientName])
   @@index([status])
@@ -115,37 +185,40 @@ model Case {
 /// Corporate Clients (e.g. TCP)
 model Client {
   id        String   @id @default(cuid())
+  tenantId  String
   name      String   @unique
-  code      String?  // e.g. "TCP"
+  code      String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   cases     Case[]
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 /// Claimant - individuals who submit accommodation requests
 model Claimant {
-  id              String    @id @default(cuid())
-  claimantNumber  String    @unique  // 6-digit unique ID (e.g., "847293")
-  name            String               // Encrypted
-  nameHash        String               // For matching (lowercase, trimmed)
-  birthdate       DateTime             // For matching
-  email           String?              // Encrypted
-  emailHash       String?              // For lookup
-  phone           String?              // Encrypted
-  phoneHash       String?              // For lookup
-  
-  // Verification credentials (PIN default, passphrase 12-65 chars)
-  pinHash         String?              // Hashed 4-6 digit PIN
-  passphraseHash  String?              // Hashed passphrase (12-65 chars)
-  credentialType  String    @default("PIN")  // "PIN" or "PASSPHRASE"
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  cases           Case[]
-  
-  @@unique([nameHash, birthdate])  // Unique combination for matching
+  id             String   @id @default(cuid())
+  tenantId       String
+  claimantNumber String   @unique
+  name           String
+  nameHash       String
+  birthdate      DateTime
+  email          String?
+  emailHash      String?
+  phone          String?
+  phoneHash      String?
+  pinHash        String?
+  passphraseHash String?
+  credentialType String   @default("PIN")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  cases          Case[]
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([nameHash, birthdate])
+  @@index([tenantId])
   @@index([claimantNumber])
   @@index([emailHash])
   @@index([phoneHash])
@@ -153,23 +226,30 @@ model Claimant {
 
 /// Claim Family - groups related cases together
 model ClaimFamily {
-  id          String   @id @default(cuid())
-  name        String?  // Optional family label
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cases       Case[]
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cases     Case[]
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 /// Identity Verification - logs verification attempts during phone calls
 model IdentityVerification {
-  id          String   @id @default(cuid())
-  caseId      String
-  case        Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  noteId      String?  // Optional link to the note where verification occurred
-  verified    Boolean
-  attemptedAt DateTime @default(now())
-  verifiedById String  // User ID who performed verification
-  
+  id           String   @id @default(cuid())
+  tenantId     String
+  caseId       String
+  noteId       String?
+  verified     Boolean
+  attemptedAt  DateTime @default(now())
+  verifiedById String
+  case         Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
   @@index([caseId])
   @@index([verifiedById])
 }
@@ -177,20 +257,21 @@ model IdentityVerification {
 /// Contacts associated with a Case (Address Book)
 model Contact {
   id        String   @id @default(cuid())
+  tenantId  String
   name      String
-  role      String   // e.g. "Attorney", "Doctor", "Adjuster"
+  role      String
   email     String?
   phone     String?
-  type      String   // "CLAIMANT", "ATTORNEY", "MEDICAL_PROVIDER", "EMPLOYER", "OTHER"
+  type      String
   address   String?
   notes     String?
-  
   caseId    String
-  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([caseId])
   @@index([type])
 }
@@ -198,39 +279,34 @@ model Contact {
 /// Accommodation requests linked to a Case
 /// Accommodation requests linked to a Case
 model Accommodation {
-  id               String              @id @default(cuid())
-  accommodationNumber String           @default("001") // e.g. "001", "002"
-  
-  type             AccommodationType
-  subtype          String?             // Specific subtype text
-  
-  description      String              // Main description of request
-  
-  status           AccommodationStatus @default(PENDING)
-  lifecycleStatus  LifecycleStatus     @default(OPEN)
-  lifecycleSubstatus LifecycleSubstatus @default(PENDING)
-  
-  isLongTerm       Boolean             @default(false)
-  startDate        DateTime
-  endDate          DateTime?
-  
-  estimatedCost    Decimal?            @db.Decimal(10, 2)
-  actualCost       Decimal?            @db.Decimal(10, 2)
-  reviewDate       DateTime?
-  isExternal       Boolean             @default(false)
-  
-  decisionDate     DateTime?
-  decisionMakerId  String?
-  decisionMaker    User?               @relation("DecisionMaker", fields: [decisionMakerId], references: [id])
-  
-  costCode         String?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  
-  caseId           String
-  case             Case                @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id                  String              @id @default(cuid())
+  tenantId            String
+  accommodationNumber String              @default("001")
+  type                AccommodationType
+  subtype             String?
+  description         String
+  status              AccommodationStatus @default(PENDING)
+  lifecycleStatus     LifecycleStatus     @default(OPEN)
+  lifecycleSubstatus  LifecycleSubstatus  @default(PENDING)
+  isLongTerm          Boolean             @default(false)
+  startDate           DateTime
+  endDate             DateTime?
+  estimatedCost       Decimal?            @db.Decimal(10, 2)
+  actualCost          Decimal?            @db.Decimal(10, 2)
+  reviewDate          DateTime?
+  isExternal          Boolean             @default(false)
+  decisionDate        DateTime?
+  decisionMakerId     String?
+  costCode            String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  caseId              String
+  case                Case                @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  decisionMaker       User?               @relation("DecisionMaker", fields: [decisionMakerId], references: [id])
+  tenant              Tenant              @relation(fields: [tenantId], references: [id])
 
   @@unique([caseId, accommodationNumber])
+  @@index([tenantId])
   @@index([caseId])
   @@index([status])
   @@index([decisionMakerId])
@@ -239,6 +315,7 @@ model Accommodation {
 /// Tasks for case orchestration with due dates and assignees
 model Task {
   id           String       @id @default(cuid())
+  tenantId     String
   title        String
   description  String?
   status       TaskStatus   @default(PENDING)
@@ -254,11 +331,13 @@ model Task {
   caseId       String
   assignedToId String
   createdById  String
+  reminders    Reminder[]
   assignedTo   User         @relation("AssignedTo", fields: [assignedToId], references: [id])
   case         Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
   createdBy    User         @relation("CreatedBy", fields: [createdById], references: [id])
-  reminders    Reminder[]
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([status])
   @@index([dueDate])
   @@index([category])
@@ -269,6 +348,7 @@ model Task {
 /// Threaded, chronological notes attached to Cases
 model Note {
   id        String   @id @default(cuid())
+  tenantId  String
   content   String
   noteType  String?
   createdAt DateTime @default(now())
@@ -280,7 +360,9 @@ model Note {
   case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
   parent    Note?    @relation("NoteReplies", fields: [parentId], references: [id])
   replies   Note[]   @relation("NoteReplies")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([caseId])
   @@index([authorId])
   @@index([createdAt])
@@ -290,6 +372,7 @@ model Note {
 /// Automated audit log tracking "Who changed what and when"
 model AuditLog {
   id         String   @id @default(cuid())
+  tenantId   String
   entityType String
   entityId   String
   action     String
@@ -299,8 +382,10 @@ model AuditLog {
   metadata   String?
   timestamp  DateTime @default(now())
   userId     String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
   user       User     @relation(fields: [userId], references: [id])
 
+  @@index([tenantId])
   @@index([entityType, entityId])
   @@index([userId])
   @@index([timestamp])
@@ -310,6 +395,7 @@ model AuditLog {
 /// Documents attached to Cases with Document Control Numbers
 model Document {
   id                    String       @id @default(cuid())
+  tenantId              String
   fileName              String
   fileType              String
   fileSize              Int
@@ -322,17 +408,38 @@ model Document {
   uploadedById          String
   annotations           Annotation[]
   case                  Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tenant                Tenant       @relation(fields: [tenantId], references: [id])
   uploadedBy            User         @relation(fields: [uploadedById], references: [id])
 
+  @@index([tenantId])
   @@index([caseId])
   @@index([documentControlNumber])
   @@index([category])
   @@index([uploadedById])
 }
 
+/// Letter templates uploaded by super admins, used to populate message bodies
+model DocumentTemplate {
+  id               String   @id @default(cuid())
+  tenantId         String
+  name             String
+  description      String?
+  originalFile     Bytes
+  fileType         String   @default("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+  htmlContent      String
+  variableMappings Json
+  createdByAdminId String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
 /// Persistent annotations/highlights on Documents
 model Annotation {
   id          String   @id @default(cuid())
+  tenantId    String
   documentId  String
   pageNumber  Int
   color       String   @default("#FFFF00")
@@ -344,53 +451,51 @@ model Annotation {
   createdAt   DateTime @default(now())
   createdBy   User     @relation(fields: [createdById], references: [id])
   document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([documentId])
   @@index([createdById])
 }
 
 /// Secure internal messaging between users with external email support
 model Message {
-  id              String    @id @default(cuid())
-  subject         String?
-  content         String
-  read            Boolean   @default(false)
-  inInbox         Boolean   @default(true)  // True = In Inbox. False = Moved out (Archived or Custom Folder)
-  starred         Boolean   @default(false)
-  archived        Boolean   @default(false)
-  deletedBySender Boolean   @default(false)
-  deletedByRecipient Boolean @default(false)
-  inTrash         Boolean   @default(false)
-  inJunk          Boolean   @default(false)
-  trashDate       DateTime?
-  createdAt       DateTime  @default(now())
-  
-  // Internal user references (nullable for external emails)
-  senderId        String?
-  recipientId     String?
-  
-  // External email support (for future integration)
-  isExternal          Boolean  @default(false)  // True if message involves external email
-  externalEmail       String?                    // External email address (encrypted)
-  externalEmailHash   String?                    // Hash for lookup
-  externalName        String?                    // External sender/recipient name (encrypted)
-  direction           String   @default("INTERNAL")  // INTERNAL, INBOUND, OUTBOUND
-  externalMessageId   String?                    // External email message ID for threading
-  
-  // Case and threading
-  caseId          String?
-  replyToId       String?
-  forwardedFromId String?
-  
-  // Relations
-  recipient       User?     @relation("ReceivedMessages", fields: [recipientId], references: [id])
-  sender          User?     @relation("SentMessages", fields: [senderId], references: [id])
-  case            Case?     @relation(fields: [caseId], references: [id])
-  replyTo         Message?  @relation("MessageReplies", fields: [replyToId], references: [id])
-  replies         Message[] @relation("MessageReplies")
-  forwardedFrom   Message?  @relation("MessageForwards", fields: [forwardedFromId], references: [id])
-  forwards        Message[] @relation("MessageForwards")
+  id                 String                    @id @default(cuid())
+  tenantId           String
+  subject            String?
+  content            String
+  read               Boolean                   @default(false)
+  inInbox            Boolean                   @default(true)
+  starred            Boolean                   @default(false)
+  archived           Boolean                   @default(false)
+  deletedBySender    Boolean                   @default(false)
+  deletedByRecipient Boolean                   @default(false)
+  inTrash            Boolean                   @default(false)
+  inJunk             Boolean                   @default(false)
+  trashDate          DateTime?
+  createdAt          DateTime                  @default(now())
+  senderId           String?
+  recipientId        String?
+  isExternal         Boolean                   @default(false)
+  externalEmail      String?
+  externalEmailHash  String?
+  externalName       String?
+  direction          String                    @default("INTERNAL")
+  externalMessageId  String?
+  caseId             String?
+  replyToId          String?
+  forwardedFromId    String?
+  case               Case?                     @relation(fields: [caseId], references: [id])
+  forwardedFrom      Message?                  @relation("MessageForwards", fields: [forwardedFromId], references: [id])
+  forwards           Message[]                 @relation("MessageForwards")
+  recipient          User?                     @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  replyTo            Message?                  @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies            Message[]                 @relation("MessageReplies")
+  sender             User?                     @relation("SentMessages", fields: [senderId], references: [id])
+  tenant             Tenant                    @relation(fields: [tenantId], references: [id])
+  folderAssignments  MessageFolderAssignment[]
 
+  @@index([tenantId])
   @@index([senderId])
   @@index([recipientId])
   @@index([read])
@@ -399,38 +504,37 @@ model Message {
   @@index([archived])
   @@index([isExternal])
   @@index([direction])
-  
-  folderAssignments MessageFolderAssignment[]
 }
 
 /// Custom message folders created by users
 model MessageFolder {
-  id        String    @id @default(cuid())
+  id        String                    @id @default(cuid())
+  tenantId  String
   name      String
-  color     String    @default("#6366f1")
+  color     String                    @default("#6366f1")
   icon      String?
-  position  Int       @default(0)
+  position  Int                       @default(0)
   userId    String
-  createdAt DateTime  @default(now())
-  
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  MessageFolderAssignment[]
+  createdAt DateTime                  @default(now())
   rules     InboundRuleFolder[]
-  
+  tenant    Tenant                    @relation(fields: [tenantId], references: [id])
+  user      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  MessageFolderAssignment[]
+
   @@unique([userId, name])
+  @@index([tenantId])
   @@index([userId])
 }
 
 /// Many-to-many linking messages to folders
 model MessageFolderAssignment {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   messageId String
   folderId  String
-  createdAt DateTime @default(now())
-  
-  message   Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
   folder    MessageFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  
+  message   Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
   @@unique([messageId, folderId])
   @@index([messageId])
   @@index([folderId])
@@ -438,36 +542,33 @@ model MessageFolderAssignment {
 
 /// Inbound message routing rules
 model InboundRule {
-  id                 String   @id @default(cuid())
-  name               String
-  enabled            Boolean  @default(true)
-  priority           Int      @default(0)
-  
-  // Conditions (rule matches if ALL specified conditions match)
-  senderContains     String?
-  senderEquals       String?
-  subjectContains    String?
-  contentContains    String?
-  caseNumberContains String?
-  isExternal         Boolean?
-  hasAttachment      Boolean?
-  isHighPriority     Boolean?
-  
-  // Actions
-  actionKeepInInbox  Boolean  @default(false) // If false (default), it's a MOVE. If true, it's a COPY.
-  actionMarkAsRead   Boolean  @default(false)
-  actionStar         Boolean  @default(false)
-  actionArchive      Boolean  @default(false)
-  actionSendEmailNotification Boolean @default(false)
-  actionSendSMSNotification   Boolean @default(false)
-  
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  targetFolders InboundRuleFolder[]
-  
+  id                          String              @id @default(cuid())
+  tenantId                    String
+  name                        String
+  enabled                     Boolean             @default(true)
+  priority                    Int                 @default(0)
+  senderContains              String?
+  senderEquals                String?
+  subjectContains             String?
+  contentContains             String?
+  caseNumberContains          String?
+  isExternal                  Boolean?
+  hasAttachment               Boolean?
+  isHighPriority              Boolean?
+  actionKeepInInbox           Boolean             @default(false)
+  actionMarkAsRead            Boolean             @default(false)
+  actionStar                  Boolean             @default(false)
+  actionArchive               Boolean             @default(false)
+  actionSendEmailNotification Boolean             @default(false)
+  actionSendSMSNotification   Boolean             @default(false)
+  userId                      String
+  createdAt                   DateTime            @default(now())
+  updatedAt                   DateTime            @updatedAt
+  tenant                      Tenant              @relation(fields: [tenantId], references: [id])
+  user                        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetFolders               InboundRuleFolder[]
+
+  @@index([tenantId])
   @@index([userId])
   @@index([enabled])
 }
@@ -476,28 +577,30 @@ model InboundRule {
 model InboundRuleFolder {
   ruleId   String
   folderId String
-  
-  rule     InboundRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
   folder   MessageFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  
+  rule     InboundRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
   @@id([ruleId, folderId])
 }
 
 /// Call requests/return call tracking
 model CallRequest {
-  id          String   @id @default(cuid())
-  name        String
-  phoneNumber String
-  reason      String
-  urgent      Boolean  @default(false)
-  status      String   @default("PENDING")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id           String     @id @default(cuid())
+  tenantId     String
+  name         String
+  phoneNumber  String
+  reason       String
+  urgent       Boolean    @default(false)
+  status       String     @default("PENDING")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   scheduledFor DateTime?
   caseId       String
-  case         Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  case         Case       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tenant       Tenant     @relation(fields: [tenantId], references: [id])
   reminders    Reminder[]
 
+  @@index([tenantId])
   @@index([status])
   @@index([urgent])
 }
@@ -505,6 +608,7 @@ model CallRequest {
 /// Asset Inventory for Assistive Technology
 model InventoryItem {
   id                 String          @id @default(cuid())
+  tenantId           String
   name               String
   assetTag           String          @unique
   serialNumber       String?
@@ -523,7 +627,9 @@ model InventoryItem {
   updatedAt          DateTime        @updatedAt
   assignedToCase     Case?           @relation(fields: [assignedToCaseId], references: [id])
   assignedToUser     User?           @relation(fields: [assignedToUserId], references: [id])
+  tenant             Tenant          @relation(fields: [tenantId], references: [id])
 
+  @@index([tenantId])
   @@index([status])
   @@index([category])
   @@index([assignedToUserId])
@@ -533,6 +639,7 @@ model InventoryItem {
 /// Meetings with recurrence support
 model Meeting {
   id             String            @id @default(cuid())
+  tenantId       String
   title          String
   description    String?
   location       String?
@@ -541,29 +648,24 @@ model Meeting {
   allDay         Boolean           @default(false)
   color          String            @default("#3b82f6")
   type           MeetingType       @default(OTHER)
-  
-  // Recurrence
-  recurrenceRule String?           // RRULE format
+  recurrenceRule String?
   recurrenceEnd  DateTime?
   parentId       String?
+  caseId         String?
+  organizerId    String
+  externalId     String?
+  syncSource     String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  case           Case?             @relation(fields: [caseId], references: [id])
+  organizer      User              @relation("MeetingOrganizer", fields: [organizerId], references: [id])
   parent         Meeting?          @relation("MeetingRecurrence", fields: [parentId], references: [id])
   instances      Meeting[]         @relation("MeetingRecurrence")
-  
-  // Relations
-  caseId         String?
-  case           Case?             @relation(fields: [caseId], references: [id])
-  organizerId    String
-  organizer      User              @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
   attendees      MeetingAttendee[]
   reminders      Reminder[]
 
-  // External Sync
-  externalId     String?
-  syncSource     String?
-
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-
+  @@index([tenantId])
   @@index([startTime])
   @@index([organizerId])
   @@index([caseId])
@@ -571,40 +673,96 @@ model Meeting {
 
 /// Meeting attendees
 model MeetingAttendee {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
+  tenantId  String
   meetingId String
   userId    String?
   email     String?
-  status    String   @default("PENDING")
-  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id])
+  status    String  @default("PENDING")
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  user      User?   @relation(fields: [userId], references: [id])
 
+  @@index([tenantId])
   @@index([meetingId])
   @@index([userId])
 }
 
 /// Reminders for meetings, tasks, and calls
 model Reminder {
-  id         String       @id @default(cuid())
-  type       String       @default("EMAIL")
-  triggerAt  DateTime
-  sent       Boolean      @default(false)
-  
-  meetingId  String?
-  taskId     String?
-  callId     String?
-  userId     String
-  
-  meeting    Meeting?     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  task       Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id          String       @id @default(cuid())
+  tenantId    String
+  type        String       @default("EMAIL")
+  triggerAt   DateTime
+  sent        Boolean      @default(false)
+  meetingId   String?
+  taskId      String?
+  callId      String?
+  userId      String
+  createdAt   DateTime     @default(now())
   callRequest CallRequest? @relation(fields: [callId], references: [id], onDelete: Cascade)
-  user       User         @relation(fields: [userId], references: [id])
+  meeting     Meeting?     @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  task        Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
 
-  createdAt  DateTime     @default(now())
-
+  @@index([tenantId])
   @@index([triggerAt])
   @@index([sent])
   @@index([userId])
+}
+
+/// Detailed Error Logs for debugging with Transaction IDs
+model ErrorLog {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  transactionId String   @unique
+  message       String
+  stack         String?
+  path          String?
+  method        String?
+  statusCode    Int      @default(500)
+  metadata      Json?
+  userId        String?
+  timestamp     DateTime @default(now())
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([transactionId])
+  @@index([timestamp])
+  @@index([userId])
+}
+
+/// User-submitted bug reports
+model BugReport {
+  id            String   @id @default(cuid())
+  tenantId      String?
+  transactionId String?
+  subject       String
+  description   String
+  reporterName  String
+  reporterEmail String?
+  reporterPhone String?
+  contactMethod String?
+  status        String   @default("OPEN")
+  userId        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  tenant        Tenant?  @relation(fields: [tenantId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([transactionId])
+  @@index([status])
+  @@index([userId])
+}
+
+enum TenantStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  DELETED
 }
 
 enum InventoryStatus {
@@ -620,6 +778,7 @@ enum Role {
   AUDITOR
   COORDINATOR
   PROGRAM_LEAD
+  SUPER_ADMIN
 }
 
 enum TaskStatus {
@@ -683,49 +842,4 @@ enum MeetingType {
   FOLLOW_UP
   CHECK_IN
   OTHER
-}
-
-/// Detailed Error Logs for debugging with Transaction IDs
-model ErrorLog {
-  id            String   @id @default(cuid())
-  transactionId String   @unique // The ID shown to the user
-  message       String
-  stack         String?
-  path          String?
-  method        String?
-  statusCode    Int      @default(500)
-  metadata      Json?    // Any extra context (user inputs, query params)
-  userId        String?
-  timestamp     DateTime @default(now())
-
-  user          User?    @relation(fields: [userId], references: [id])
-
-  @@index([transactionId])
-  @@index([timestamp])
-  @@index([userId])
-}
-
-/// User-submitted bug reports
-model BugReport {
-  id              String   @id @default(cuid())
-  transactionId   String?  // Optional reference to a specific error
-  subject         String
-  description     String
-  
-  // Contact Info
-  reporterName    String
-  reporterEmail   String?
-  reporterPhone   String?
-  contactMethod   String?  // "EMAIL", "PHONE", "NONE"
-  
-  status          String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
-  userId          String?  // If authenticated
-  user            User?    @relation(fields: [userId], references: [id])
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([transactionId])
-  @@index([status])
-  @@index([userId])
 }
