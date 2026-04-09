@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -36,24 +37,24 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { User as UserType, Case, Note, Task, Document } from '@prisma/client';
-import { AddNoteData } from './AddNoteModal';
-import AddNoteModal from './AddNoteModal';
-import GenerateDecisionModal from './GenerateDecisionModal';
+import { AddNoteData } from './modals/AddNoteModal';
+import AddNoteModal from './modals/AddNoteModal';
+import { GenerateDecisionModal } from './modals/GenerateDecisionModal';
 import { TimelineView } from './TimelineView';
 import { DecisioningTab } from './case/DecisioningTab';
 import dynamic from 'next/dynamic';
 const DocumentViewer = dynamic(() => import('./DocumentViewer'), { ssr: false });
-import { DownloadOptionsModal } from './DownloadOptionsModal';
-import { AddAccommodationModal, AddAccommodationData } from './AddAccommodationModal';
-import { AddTaskModal, AddTaskData } from './AddTaskModal';
-import { TransferCaseModal } from './TransferCaseModal';
-import { TaskDetailModal } from './TaskDetailModal';
+import { DownloadOptionsModal } from './modals/DownloadOptionsModal';
+import { AddAccommodationModal, AddAccommodationData } from './modals/AddAccommodationModal';
+import { AddTaskModal, AddTaskData } from './modals/AddTaskModal';
+import { TransferCaseModal } from './modals/TransferCaseModal';
+import { TaskDetailModal } from './modals/TaskDetailModal';
 import PortalMessagesSection from './PortalMessagesSection';
-import { EditCaseModal, EditCaseData } from './EditCaseModal';
-import { AddContactModal, AddContactData } from './AddContactModal';
+import { EditCaseModal, EditCaseData } from './modals/EditCaseModal';
+import { AddContactModal, AddContactData } from './modals/AddContactModal';
 import { CaseTasksTable } from './CaseTasksTable';
-import EditNoteModal from './EditNoteModal';
-import LinkClaimsModal from './LinkClaimsModal';
+import EditNoteModal from './modals/EditNoteModal';
+import LinkClaimsModal from './modals/LinkClaimsModal';
 
 // Local Types
 interface Contact {
@@ -95,6 +96,7 @@ type ExtendedCase = Case & {
     accommodations: any[]; // Placeholder for relation
     medicalCondition?: string | null;
     preferredStartDate?: string | null;
+    medicalDueDate?: string | null;
     claimant?: { id: string; claimantNumber: string };
     claimFamily?: { id: string; name: string | null };
 };
@@ -148,6 +150,25 @@ export function CaseDetailPage({
     const [isLinkClaimsModalOpen, setIsLinkClaimsModalOpen] = useState(false);
     const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
+    const [medicalDueDate, setMedicalDueDate] = useState<string>(
+        caseData?.medicalDueDate ? caseData.medicalDueDate.toString().split('T')[0] : ''
+    );
+    const [savingMedDue, setSavingMedDue] = useState(false);
+
+    async function saveMedicalDueDate(value: string) {
+        setSavingMedDue(true);
+        try {
+            await fetch(`/api/cases/${caseData?.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ medicalDueDate: value || null }),
+            });
+            setMedicalDueDate(value);
+        } finally {
+            setSavingMedDue(false);
+        }
+    }
+
     // Upload State
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
@@ -184,7 +205,7 @@ export function CaseDetailPage({
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch('/api/users');
+            const res = await apiFetch('/api/users');
             if (res.ok) {
                 const data = await res.json();
                 setUsers(data);
@@ -229,7 +250,7 @@ export function CaseDetailPage({
             formData.append('caseId', caseId);
             formData.append('category', uploadCategory);
 
-            const response = await fetch('/api/documents/upload', {
+            const response = await apiFetch('/api/documents/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -305,7 +326,7 @@ export function CaseDetailPage({
 
     const handleAddTask = async (data: AddTaskData) => {
         try {
-            const res = await fetch('/api/tasks', {
+            const res = await apiFetch('/api/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...data, caseId }),
@@ -912,6 +933,18 @@ export function CaseDetailPage({
                                             <dd className="mt-1 text-sm text-gray-900 dark:text-white">{caseData.preferredStartDate}</dd>
                                         </div>
                                     )}
+                                    <div>
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Medical Due Date</dt>
+                                        <dd className="mt-1">
+                                            <input
+                                                type="date"
+                                                value={medicalDueDate}
+                                                onChange={e => saveMedicalDueDate(e.target.value)}
+                                                disabled={savingMedDue}
+                                                className="text-sm text-gray-900 dark:text-white bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 disabled:opacity-50"
+                                            />
+                                        </dd>
+                                    </div>
                                     <div>
                                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Projected Return</dt>
                                         <dd className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(caseData.closedAt)}</dd>
