@@ -260,7 +260,7 @@ export function AboutPage() {
               onMouseEnter={e => (e.currentTarget.style.color = 'rgba(240,238,232,0.8)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(240,238,232,0.5)')}
             >
-              Already have an account? Sign in →
+              Already have an account? Sign in <span aria-hidden="true">→</span>
             </Link>
           </p>
         </div>
@@ -279,7 +279,7 @@ export function AboutPage() {
           className="absolute top-0 left-0 right-0 h-px"
           style={{ background: 'linear-gradient(to right, transparent, rgba(13,148,136,0.4), transparent)' }}
         />
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="AccommAlly — back to home">
           <div
             className="w-6 h-6 rounded-md flex items-center justify-center"
             style={{ backgroundColor: '#0D9488' }}
