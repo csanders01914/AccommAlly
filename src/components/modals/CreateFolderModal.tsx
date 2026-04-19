@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState } from 'react';
 import { X, Folder, Loader2 } from 'lucide-react';
@@ -42,7 +43,7 @@ export function CreateFolderModal({ isOpen, onClose, onSuccess }: CreateFolderMo
         setError('');
 
         try {
-            const res = await fetch('/api/messages/folders', {
+            const res = await apiFetch('/api/messages/folders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name.trim(), color })

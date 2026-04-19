@@ -92,21 +92,37 @@ async function main() {
     await prisma.claimant.deleteMany();
     await prisma.client.deleteMany();
     await prisma.user.deleteMany();
+    await prisma.tenant.deleteMany();
     console.log('✨ Database wiped');
 
-    // Default password for all seed users: "password123"
+    // Default password for seed users: "password123"
     const passwordHash = await bcrypt.hash('password123', 10);
+    // Chris Sanders uses a distinct password
+    const chrisPasswordHash = await bcrypt.hash('Password123!', 10);
 
     const sarahEmail = 'sarah@accessally.org';
     const michaelEmail = 'michael@accessally.org';
     const chrisEmail = 'csanders0191@proton.me';
     const systemEmail = 'system@accessally.org';
 
+    // 1a. Create Tenant
+    const tenant = await prisma.tenant.upsert({
+        where: { slug: 'demo-tenant' },
+        update: {},
+        create: {
+            name: 'Demo Organization',
+            slug: 'demo-tenant',
+            status: 'ACTIVE',
+            plan: 'ENTERPRISE'
+        }
+    });
+
     // 1. Create Users
     const sarah = await prisma.user.upsert({
         where: { emailHash: hash(sarahEmail) },
         update: { passwordHash },
         create: {
+            tenantId: tenant.id,
             id: 'user-sarah-001',
             email: encrypt(sarahEmail),
             emailHash: hash(sarahEmail),
@@ -123,6 +139,7 @@ async function main() {
         where: { emailHash: hash(michaelEmail) },
         update: { passwordHash },
         create: {
+            tenantId: tenant.id,
             id: 'user-michael-002',
             email: encrypt(michaelEmail),
             emailHash: hash(michaelEmail),
@@ -137,12 +154,13 @@ async function main() {
 
     const chris = await prisma.user.upsert({
         where: { emailHash: hash(chrisEmail) },
-        update: { passwordHash, role: 'ADMIN' },
+        update: { passwordHash: chrisPasswordHash, role: 'ADMIN' },
         create: {
+            tenantId: tenant.id,
             id: 'user-chris-003',
             email: encrypt(chrisEmail),
             emailHash: hash(chrisEmail),
-            passwordHash,
+            passwordHash: chrisPasswordHash,
             name: encrypt('Chris Sanders'),
             username: 'csanders',
             role: 'ADMIN',
@@ -155,6 +173,7 @@ async function main() {
         where: { emailHash: hash(systemEmail) },
         update: { passwordHash, role: 'ADMIN' },
         create: {
+            tenantId: tenant.id,
             id: 'user-system-000',
             email: encrypt(systemEmail),
             emailHash: hash(systemEmail),
@@ -169,6 +188,7 @@ async function main() {
         where: { emailHash: hash('sarah.jones@accessally.org') },
         update: { passwordHash },
         create: {
+            tenantId: tenant.id,
             id: 'user-sarah-j-004',
             email: encrypt('sarah.jones@accessally.org'),
             emailHash: hash('sarah.jones@accessally.org'),
@@ -188,6 +208,7 @@ async function main() {
         where: { name: 'TCP' },
         update: {},
         create: {
+            tenantId: tenant.id,
             name: 'TCP',
             code: 'TCP',
             active: true,
@@ -251,6 +272,7 @@ async function main() {
 
             const claimant = await prisma.claimant.create({
                 data: {
+                    tenantId: tenant.id,
                     claimantNumber,
                     name: encrypt(fullName),
                     nameHash,
@@ -266,6 +288,7 @@ async function main() {
 
             await prisma.case.create({
                 data: {
+                    tenantId: tenant.id,
                     title: program,
                     description: `Participant in ${program}. ${barrier}.`,
                     caseNumber: generateCaseNumber('TCP', i + 1),
@@ -286,6 +309,7 @@ async function main() {
                     claimantRef: claimant.id,
                     tasks: {
                         create: {
+                            tenantId: tenant.id,
                             title: 'Initial Case Review',
                             description: `Review accommodation request for ${fullName} in ${program}.`,
                             status: 'PENDING',
@@ -306,6 +330,7 @@ async function main() {
     // Create a claimant for demo case
     const demoClaimant = await prisma.claimant.create({
         data: {
+            tenantId: tenant.id,
             claimantNumber: generateClaimantId(),
             name: encrypt('Robert Johnson'),
             nameHash: hash('robertjohnson'),
@@ -321,6 +346,7 @@ async function main() {
 
     const demoCase = await prisma.case.create({
         data: {
+            tenantId: tenant.id,
             title: 'Ergonomic Equipment Request',
             description: 'Request for standing desk and ergonomic chair',
             caseNumber: generateCaseNumber('TCP', 999),
@@ -343,6 +369,7 @@ async function main() {
     await prisma.message.createMany({
         data: [
             {
+                tenantId: tenant.id,
                 content: 'Please review the updated policy documents.',
                 senderId: sarah.id,
                 recipientId: michael.id,
@@ -350,6 +377,7 @@ async function main() {
                 read: false,
             },
             {
+                tenantId: tenant.id,
                 content: 'Meeting rescheduled to 3 PM.',
                 senderId: sarah.id,
                 recipientId: michael.id,
@@ -364,6 +392,7 @@ async function main() {
     // 5. Create Claim Families
     const family = await prisma.claimFamily.create({
         data: {
+            tenantId: tenant.id,
             name: 'Test Family',
         }
     });

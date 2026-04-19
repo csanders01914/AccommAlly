@@ -42,26 +42,26 @@ export function FinancialTab() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <p className="text-sm font-medium text-gray-500">Total Spend</p>
-                    <h3 className="text-2xl font-bold mt-1">${totalSpend.toLocaleString()}</h3>
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Spend</p>
+                    <h3 className="text-2xl font-bold mt-1 text-gray-800 dark:text-white">${totalSpend.toLocaleString()}</h3>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <p className="text-sm font-medium text-gray-500">Top Cost Center</p>
-                    <h3 className="text-lg font-bold mt-1 truncate">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Cost Center</p>
+                    <h3 className="text-lg font-bold mt-1 truncate text-gray-800 dark:text-white">
                         {data.costByJobFamily.sort((a, b) => b.value - a.value)[0]?.name || 'N/A'}
                     </h3>
                 </div>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <p className="text-sm font-medium text-gray-500">Potential Tax Credits</p>
-                    <h3 className="text-2xl font-bold mt-1">{data.taxCreditEligible.length} <span className="text-xs font-normal text-gray-400">items</span></h3>
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Potential Tax Credits</p>
+                    <h3 className="text-2xl font-bold mt-1 text-gray-800 dark:text-white">{data.taxCreditEligible.length} <span className="text-xs font-normal text-gray-500">items</span></h3>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Cost Analysis Chart */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                         <TrendingUp className="h-5 w-5 text-green-500" />
                         Cost by Job Family
                     </h3>
@@ -82,8 +82,8 @@ export function FinancialTab() {
                 </div>
 
                 {/* Internal vs External */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                         <PieChartIcon className="h-5 w-5 text-purple-500" />
                         Internal vs External Spend
                     </h3>
@@ -115,8 +115,8 @@ export function FinancialTab() {
             </div>
 
             {/* Tax Credit Table */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="bg-white/30 dark:bg-gray-900/30 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden backdrop-blur-md">
+                <div className="p-6 border-b border-white/10 dark:border-gray-700/30">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
                         <DollarSign className="h-5 w-5 text-blue-500" />
                         Potential Tax Credit Eligibility (Disabled Access Credit)
@@ -124,16 +124,16 @@ export function FinancialTab() {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500">
+                        <thead className="bg-white/20 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Type</th>
                                 <th className="px-6 py-3 font-medium">Description</th>
                                 <th className="px-6 py-3 font-medium">Cost</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
                             {data.taxCreditEligible.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                <tr key={item.id} className="hover:bg-white/20 dark:hover:bg-gray-800/30">
                                     <td className="px-6 py-4 font-medium">{item.type.replace(/_/g, ' ')}</td>
                                     <td className="px-6 py-4 text-gray-500 truncate max-w-xs">{item.description}</td>
                                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">${Number(item.actualCost).toLocaleString()}</td>

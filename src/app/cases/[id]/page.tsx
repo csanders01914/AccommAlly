@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -23,7 +24,7 @@ export default function CaseDetailPageWrapper() {
         setLoading(true);
         try {
             // 1. Get User Session
-            const userRes = await fetch('/api/auth/me');
+            const userRes = await apiFetch('/api/auth/me');
             if (!userRes.ok) {
                 router.push('/');
                 return;
@@ -33,7 +34,7 @@ export default function CaseDetailPageWrapper() {
 
             // 2. Unread Count
             try {
-                const unreadRes = await fetch('/api/messages/unread-count');
+                const unreadRes = await apiFetch('/api/messages/unread-count');
                 if (unreadRes.ok) {
                     const { count } = await unreadRes.json();
                     setUnreadCount(count);

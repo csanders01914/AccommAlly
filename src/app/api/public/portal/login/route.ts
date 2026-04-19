@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { portalLoginRateLimiter } from '@/lib/rate-limit';
 import { verifyCredential } from '@/lib/claimant';
 import logger from '@/lib/logger';
-import { PORTAL_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
+import { PORTAL_SESSION_COOKIE_NAME, PORTAL_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
     try {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         const cookieStore = await cookies();
         const isSecure = request.nextUrl.protocol === 'https:';
 
-        cookieStore.set('portal_token', token, {
+        cookieStore.set(PORTAL_SESSION_COOKIE_NAME, token, {
             httpOnly: true,
             secure: isSecure,
             sameSite: 'lax',

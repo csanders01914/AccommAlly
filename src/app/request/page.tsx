@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState } from 'react';
 import { Shield, Send, CheckCircle, Upload, User, Mail, Phone, Building2, Calendar, FileText, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -116,7 +117,7 @@ export default function AccommodationRequestPage() {
                 }
             });
 
-            const response = await fetch('/api/cases', {
+            const response = await apiFetch('/api/cases', {
                 method: 'POST',
                 body: submitData,
             });

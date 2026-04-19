@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
-import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/constants";
+import { CSRF_COOKIE_NAME, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/constants";
 
 // Paths that require authentication
 const PROTECTED_PATHS = ["/dashboard", "/admin", "/auditor", "/cases"];
@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
     const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
 
     if (isProtected) {
-        const token = request.cookies.get("session_token")?.value;
+        const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
         const session = token ? await verifyToken(token) : null;
 
         if (!session) {

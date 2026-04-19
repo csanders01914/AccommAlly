@@ -34,7 +34,7 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-purple-50 to-transparent dark:from-purple-900/10">
+            <div className="p-4 border-b border-white/10 dark:border-gray-700/30 flex items-center justify-between bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-900/10">
                 <h3
                     onClick={() => router.push('/messages')}
                     className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-pointer hover:text-purple-600 transition-colors"
@@ -57,8 +57,9 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
                         className={cn(
                             "p-3 rounded-lg cursor-pointer transition-colors border border-transparent",
                             msg.unread
-                                ? "bg-purple-50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800/30"
-                                : "hover:bg-gray-50 dark:hover:bg-gray-800"
+
+                                ? "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100/50 dark:border-purple-800/30"
+                                : "hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
                         )}
                     >
                         <div className="flex justify-between items-center mb-1">
@@ -80,7 +81,7 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
                         </p>
                     </div>
                 )) : (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-gray-600 dark:text-gray-400 font-medium text-sm">
                         No new messages
                     </div>
                 )}

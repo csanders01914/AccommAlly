@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -69,7 +70,7 @@ export default function NewCasePage() {
                 fullName: `${formData.firstName} ${formData.lastName}`.trim(),
             };
 
-            const response = await fetch('/api/cases', {
+            const response = await apiFetch('/api/cases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(submissionData),

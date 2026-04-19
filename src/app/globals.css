@@ -1,159 +1,187 @@
 @import "tailwindcss";
 
-/* Configure Tailwind v4 to use class-based dark mode */
-@variant dark (&:where(.dark, .dark *));
-
 /* ============================================
-   AccessAlly Design System
-   WCAG 2.1 AA Compliant High-Contrast Theme
+   AccommAlly Design System
+   Warm Precision — WCAG 2.1 AA Compliant
    ============================================ */
 
-:root {
-  /* Core Colors - High Contrast for Accessibility */
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-
-  /* Primary - Blue with 4.5:1+ contrast ratio */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-
-  /* Semantic Colors */
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-
-  /* Surface Colors */
-  --surface: #ffffff;
-  --surface-raised: #f9fafb;
-  --border: #d1d5db;
-  --border-strong: #9ca3af;
-
-  /* Text Colors - WCAG AA Compliant */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
-
-  /* Focus Ring */
-  --focus-ring: #2563eb;
-  --focus-ring-offset: #ffffff;
+@theme {
+  --font-display: var(--font-instrument-serif), "Georgia", serif;
+  --font-body: var(--font-dm-sans), system-ui, sans-serif;
 }
 
-/* Dark Mode - Enhanced contrast */
-/* Dark Mode - increased specificity */
+@variant dark (&:where(.dark, .dark *));
+@variant high-contrast (&:where(.high-contrast, .high-contrast *));
+
+/* Accessibility Fonts */
+.font-dyslexic {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+}
+
+.font-hyperlegible {
+  font-family: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* ============================================
+   Light Mode
+   ============================================ */
+:root {
+  /* Page */
+  --background: #F8F7F5;
+  --foreground: #1C1A17;
+
+  /* Primary — Teal (WCAG AA 4.5:1 on white) */
+  --primary-50: #F0FDFA;
+  --primary-100: #CCFBF1;
+  --primary-500: #14B8A6;
+  --primary-600: #0D9488;
+  --primary-700: #0F766E;
+
+  /* Semantic */
+  --success: #059669;
+  --warning: #D97706;
+  --danger: #DC2626;
+
+  /* Surfaces */
+  --surface: #FFFFFF;
+  --surface-raised: #F3F1EC;
+  --border: #E5E2DB;
+  --border-strong: #C8C4BB;
+
+  /* Text — WCAG AA compliant */
+  --text-primary: #1C1A17;
+  --text-secondary: #5C5850;
+  --text-muted: #8C8880;
+
+  /* Sidebar — dark by default, overrideable by tenant */
+  --sidebar-background: #1C1A17;
+  --sidebar-foreground: #F0EEE8;
+
+  /* Focus */
+  --focus-ring: #0D9488;
+  --focus-ring-offset: #FFFFFF;
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
 html.dark {
-  --background: #0f0f0f;
-  --foreground: #f5f5f5;
+  --background: #141412;
+  --foreground: #F0EEE8;
 
-  --primary-50: #1e3a5f;
-  --primary-100: #1e40af;
-  --primary-500: #60a5fa;
-  --primary-600: #3b82f6;
-  --primary-700: #2563eb;
+  --primary-50: #0D3D38;
+  --primary-100: #134E4A;
+  --primary-500: #2DD4BF;
+  --primary-600: #14B8A6;
+  --primary-700: #0D9488;
 
-  --success: #10b981;
-  --warning: #fbbf24;
-  --danger: #f87171;
+  --success: #10B981;
+  --warning: #FBBF24;
+  --danger: #F87171;
 
-  --surface: #171717;
-  --surface-raised: #262626;
-  --border: #404040;
-  --border-strong: #525252;
+  --surface: #1C1B18;
+  --surface-raised: #252421;
+  --border: #2E2D28;
+  --border-strong: #3D3C36;
 
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-muted: #9ca3af;
+  --text-primary: #F0EEE8;
+  --text-secondary: #A8A49C;
+  --text-muted: #6C6860;
 
-  --focus-ring: #60a5fa;
-  --focus-ring-offset: #171717;
+  --sidebar-background: #0F0E0C;
+  --sidebar-foreground: #F0EEE8;
+
+  --focus-ring: #2DD4BF;
+  --focus-ring-offset: #1C1B18;
 
   color-scheme: dark;
 }
 
-/* Force dark mode colors on common Tailwind classes */
-html.dark .bg-white {
-  background-color: #1f1f1f !important;
+/* ============================================
+   High Contrast Mode (Yellow on Black)
+   ============================================ */
+html.high-contrast {
+  --background: #000000;
+  --foreground: #ffff00;
+  --primary-500: #ffff00;
+  --primary-600: #ffff00;
+  --surface: #000000;
+  --surface-raised: #000000;
+  --border: #ffff00;
+  --border-strong: #ffff00;
+  --text-primary: #ffff00;
+  --text-secondary: #ffff00;
+  --text-muted: #ffff00;
+  --focus-ring: #ffff00;
 }
 
-html.dark .bg-gray-50 {
-  background-color: #0a0a0a !important;
+html.high-contrast body,
+html.high-contrast * {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
 }
 
-html.dark .bg-gray-100 {
-  background-color: #171717 !important;
+html.high-contrast img,
+html.high-contrast video,
+html.high-contrast svg {
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
-html.dark .bg-gray-200 {
-  background-color: #262626 !important;
+/* ============================================
+   Accessibility Font Classes
+   ============================================ */
+html.font-dyslexic * {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+  line-height: 1.6 !important;
 }
 
-html.dark .border-gray-200 {
-  border-color: #404040 !important;
+html.font-hyperlegible * {
+  font-family: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-html.dark .border-gray-300 {
-  border-color: #525252 !important;
-}
-
-html.dark .text-gray-900 {
-  color: #f9fafb !important;
-}
-
-html.dark .text-gray-800 {
-  color: #e5e5e5 !important;
-}
-
-html.dark .text-gray-700 {
-  color: #d4d4d4 !important;
-}
-
-html.dark .text-gray-600 {
-  color: #a3a3a3 !important;
-}
-
-html.dark .text-gray-500 {
-  color: #737373 !important;
-}
-
-html.dark input,
-html.dark textarea,
-html.dark select {
-  background-color: #262626 !important;
-  border-color: #404040 !important;
-  color: #f5f5f5 !important;
-}
-
-html.dark input::placeholder,
-html.dark textarea::placeholder {
-  color: #737373 !important;
-}
-
+/* ============================================
+   Tailwind v4 Theme Inline
+   ============================================ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
-/* Base Styles */
+/* ============================================
+   Base Styles
+   ============================================ */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Focus Styles - WCAG 2.1 Compliant */
+.app-background {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--primary-500), transparent 94%) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, color-mix(in srgb, var(--primary-500), transparent 96%) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* ============================================
+   Focus Styles — WCAG 2.1 Compliant
+   ============================================ */
 *:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-/* Ensure links have proper contrast */
+/* ============================================
+   Links
+   ============================================ */
 a {
   color: var(--primary-600);
   text-decoration: underline;
@@ -164,7 +192,6 @@ a:hover {
   color: var(--primary-700);
 }
 
-/* Link colors in Dark Mode */
 html.dark a {
   color: var(--primary-500);
 }
@@ -173,7 +200,9 @@ html.dark a:hover {
   color: var(--primary-600);
 }
 
-/* Skip Link for Keyboard Navigation */
+/* ============================================
+   Skip Link
+   ============================================ */
 .skip-link {
   position: absolute;
   top: -40px;
@@ -190,15 +219,104 @@ html.dark a:hover {
   top: 0;
 }
 
-/* High Contrast Selection */
+/* ============================================
+   Selection
+   ============================================ */
 ::selection {
   background: var(--primary-500);
   color: white;
 }
 
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
+/* ============================================
+   Dark Mode — Tailwind class overrides
+   (needed because components use bg-white etc.)
+   ============================================ */
+html.dark .bg-white {
+  background-color: #1C1B18 !important;
+}
 
+html.dark .bg-gray-50 {
+  background-color: #141412 !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #1C1B18 !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: #252421 !important;
+}
+
+html.dark .border-gray-200 {
+  border-color: #2E2D28 !important;
+}
+
+html.dark .border-gray-300 {
+  border-color: #3D3C36 !important;
+}
+
+html.dark .text-gray-900 {
+  color: #F0EEE8 !important;
+}
+
+html.dark .text-gray-800 {
+  color: #E8E5DF !important;
+}
+
+html.dark .text-gray-700 {
+  color: #D4D0C8 !important;
+}
+
+html.dark .text-gray-600 {
+  color: #A8A49C !important;
+}
+
+html.dark .text-gray-500 {
+  color: #6C6860 !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #252421 !important;
+  border-color: #2E2D28 !important;
+  color: #F0EEE8 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #6C6860 !important;
+}
+
+/* ============================================
+   Sidebar Scrollbar
+   ============================================ */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {

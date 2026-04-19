@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { X, AlertTriangle, Terminal, Copy, Check } from 'lucide-react';
-import { BugReportModal } from '@/components/BugReportModal';
+import { BugReportModal } from '@/components/modals/BugReportModal';
 
 interface ErrorContextType {
     showError: (message: string, transactionId?: string) => void;

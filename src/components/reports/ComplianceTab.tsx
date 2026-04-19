@@ -37,28 +37,28 @@ export function ComplianceTab() {
         <div className="space-y-6 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Initial Response Lag */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Initial Response Lag</p>
-                            <h3 className="text-2xl font-bold mt-2">{data.initialResponseLag} <span className="text-sm font-normal text-gray-500">days</span></h3>
-                            <p className="text-xs text-gray-400 mt-1">Avg time to first interactive dialogue</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Initial Response Lag</p>
+                            <h3 className="text-2xl font-bold mt-2 text-gray-800 dark:text-white">{data.initialResponseLag} <span className="text-sm font-normal text-gray-500">days</span></h3>
+                            <p className="text-xs text-gray-500 mt-1">Avg time to first interactive dialogue</p>
                         </div>
-                        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                        <div className="p-3 bg-blue-100/50 dark:bg-blue-900/20 rounded-full">
                             <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                         </div>
                     </div>
                 </div>
 
                 {/* Avg Case Duration */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Avg Case Duration</p>
-                            <h3 className="text-2xl font-bold mt-2">{data.avgCaseDuration} <span className="text-sm font-normal text-gray-500">days</span></h3>
-                            <p className="text-xs text-gray-400 mt-1">Request to closure</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Case Duration</p>
+                            <h3 className="text-2xl font-bold mt-2 text-gray-800 dark:text-white">{data.avgCaseDuration} <span className="text-sm font-normal text-gray-500">days</span></h3>
+                            <p className="text-xs text-gray-500 mt-1">Request to closure</p>
                         </div>
-                        <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                        <div className="p-3 bg-purple-100/50 dark:bg-purple-900/20 rounded-full">
                             <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                         </div>
                     </div>
@@ -66,8 +66,8 @@ export function ComplianceTab() {
             </div>
 
             {/* Recertification Calendar */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="bg-white/30 dark:bg-gray-900/30 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden backdrop-blur-md">
+                <div className="p-6 border-b border-white/10 dark:border-gray-700/30">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-amber-500" />
                         Recertification Calendar
@@ -76,7 +76,7 @@ export function ComplianceTab() {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500 border-b border-gray-200 dark:border-gray-700">
+                        <thead className="bg-white/20 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400 border-b border-white/10 dark:border-gray-700/30">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Review Date</th>
                                 <th className="px-6 py-3 font-medium">Case Number</th>
@@ -87,14 +87,14 @@ export function ComplianceTab() {
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                             {data.expiringAccommodations.length > 0 ? (
                                 data.expiringAccommodations.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <tr key={item.id} className="hover:bg-white/20 dark:hover:bg-gray-800/30 transition-colors">
                                         <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                                             {format(new Date(item.reviewDate), 'MMM d, yyyy')}
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">{item.caseNumber}</td>
                                         <td className="px-6 py-4 text-gray-500">{item.clientName}</td>
                                         <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100/50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                                                 {item.type.replace(/_/g, ' ')}
                                             </span>
                                         </td>

@@ -99,7 +99,7 @@ export function CallRequestsWidget({ requests, onUpdate }: CallRequestsWidgetPro
                         </div>
                     </div>
                 )) : (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-gray-600 dark:text-gray-400 font-medium text-sm">
                         All calls returned ✓
                     </div>
                 )}

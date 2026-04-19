@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
@@ -49,7 +50,7 @@ export default function BugReportsPage() {
 
     const fetchReports = async () => {
         try {
-            const res = await fetch('/api/bug-reports');
+            const res = await apiFetch('/api/bug-reports');
             if (res.ok) {
                 const data = await res.json();
                 setReports(data.reports);

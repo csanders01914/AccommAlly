@@ -17,7 +17,7 @@ interface Case {
 
 interface LoadTemplateModalProps {
     onClose: () => void;
-    onLoad: (html: string) => void;
+    onLoad: (html: string, caseId: string) => void;
     linkedCaseId?: string;
     cases: Case[];
 }
@@ -52,7 +52,7 @@ export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: Load
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            onLoad(data.html);
+            onLoad(data.html, selectedCaseId);
             onClose();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to apply template');

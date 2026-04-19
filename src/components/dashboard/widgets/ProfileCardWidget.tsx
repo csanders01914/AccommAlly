@@ -31,12 +31,12 @@ export function ProfileCardWidget({ user, stats }: ProfileCardProps) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-auto border-t border-gray-100 dark:border-gray-800 pt-6">
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 mt-auto border-t border-gray-100/50 dark:border-gray-800/50 pt-6">
+                <div className="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalCases}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Recent Cases</div>
                 </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="text-center p-3 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {stats.openTasks}
                     </div>

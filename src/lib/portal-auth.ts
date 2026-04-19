@@ -1,3 +1,4 @@
+import { PORTAL_SESSION_COOKIE_NAME } from '@/lib/constants';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import logger from '@/lib/logger';
@@ -29,7 +30,7 @@ export interface PortalSession {
  */
 export async function getPortalSession(): Promise<PortalSession | null> {
     const cookieStore = await cookies();
-    const token = cookieStore.get('portal_token')?.value;
+    const token = cookieStore.get(PORTAL_SESSION_COOKIE_NAME)?.value;
     if (!token) return null;
     try {
         const { payload } = await jwtVerify(token, getPortalSecretKey(), { algorithms: [ALG] });

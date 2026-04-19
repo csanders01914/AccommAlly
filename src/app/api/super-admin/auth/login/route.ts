@@ -8,7 +8,7 @@ import { comparePassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { createRateLimiter } from '@/lib/rate-limit';
 import logger from '@/lib/logger';
-import { RATE_LIMIT_SUPER_ADMIN_MAX, RATE_LIMIT_SUPER_ADMIN_WINDOW, SUPER_ADMIN_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
+import { RATE_LIMIT_SUPER_ADMIN_MAX, RATE_LIMIT_SUPER_ADMIN_WINDOW, SUPER_ADMIN_SESSION_COOKIE_NAME, SUPER_ADMIN_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
 
 // Super-admin login: 5 attempts per 15 minutes, keyed by email hash
 const superAdminLimiter = createRateLimiter({
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
         // Set cookie
         const cookieStore = await cookies();
-        cookieStore.set('super_admin_token', token, {
+        cookieStore.set(SUPER_ADMIN_SESSION_COOKIE_NAME, token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',

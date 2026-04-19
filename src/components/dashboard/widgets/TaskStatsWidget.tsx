@@ -27,7 +27,7 @@ export function TaskStatsWidget({ tasks, stats, onViewAll }: TaskWidgetProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-transparent dark:from-emerald-900/10">
+            <div className="p-4 border-b border-white/10 dark:border-gray-700/30 flex items-center justify-between bg-gradient-to-r from-emerald-50/50 to-transparent dark:from-emerald-900/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <CheckSquare className="w-4 h-4 text-emerald-600" />
                     My Tasks
@@ -93,7 +93,7 @@ export function TaskStatsWidget({ tasks, stats, onViewAll }: TaskWidgetProps) {
                         </div>
                     );
                 }) : (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-gray-600 dark:text-gray-400 font-medium text-sm">
                         No outstanding tasks
                     </div>
                 )}

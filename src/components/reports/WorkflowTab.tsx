@@ -38,8 +38,8 @@ export function WorkflowTab() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Interactions Summary */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                         <Activity className="h-5 w-5 text-indigo-500" />
                         Interactions Log Summary
                     </h3>
@@ -58,20 +58,20 @@ export function WorkflowTab() {
                 </div>
 
                 {/* Outcome Effectiveness */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center items-center text-center">
-                    <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm flex flex-col justify-center items-center text-center backdrop-blur-md">
+                    <div className="p-4 bg-green-100/50 dark:bg-green-900/30 rounded-full mb-4">
                         <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                     </div>
-                    <h3 className="text-3xl font-bold">{data.outcomeStats.closedRatio}%</h3>
+                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white">{data.outcomeStats.closedRatio}%</h3>
                     <p className="text-sm font-medium text-gray-500 mt-2">Case Closure Ratio</p>
                     <p className="text-xs text-gray-400 mt-1 max-w-xs">Percentage of total cases that have been successfully closed.</p>
                 </div>
             </div>
 
             {/* Pending Medical Documentation */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
+            <div className="bg-white/30 dark:bg-gray-900/30 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden backdrop-blur-md">
+                <div className="p-6 border-b border-white/10 dark:border-gray-700/30">
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 dark:text-white">
                         <FileText className="h-5 w-5 text-amber-500" />
                         Pending Medical Documentation
                     </h3>
@@ -79,7 +79,7 @@ export function WorkflowTab() {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500">
+                        <thead className="bg-white/20 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Case Number</th>
                                 <th className="px-6 py-3 font-medium">Client</th>
@@ -87,10 +87,10 @@ export function WorkflowTab() {
                                 <th className="px-6 py-3 font-medium">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
                             {data.pendingMedical.length > 0 ? (
                                 data.pendingMedical.map((item) => (
-                                    <tr key={item.caseNumber} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                    <tr key={item.caseNumber} className="hover:bg-white/20 dark:hover:bg-gray-800/30">
                                         <td className="px-6 py-4 font-medium">{item.caseNumber}</td>
                                         <td className="px-6 py-4 text-gray-500">{item.clientName}</td>
                                         <td className="px-6 py-4 text-gray-500">

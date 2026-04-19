@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { Plus, Users, Search, Loader2, Trash2 } from 'lucide-react';
@@ -14,7 +15,7 @@ export function ClientManagement() {
     const fetchClients = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/clients');
+            const res = await apiFetch('/api/clients');
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data)) {
@@ -41,7 +42,7 @@ export function ClientManagement() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const res = await fetch('/api/clients', {
+            const res = await apiFetch('/api/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newClientName, code: newClientCode })

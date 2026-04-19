@@ -332,74 +332,73 @@ export function CaseTasksTable({
                     <button className="px-3 py-1 border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Save Column Preferences</button>
                 </div>
             </div>
-        </div>
 
 
-                {/* Table */ }
-    <div className="flex-1 overflow-auto bg-white dark:bg-gray-900">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 text-xs uppercase font-medium border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
-                    <tr>
-                        <SortableContext items={columns.map(col => col.id)} strategy={horizontalListSortingStrategy}>
-                            {columns.map(col => (
-                                <SortableHeader
-                                    key={col.id}
-                                    id={col.id}
-                                    onFilter={col.sortable || ['type', 'assignedTo', 'description', 'createdBy'].includes(col.id) ? (val) => setColumnFilters(prev => ({ ...prev, [col.id]: val })) : undefined}
-                                    filterValue={columnFilters[col.id]}
-                                >
-                                    {col.id === 'select' ? (
-                                        <div className="flex items-center justify-center w-full h-full py-1" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                                            <input
-                                                type="checkbox"
-                                                checked={filteredTasks.length > 0 && selectedTaskIds.size === filteredTasks.length}
-                                                onChange={toggleSelectAll}
-                                                className="rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-white cursor-pointer py-1" onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-                                            {col.label}
-                                            {col.sortable && <ArrowUpDown className="w-3 h-3" />}
-                                        </div>
-                                    )}
-                                </SortableHeader>
-                            ))
-                            }
-                        </SortableContext>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300">
-                    {filteredTasks.length > 0 ? filteredTasks.map((task) => (
-                        <tr key={task.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
-                            {columns.map(col => (
-                                <td key={col.id} className="px-4 py-3 border-gray-100 dark:border-gray-800">
-                                    {renderCell(task, col.id)}
-                                </td>
-                            ))}
-                        </tr>
-                    )) : (
-                        <tr><td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">No tasks found</td></tr>
-                    )}
-                </tbody>
-            </table>
-        </DndContext>
-    </div>
-    {/* Footer / Pagination Placeholder */ }
-    <div className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 p-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
-        <div className="flex gap-2">
-            <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&lt;</button>
-            <button className="bg-blue-600 text-white px-2 py-1 rounded">1</button>
-            <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&gt;</button>
-        </div>
-        <div>
-            10 items per page
-        </div>
-        <div>
-            1 - {filteredTasks.length} of {filteredTasks.length} items
-        </div>
-    </div>
-            </div >
-            );
+            {/* Table */}
+            <div className="flex-1 overflow-auto bg-white dark:bg-gray-900">
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 text-xs uppercase font-medium border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+                            <tr>
+                                <SortableContext items={columns.map(col => col.id)} strategy={horizontalListSortingStrategy}>
+                                    {columns.map(col => (
+                                        <SortableHeader
+                                            key={col.id}
+                                            id={col.id}
+                                            onFilter={col.sortable || ['type', 'assignedTo', 'description', 'createdBy'].includes(col.id) ? (val) => setColumnFilters(prev => ({ ...prev, [col.id]: val })) : undefined}
+                                            filterValue={columnFilters[col.id]}
+                                        >
+                                            {col.id === 'select' ? (
+                                                <div className="flex items-center justify-center w-full h-full py-1" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filteredTasks.length > 0 && selectedTaskIds.size === filteredTasks.length}
+                                                        onChange={toggleSelectAll}
+                                                        className="rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-white cursor-pointer py-1" onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
+                                                    {col.label}
+                                                    {col.sortable && <ArrowUpDown className="w-3 h-3" />}
+                                                </div>
+                                            )}
+                                        </SortableHeader>
+                                    ))
+                                    }
+                                </SortableContext>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300">
+                            {filteredTasks.length > 0 ? filteredTasks.map((task) => (
+                                <tr key={task.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                                    {columns.map(col => (
+                                        <td key={col.id} className="px-4 py-3 border-gray-100 dark:border-gray-800">
+                                            {renderCell(task, col.id)}
+                                        </td>
+                                    ))}
+                                </tr>
+                            )) : (
+                                <tr><td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">No tasks found</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </DndContext>
+            </div>
+            {/* Footer / Pagination Placeholder */}
+            <div className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 p-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                <div className="flex gap-2">
+                    <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&lt;</button>
+                    <button className="bg-blue-600 text-white px-2 py-1 rounded">1</button>
+                    <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&gt;</button>
+                </div>
+                <div>
+                    10 items per page
+                </div>
+                <div>
+                    1 - {filteredTasks.length} of {filteredTasks.length} items
+                </div>
+            </div>
+        </div >
+    );
 }

@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { X, Filter, ToggleLeft, ToggleRight, ChevronDown, ChevronUp, Plus, Trash2, Loader2, Bell, Monitor, Mail, Smartphone } from 'lucide-react';
@@ -91,7 +92,7 @@ export function SettingsModal({
     const fetchRulesData = async () => {
         setIsLoadingRules(true);
         try {
-            const rulesRes = await fetch('/api/messages/rules');
+            const rulesRes = await apiFetch('/api/messages/rules');
             if (rulesRes.ok) setRules(await rulesRes.json());
         } catch (e) {
             console.error(e);
@@ -103,7 +104,7 @@ export function SettingsModal({
     const fetchUserPrefs = async () => {
         setIsLoadingPrefs(true);
         try {
-            const res = await fetch('/api/auth/me'); // Or user endpoint
+            const res = await apiFetch('/api/auth/me'); // Or user endpoint
             if (res.ok) {
                 const data = await res.json();
                 // Assuming data.user contains preferences/notifications

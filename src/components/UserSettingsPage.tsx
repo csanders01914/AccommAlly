@@ -1,8 +1,8 @@
 // Reading file first before removing state to ensure correct context
 
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-import { User, LogOut, FileText, ChevronLeft, Save, Lock, Bell, Moon, Sun, Monitor, Shield, Building, Plus } from 'lucide-react';
+import { User, LogOut, FileText, ChevronLeft, Save, Lock, Bell, Shield, Building, Plus } from 'lucide-react';
+import { apiFetch } from '@/lib/api-client';
 
 interface UserSettingsPageProps {
     user: {
@@ -20,7 +20,7 @@ interface UserSettingsPageProps {
 }
 
 export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) {
-    const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences' | 'admin'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -31,7 +31,6 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
     const [pronouns, setPronouns] = useState(user.pronouns || '');
 
     // Preferences State
-    const { theme, setTheme } = useTheme();
     // Default to system if undefined, though useTheme handles this.
     // We don't need local state for theme anymore as next-themes handles it.
     const [notifications, setNotifications] = useState(user.notifications || { email: true, sms: false });
@@ -71,7 +70,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
     const handleEnable2FA = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/auth/2fa/setup', {
+            const res = await apiFetch('/api/auth/2fa/setup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'generate' })
@@ -92,7 +91,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
     const handleVerify2FA = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/auth/2fa/setup', {
+            const res = await apiFetch('/api/auth/2fa/setup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'enable', token, secret })
@@ -119,7 +118,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
         setIsLoading(true);
         try {
-            const res = await fetch('/api/auth/2fa/setup', {
+            const res = await apiFetch('/api/auth/2fa/setup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'disable' })
@@ -154,7 +153,6 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
                     email,
                     username,
                     pronouns,
-                    theme,
                     notifications
                 }),
             });
@@ -244,6 +242,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
                         <Bell className="w-4 h-4" />
                         Preferences
                     </button>
+
 
                 </nav>
 
@@ -507,43 +506,6 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
                         {activeTab === 'preferences' && (
                             <div className="space-y-8 max-w-lg">
-                                {/* Theme Selection */}
-                                <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Appearance</h2>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <button
-                                            onClick={() => setTheme('light')}
-                                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${theme === 'light'
-                                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                                }`}
-                                        >
-                                            <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-blue-600' : 'text-gray-500'}`} />
-                                            <span className="text-sm font-medium">Light</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setTheme('dark')}
-                                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${theme === 'dark'
-                                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                                }`}
-                                        >
-                                            <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-600' : 'text-gray-500'}`} />
-                                            <span className="text-sm font-medium">Dark</span>
-                                        </button>
-                                        <button
-                                            onClick={() => setTheme('system')}
-                                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${theme === 'system'
-                                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                                }`}
-                                        >
-                                            <Monitor className={`w-6 h-6 ${theme === 'system' ? 'text-blue-600' : 'text-gray-500'}`} />
-                                            <span className="text-sm font-medium">System</span>
-                                        </button>
-                                    </div>
-                                </div>
-
                                 {/* Notifications */}
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notifications</h2>
@@ -595,14 +557,126 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
                         )}
 
-                        {activeTab === 'admin' && user.role === 'ADMIN' && (
-                            <div className="text-center py-12 text-gray-500">
-                                <p>Client management has been moved to the <a href="/admin" className="text-blue-600 hover:underline">Admin Console</a>.</p>
-                            </div>
-                        )}
+
                     </div>
                 </div>
             </main >
         </div >
+    );
+}
+
+function OrganizationSettings() {
+    const [loading, setLoading] = useState(true);
+    const [primaryColor, setPrimaryColor] = useState('#6366f1');
+    const [secondaryColor, setSecondaryColor] = useState('#a855f7');
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await apiFetch('/api/tenant/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.settings) {
+                        setPrimaryColor(data.settings.branding?.primaryColor || '#6366f1');
+                        setSecondaryColor(data.settings.branding?.secondaryColor || '#a855f7');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load settings', e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSettings();
+    }, []);
+
+    const handleSave = async () => {
+        setSaving(true);
+        setMessage('');
+
+        try {
+            const newSettings = {
+                branding: {
+                    primaryColor,
+                    secondaryColor
+                }
+            };
+
+            const res = await apiFetch('/api/tenant/settings', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: newSettings })
+            });
+
+            if (!res.ok) throw new Error('Failed to update');
+
+            setMessage('Organization branding updated!');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (e) {
+            setMessage('Error saving settings');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) return <div className="text-center py-8">Loading...</div>;
+
+    return (
+        <div className="space-y-6 max-w-lg">
+            <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Organization Branding</h2>
+                <p className="text-sm text-gray-500 mb-6">Customize the look and feel of AccommAlly for your organization.</p>
+
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Primary Color
+                        </label>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="color"
+                                value={primaryColor}
+                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0"
+                            />
+                            <span className="font-mono text-sm text-gray-500">{primaryColor}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Secondary Color
+                        </label>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="color"
+                                value={secondaryColor}
+                                onChange={(e) => setSecondaryColor(e.target.value)}
+                                className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0"
+                            />
+                            <span className="font-mono text-sm text-gray-500">{secondaryColor}</span>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 flex items-center gap-4">
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+                        >
+                            <Save className="w-4 h-4" />
+                            {saving ? 'Saving...' : 'Save Branding'}
+                        </button>
+                        {message && (
+                            <span className={`text-sm ${message.includes('Error') ? 'text-red-500' : 'text-green-600'}`}>
+                                {message}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

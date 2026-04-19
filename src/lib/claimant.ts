@@ -68,6 +68,7 @@ export function validatePassphrase(passphrase: string): boolean {
 }
 
 export interface ClaimantData {
+    tenantId: string;
     name: string;
     birthdate: Date;
     email?: string;
@@ -77,7 +78,7 @@ export interface ClaimantData {
 }
 
 /**
- * Get or create a claimant based on name + birthdate match
+ * Get or create a claimant based on name + birthdate match within a tenant
  * Returns the claimant and whether it was newly created
  */
 export async function getOrCreateClaimant(data: ClaimantData): Promise<{
@@ -86,9 +87,10 @@ export async function getOrCreateClaimant(data: ClaimantData): Promise<{
 }> {
     const nameHash = createNameHash(data.name);
 
-    // Check for existing claimant with same name hash + birthdate
+    // Check for existing claimant with same name hash + birthdate within the tenant
     const existing = await prisma.claimant.findFirst({
         where: {
+            tenantId: data.tenantId,
             nameHash,
             birthdate: data.birthdate
         }
@@ -114,6 +116,7 @@ export async function getOrCreateClaimant(data: ClaimantData): Promise<{
 
     const claimant = await prisma.claimant.create({
         data: {
+            tenantId: data.tenantId,
             claimantNumber,
             name: encrypt(data.name),
             nameHash,

@@ -54,7 +54,7 @@ export function QuickActionsWidget({ user }: { user: any }) {
                         </div>
                     </button>
 
-                    {user?.role === 'ADMIN' && (
+                    {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
                         <button
                             onClick={() => router.push('/admin?action=create_user')}
                             className="bg-white/10 hover:bg-white/20 backdrop-blur-md p-3 rounded-xl text-left transition-all group flex items-center gap-3 border border-white/10"

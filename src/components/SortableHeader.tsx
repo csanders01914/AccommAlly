@@ -78,8 +78,8 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
         <th
             ref={setNodeRef}
             style={style}
-            className="p-0 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 select-none group relative overflow-hidden"
-            aria-sort={undefined} // Parent doesn't sort directly, but keeping it clean or 'none' might be better
+            className="p-0 bg-transparent border-b border-white/10 dark:border-gray-700/30 select-none group relative overflow-hidden"
+            aria-sort={undefined}
         >
             {/* Main Sort Button - Wraps content */}
             <div className="flex w-full h-full items-stretch">
@@ -88,13 +88,13 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
                     {...attributes}
                     {...listeners}
                     onClick={() => !isFilterOpen && onClick?.()}
-                    className="flex-1 px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset truncate flex items-center gap-1"
+                    className="flex-1 px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset truncate flex items-center gap-1"
                 >
                     <span className="truncate flex-1">{children}</span>
                 </button>
 
                 {onFilter && (
-                    <div className="flex items-center pr-1 bg-gray-100 dark:bg-gray-800">
+                    <div className="flex items-center pr-1 bg-transparent">
                         <button
                             type="button"
                             aria-label="Filter"
@@ -106,7 +106,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
                                 setIsFilterOpen(!isFilterOpen);
                             }}
                             className={cn(
-                                "p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+                                "p-1.5 rounded hover:bg-white/20 dark:hover:bg-gray-600/50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
                                 filterValue ? "text-blue-600" : "text-gray-400 opacity-0 group-hover:opacity-100 focus:opacity-100"
                             )}
                         >

@@ -34,8 +34,8 @@ export function TrendsTab() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Accommodation Type Distribution */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                         <PieChartIcon className="h-5 w-5 text-blue-500" />
                         Accommodation Type Distribution
                     </h3>
@@ -64,8 +64,8 @@ export function TrendsTab() {
                 </div>
 
                 {/* High Frequency Job Roles */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                         <BarChart3 className="h-5 w-5 text-orange-500" />
                         High-Frequency Job Roles
                     </h3>
@@ -85,8 +85,8 @@ export function TrendsTab() {
             </div>
 
             {/* Denial Reasons */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 shadow-sm backdrop-blur-md">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                     <XCircle className="h-5 w-5 text-red-500" />
                     Denial Reasons Breakdown
                 </h3>

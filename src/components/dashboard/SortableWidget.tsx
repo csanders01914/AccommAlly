@@ -35,7 +35,7 @@ export function SortableWidget({ id, className, children, onRemove }: SortableWi
             ref={setNodeRef}
             style={style}
             className={cn(
-                "relative group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-all h-full flex flex-col",
+                "relative group bg-white/80 dark:bg-gray-900/40 backdrop-blur-md rounded-xl border border-white/50 dark:border-gray-700/30 shadow-md transition-all h-full flex flex-col",
                 isDragging && "shadow-xl ring-2 ring-blue-500/50 opacity-90 scale-[1.02]",
                 className
             )}

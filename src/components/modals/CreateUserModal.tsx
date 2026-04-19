@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState } from 'react';
 import { Loader2, X, Eye, EyeOff } from 'lucide-react';
@@ -28,7 +29,7 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUserModalP
         setError(null);
 
         try {
-            const res = await fetch('/api/admin/users', {
+            const res = await apiFetch('/api/admin/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

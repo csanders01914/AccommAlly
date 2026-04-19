@@ -138,7 +138,7 @@ export function EnhancedCalendarView() {
     };
 
     return (
-        <div className="h-full flex flex-col bg-gray-900">
+        <div className="h-full flex flex-col bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
                 <div className="flex items-center gap-4">

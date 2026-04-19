@@ -63,7 +63,7 @@ export default function CalendarPage() {
                 </div>
             </header>
 
-            <main className="flex-1 overflow-hidden p-4">
+            <main className="flex-1 overflow-hidden p-6">
                 <Suspense fallback={
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />

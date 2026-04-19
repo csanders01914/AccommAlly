@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ export function UserProfileDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch('/api/dashboard');
+                const res = await apiFetch('/api/dashboard');
                 if (res.ok) {
                     const json = await res.json();
                     setData(json);
@@ -49,7 +50,7 @@ export function UserProfileDashboard() {
 
         const fetchUnread = async () => {
             try {
-                const res = await fetch('/api/messages/unread-count');
+                const res = await apiFetch('/api/messages/unread-count');
                 if (res.ok) {
                     const { count } = await res.json();
                     setUnreadCount(count);
@@ -86,7 +87,7 @@ export function UserProfileDashboard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+            <div className="min-h-screen app-background flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             </div>
         );
@@ -108,14 +109,17 @@ export function UserProfileDashboard() {
     })) || [];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-            {/* Left Sidebar Navigation */}
-            {data.user && <Sidebar user={data.user} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
 
-            {/* Main Content - offset for sidebar */}
-            <div className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
-                {/* Page Header */}
-                <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
+        <div className="flex h-screen overflow-hidden app-background">
+            {data.user && <Sidebar
+                user={data.user}
+                unreadCount={unreadCount}
+                initialCollapsed={sidebarCollapsed}
+                onToggle={setSidebarCollapsed}
+            />}  {/* Main Content - offset for sidebar */}
+            <div className={`transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} h-full overflow-y-auto w-full`}>
+                {/* Header */}
+                <header className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-white/20 dark:border-gray-700/30 p-4 rounded-2xl mx-6 mt-6 mb-2 shadow-lg transition-all">
                     <div className="px-6 lg:px-8">
                         <div className="flex items-center justify-between h-16">
                             <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Dashboard</h1>

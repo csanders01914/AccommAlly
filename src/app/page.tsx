@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,7 @@ import {
   CaseDetailPage,
 } from '@/components/CaseDetailPage';
 import { Loader2 } from 'lucide-react';
+import { TenantThemeProvider } from '@/components/providers/TenantThemeProvider';
 
 // Types
 type CurrentUser = {
@@ -21,6 +23,9 @@ type CurrentUser = {
   pronouns?: string;
   theme?: string;
   notifications?: any;
+  tenant?: {
+    settings?: any;
+  };
 } | null;
 
 type CurrentView = 'login' | 'dashboard' | 'case-detail' | 'settings' | 'profile-dashboard';
@@ -39,7 +44,7 @@ export default function Home() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await apiFetch('/api/auth/me');
         if (res.ok) {
           const data = await res.json();
           if (data.user) {
@@ -66,7 +71,7 @@ export default function Home() {
     setLoginError(undefined);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -94,7 +99,7 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch (e) {
       console.error('Logout error', e);
     }
@@ -111,7 +116,7 @@ export default function Home() {
     setIsLoading(true);
     setLoginError(undefined);
     try {
-      const res = await fetch('/api/auth/2fa/verify', {
+      const res = await apiFetch('/api/auth/2fa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: tempUserId, token: code })
@@ -196,16 +201,20 @@ export default function Home() {
 
     case 'settings':
       return (
-        <UserSettingsPage
-          user={currentUser}
-          onUpdateUser={(u) => setCurrentUser({ ...currentUser, ...u })}
-        />
+        <TenantThemeProvider settings={currentUser?.tenant?.settings}>
+          <UserSettingsPage
+            user={currentUser}
+            onUpdateUser={(u) => setCurrentUser({ ...currentUser, ...u })}
+          />
+        </TenantThemeProvider>
       );
 
     case 'profile-dashboard':
     default:
       return (
-        <UserProfileDashboard />
+        <TenantThemeProvider settings={currentUser?.tenant?.settings}>
+          <UserProfileDashboard />
+        </TenantThemeProvider>
       );
   }
 }

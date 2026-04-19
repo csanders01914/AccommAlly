@@ -1,14 +1,15 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, Key, User, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Shield, Key, User, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 export default function PortalLoginPage() {
     const router = useRouter();
     const [identifier, setIdentifier] = useState('');
     const [lastName, setLastName] = useState('');
+    const [pin, setPin] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -18,10 +19,10 @@ export default function PortalLoginPage() {
         setError('');
 
         try {
-            const res = await fetch('/api/public/portal/login', {
+            const res = await apiFetch('/api/public/portal/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier, lastName })
+                body: JSON.stringify({ identifier, lastName, pin })
             });
 
             if (res.ok) {
@@ -55,7 +56,7 @@ export default function PortalLoginPage() {
                     <form onSubmit={handleLogin} className="space-y-6">
                         {error && (
                             <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" /> {error}
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
                             </div>
                         )}
 
@@ -71,6 +72,7 @@ export default function PortalLoginPage() {
                                     placeholder="e.g. 123456 or AA..."
                                     className="w-full bg-white/5 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all uppercase placeholder-blue-200/50"
                                     required
+                                    autoComplete="username"
                                 />
                             </div>
                         </div>
@@ -87,8 +89,28 @@ export default function PortalLoginPage() {
                                     placeholder="Enter your last name"
                                     className="w-full bg-white/5 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder-blue-200/50"
                                     required
+                                    autoComplete="family-name"
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="pin" className="block text-sm font-medium text-blue-100 mb-2">PIN</label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300/50" aria-hidden="true" />
+                                <input
+                                    id="pin"
+                                    type="password"
+                                    inputMode="numeric"
+                                    value={pin}
+                                    onChange={(e) => setPin(e.target.value)}
+                                    placeholder="Enter your PIN"
+                                    className="w-full bg-white/5 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder-blue-200/50"
+                                    required
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                            <p className="mt-1.5 text-xs text-blue-200/50">Your PIN was provided when your case was opened. Contact your examiner if you need help.</p>
                         </div>
 
                         <button
@@ -100,6 +122,10 @@ export default function PortalLoginPage() {
                         </button>
                     </form>
                 </div>
+
+                <p className="text-center text-blue-200/40 text-xs mt-6">
+                    Need help? Contact your accommodation examiner directly.
+                </p>
             </div>
         </div>
     );

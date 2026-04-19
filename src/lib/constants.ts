@@ -3,6 +3,12 @@ export const SESSION_DURATION = '8h';
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;           // 8 hours
 export const PORTAL_SESSION_MAX_AGE_SECONDS = 60 * 60;         // 1 hour
 export const SUPER_ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 4; // 4 hours
+export const ACCOUNT_LOCKOUT_DURATION_SECONDS = 15 * 60;       // 15 min lockout after failed logins
+
+// Cookie names
+export const SESSION_COOKIE_NAME = 'session_token';
+export const PORTAL_SESSION_COOKIE_NAME = 'portal_token';
+export const SUPER_ADMIN_SESSION_COOKIE_NAME = 'super_admin_token';
 
 // CSRF
 export const CSRF_COOKIE_NAME = 'csrf_token';

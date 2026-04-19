@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,7 +53,7 @@ export default function PortalDashboard() {
     const fetchData = useCallback(() => {
         setLoading(true);
         setError(null);
-        fetch('/api/public/portal/status')
+        apiFetch('/api/public/portal/status')
             .then(async (res) => {
                 if (res.ok) return res.json();
                 if (res.status === 401) {
@@ -74,7 +75,7 @@ export default function PortalDashboard() {
     const fetchMessages = useCallback(async () => {
         setMessagesLoading(true);
         try {
-            const res = await fetch('/api/public/portal/messages');
+            const res = await apiFetch('/api/public/portal/messages');
             if (res.ok) {
                 const data = await res.json();
                 setMessages(data.messages || []);
@@ -97,7 +98,7 @@ export default function PortalDashboard() {
     }, [activeTab, fetchMessages]);
 
     const handleLogout = async () => {
-        await fetch('/api/public/portal/logout', { method: 'POST' });
+        await apiFetch('/api/public/portal/logout', { method: 'POST' });
         router.push('/portal');
     };
 
@@ -113,7 +114,7 @@ export default function PortalDashboard() {
         setMessageSuccess(null);
 
         try {
-            const res = await fetch('/api/public/portal/messages', {
+            const res = await apiFetch('/api/public/portal/messages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

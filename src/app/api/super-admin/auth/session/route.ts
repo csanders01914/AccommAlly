@@ -1,3 +1,4 @@
+import { SUPER_ADMIN_SESSION_COOKIE_NAME } from '@/lib/constants';
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSuperAdminSession } from '@/lib/super-admin-auth';
@@ -10,7 +11,7 @@ import logger from '@/lib/logger';
 export async function GET(request: NextRequest) {
     try {
         const cookieStore = await cookies();
-        const token = cookieStore.get('super_admin_token')?.value;
+        const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
 
         const session = await getSuperAdminSession(token);
 

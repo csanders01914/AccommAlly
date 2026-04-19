@@ -30,7 +30,7 @@ export function RecentCasesWidget({ cases }: RecentCasesWidgetProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/10">
+            <div className="p-4 border-b border-white/10 dark:border-gray-700/30 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                     <FileText className="w-4 h-4 text-blue-600" />
                     Recent Cases

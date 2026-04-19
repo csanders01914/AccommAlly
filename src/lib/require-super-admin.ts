@@ -1,3 +1,4 @@
+import { SUPER_ADMIN_SESSION_COOKIE_NAME } from '@/lib/constants';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { getSuperAdminSession } from '@/lib/super-admin-auth';
@@ -9,7 +10,7 @@ import type { SuperAdminSession } from '@/lib/super-admin-auth';
  */
 export async function requireSuperAdmin(): Promise<SuperAdminSession | null> {
     const cookieStore = await cookies();
-    const token = cookieStore.get('super_admin_token')?.value;
+    const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
     const session = await getSuperAdminSession(token);
     if (!session) return null;
     const admin = await prisma.superAdmin.findUnique({

@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, Folder, Loader2 } from 'lucide-react';
@@ -114,7 +115,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
 
     const fetchFolders = async () => {
         try {
-            const res = await fetch('/api/messages/folders');
+            const res = await apiFetch('/api/messages/folders');
             if (res.ok) setFolders(await res.json());
         } catch (e) { console.error(e); }
     };
@@ -133,7 +134,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
         setError('');
 
         try {
-            await fetch('/api/messages/rules', {
+            await apiFetch('/api/messages/rules', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

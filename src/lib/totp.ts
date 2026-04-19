@@ -1,4 +1,5 @@
 
+import crypto from 'crypto';
 import { authenticator } from '@otplib/preset-default';
 
 export const generateSecret = (email: string) => {
@@ -17,6 +18,6 @@ export const verifyToken = (token: string, secret: string) => {
 
 export const generateRecoveryCodes = () => {
     return Array.from({ length: 10 }, () =>
-        Math.random().toString(36).substring(2, 10).toUpperCase()
+        crypto.randomBytes(5).toString('hex').toUpperCase().substring(0, 8)
     );
 };

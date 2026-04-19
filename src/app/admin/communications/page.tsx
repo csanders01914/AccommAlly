@@ -1,9 +1,10 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { Mail, Phone, RefreshCw, User, Calendar, ArrowRight, CheckCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
-import { ReassignModal } from '@/components/ReassignModal';
+import { ReassignModal } from '@/components/modals/ReassignModal';
 
 type Tab = 'MESSAGES' | 'RTCS';
 
@@ -46,7 +47,7 @@ export default function AdminCommunicationsPage() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/communications?type=all');
+            const res = await apiFetch('/api/admin/communications?type=all');
             if (res.ok) {
                 const data = await res.json();
                 setMessages(data.messages);
@@ -63,7 +64,7 @@ export default function AdminCommunicationsPage() {
         if (!reassignItem) return;
 
         try {
-            const res = await fetch('/api/admin/communications/reassign', {
+            const res = await apiFetch('/api/admin/communications/reassign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -103,11 +104,11 @@ export default function AdminCommunicationsPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
+            <div className="flex space-x-1 bg-white/20 dark:bg-gray-800/50 p-1 rounded-xl w-fit border border-white/10">
                 <button
                     onClick={() => setActiveTab('MESSAGES')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'MESSAGES'
-                        ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                        ? 'bg-white/50 dark:bg-gray-700/50 text-blue-700 dark:text-blue-300 shadow-sm backdrop-blur-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                 >
@@ -119,7 +120,7 @@ export default function AdminCommunicationsPage() {
                 <button
                     onClick={() => setActiveTab('RTCS')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'RTCS'
-                        ? 'bg-white dark:bg-gray-700 text-amber-600 dark:text-amber-400 shadow-sm'
+                        ? 'bg-white/50 dark:bg-gray-700/50 text-amber-700 dark:text-amber-300 shadow-sm backdrop-blur-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                 >
@@ -131,7 +132,7 @@ export default function AdminCommunicationsPage() {
             </div>
 
             {/* Content Area */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[500px]">
+            <div className="bg-white/30 dark:bg-gray-900/30 rounded-2xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden min-h-[500px] backdrop-blur-md">
                 {loading && messages.length === 0 && rtcs.length === 0 ? (
                     <div className="flex justify-center items-center h-64">
                         <span className="text-gray-400">Loading...</span>
@@ -139,7 +140,7 @@ export default function AdminCommunicationsPage() {
                 ) : activeTab === 'MESSAGES' ? (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 text-gray-500 font-medium">
+                            <thead className="bg-white/20 dark:bg-gray-800/50 border-b border-white/10 dark:border-gray-700/30 text-gray-600 dark:text-gray-300 font-medium">
                                 <tr>
                                     <th className="px-6 py-4">Date</th>
                                     <th className="px-6 py-4">From</th>
@@ -148,9 +149,9 @@ export default function AdminCommunicationsPage() {
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                            <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
                                 {messages.map(msg => (
-                                    <tr key={msg.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <tr key={msg.id} className="hover:bg-white/20 dark:hover:bg-gray-800/30 transition-colors">
                                         <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
                                             {format(new Date(msg.createdAt), 'MMM d, h:mm a')}
                                         </td>
@@ -192,7 +193,7 @@ export default function AdminCommunicationsPage() {
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 text-gray-500 font-medium">
+                            <thead className="bg-white/20 dark:bg-gray-800/50 border-b border-white/10 dark:border-gray-700/30 text-gray-600 dark:text-gray-300 font-medium">
                                 <tr>
                                     <th className="px-6 py-4">Status</th>
                                     <th className="px-6 py-4">Client</th>
@@ -202,9 +203,9 @@ export default function AdminCommunicationsPage() {
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                            <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
                                 {rtcs.map(rtc => (
-                                    <tr key={rtc.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <tr key={rtc.id} className="hover:bg-white/20 dark:hover:bg-gray-800/30 transition-colors">
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${rtc.priority === 'URGENT' || rtc.priority === 'HIGH'
                                                 ? 'bg-red-50 text-red-700 border-red-100'
