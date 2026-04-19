@@ -12,7 +12,7 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { session, error } = await requireAuth();
+        const { session, error } = await requireAuth({ request });
         if (error) return error;
 
         const { id } = await params;
@@ -23,7 +23,18 @@ export async function DELETE(
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        // Annotations are deleted automatically via onDelete: Cascade in schema
+        // Audit log before delete so we capture fileName and caseId
+        await tenantPrisma.auditLog.create({
+            data: {
+                entityType: 'Document',
+                entityId: id,
+                action: 'DELETE',
+                userId: session.id,
+                metadata: JSON.stringify({ fileName: document.fileName, caseId: document.caseId }),
+            },
+        });
+
+        // Annotation records are removed automatically via onDelete: Cascade on Annotation.document
         await tenantPrisma.document.delete({ where: { id } });
 
         return new NextResponse(null, { status: 204 });
