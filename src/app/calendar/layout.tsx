@@ -22,7 +22,7 @@ export default function CalendarLayout({
                 // Fetch User
                 const userRes = await fetch('/api/auth/me');
                 if (!userRes.ok) {
-                    router.push('/');
+                    router.push('/login');
                     return;
                 }
                 const userData = await userRes.json();
@@ -36,7 +36,7 @@ export default function CalendarLayout({
                 }
             } catch (e) {
                 console.error(e);
-                router.push('/');
+                router.push('/login');
             } finally {
                 setIsLoading(false);
             }

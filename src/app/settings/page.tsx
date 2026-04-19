@@ -19,14 +19,14 @@ export default function SettingsPage() {
                     if (data.user) {
                         setUser(data.user);
                     } else {
-                        router.push('/');
+                        router.push('/login');
                     }
                 } else {
-                    router.push('/');
+                    router.push('/login');
                 }
             } catch (e) {
                 console.error(e);
-                router.push('/');
+                router.push('/login');
             } finally {
                 setLoading(false);
             }

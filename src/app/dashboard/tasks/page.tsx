@@ -197,7 +197,7 @@ export default function TasksDashboardPage() {
             try {
                 const res = await apiFetch('/api/auth/me'); // This route currently returns session with ID
                 if (!res.ok) {
-                    router.push('/');
+                    router.push('/login');
                     return;
                 }
                 const data = await res.json();
@@ -252,7 +252,7 @@ export default function TasksDashboardPage() {
                     console.error('Failed to fetch auxiliary data', e);
                 }
             } catch {
-                router.push('/');
+                router.push('/login');
             }
         };
         checkAuth();

@@ -26,7 +26,7 @@ export default function CaseDetailPageWrapper() {
             // 1. Get User Session
             const userRes = await apiFetch('/api/auth/me');
             if (!userRes.ok) {
-                router.push('/');
+                router.push('/login');
                 return;
             }
             const userData = await userRes.json();

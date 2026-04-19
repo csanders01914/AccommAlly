@@ -35,7 +35,7 @@ export default function SessionTimeoutProvider({ children }: { children: React.R
             });
         }
         // Redirect to login
-        router.push('/');
+        router.push('/login');
     }, [router]);
 
     useEffect(() => {

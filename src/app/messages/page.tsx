@@ -33,6 +33,9 @@ import {
     Filter,
     FileText,
     Paperclip,
+    FolderDown,
+    Copy,
+    CheckCircle,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -142,7 +145,7 @@ function MessagesContent() {
             try {
                 const res = await apiFetch('/api/auth/me');
                 if (!res.ok) {
-                    router.push('/');
+                    router.push('/login');
                     return;
                 }
                 const data = await res.json();
@@ -172,7 +175,7 @@ function MessagesContent() {
 
             } catch (e) {
                 console.error(e);
-                router.push('/');
+                router.push('/login');
             }
         };
         loadUser();
@@ -183,7 +186,22 @@ function MessagesContent() {
     // Handle URL Actions
     useEffect(() => {
         if (searchParams.get('compose') === 'true') {
-            handleNewMessage();
+            const externalEmail = searchParams.get('externalEmail') || '';
+            const externalName = searchParams.get('externalName') || '';
+            const caseId = searchParams.get('caseId') || '';
+            setComposeMode('new');
+            setComposeData({
+                recipientId: '',
+                subject: '',
+                body: signature ? `\n\n${signature}` : '',
+                caseId,
+                replyToId: '',
+                forwardedFromId: '',
+                isExternal: !!externalEmail,
+                externalEmail,
+                externalName,
+            });
+            setIsComposeOpen(true);
             router.replace('/messages', { scroll: false });
         }
     }, [searchParams, router]);
@@ -808,6 +826,57 @@ function MessageDetail({
     onDelete: () => void;
     onAddToCalendar: () => void;
 }) {
+    const [savingToCase, setSavingToCase] = useState(false);
+    const [savedDCN, setSavedDCN] = useState<string | null>(null);
+    const [dcnCopied, setDcnCopied] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+
+    const handleSaveToCase = async () => {
+        if (!message.case?.id) return;
+        setSavingToCase(true);
+        setSaveError(null);
+        setSavedDCN(null);
+        try {
+            const senderName = message.isExternal
+                ? (message.externalName || message.externalEmail || 'External Sender')
+                : (message.sender?.name || 'Unknown');
+            const dateStr = format(new Date(message.createdAt), 'PPPP \'at\' p');
+            const htmlContent = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>${message.subject || '(No Subject)'}</title></head>
+<body style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:24px;color:#111">
+  <table style="width:100%;border-bottom:2px solid #e5e7eb;padding-bottom:16px;margin-bottom:16px">
+    <tr><td style="color:#6b7280;width:80px">From:</td><td><strong>${senderName}</strong></td></tr>
+    <tr><td style="color:#6b7280">Date:</td><td>${dateStr}</td></tr>
+    <tr><td style="color:#6b7280">Subject:</td><td><strong>${message.subject || '(No Subject)'}</strong></td></tr>
+    <tr><td style="color:#6b7280">Case:</td><td>${message.case.caseNumber}</td></tr>
+  </table>
+  <div>${message.body}</div>
+</body>
+</html>`;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const safeSubject = (message.subject || 'message').replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+            const file = new File([blob], `email_${safeSubject}_${Date.now()}.html`, { type: 'text/html' });
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('caseId', message.case.id);
+            formData.append('category', 'CORRESPONDENCE');
+
+            const res = await apiFetch('/api/documents/upload', { method: 'POST', body: formData });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || 'Upload failed');
+            }
+            const result = await res.json();
+            setSavedDCN(result.documentControlNumber);
+        } catch (err) {
+            setSaveError(err instanceof Error ? err.message : 'Failed to save');
+        } finally {
+            setSavingToCase(false);
+        }
+    };
+
     // Handle external vs internal senders
     const isExternalInbound = message.isExternal && message.direction === 'INBOUND';
     const isExternalOutbound = message.isExternal && message.direction === 'OUTBOUND';
@@ -872,11 +941,60 @@ function MessageDetail({
                     <button onClick={onAddToCalendar} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors" title="Add to Calendar">
                         <Calendar className="w-4 h-4" />
                     </button>
+                    <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1" />
+                    <button
+                        onClick={handleSaveToCase}
+                        disabled={!message.case?.id || savingToCase}
+                        title={message.case?.id ? 'Save to case documents' : 'No related case — link a case first'}
+                        className={cn(
+                            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                            message.case?.id
+                                ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
+                                : "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                        )}
+                    >
+                        {savingToCase ? (
+                            <div className="w-3.5 h-3.5 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
+                        ) : (
+                            <FolderDown className="w-3.5 h-3.5" />
+                        )}
+                        Save to Case
+                    </button>
                     <div className="flex-1" />
                     <button onClick={onDelete} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors" title="Delete">
                         <Trash2 className="w-4 h-4" />
                     </button>
                 </div>
+
+                {/* Save to case result banners */}
+                {savedDCN && (
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800">
+                        <div className="flex items-center gap-2 text-sm text-green-800 dark:text-green-200">
+                            <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                            Saved to case documents. DCN: <code className="font-mono font-semibold">{savedDCN}</code>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                onClick={() => { navigator.clipboard.writeText(savedDCN); setDcnCopied(true); setTimeout(() => setDcnCopied(false), 2000); }}
+                                className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                                <Copy className="w-3 h-3" />
+                                {dcnCopied ? 'Copied!' : 'Copy'}
+                            </button>
+                            <button onClick={() => setSavedDCN(null)} className="p-1 text-green-600 hover:text-green-800 rounded transition-colors">
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {saveError && (
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
+                        {saveError}
+                        <button onClick={() => setSaveError(null)} className="p-1 rounded transition-colors hover:text-red-900">
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                )}
 
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 dark:border-gray-800">

@@ -18,7 +18,7 @@ export default function CalendarPage() {
             try {
                 const res = await fetch('/api/auth/me');
                 if (!res.ok) {
-                    router.push('/');
+                    router.push('/login');
                     return;
                 }
                 const data = await res.json();
@@ -36,7 +36,7 @@ export default function CalendarPage() {
                 }
 
             } catch (e) {
-                router.push('/');
+                router.push('/login');
             } finally {
                 setLoading(false);
             }
