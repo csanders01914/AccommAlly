@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { decrypt } from '@/lib/encryption';
+import { decrypt, hash } from '@/lib/encryption';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import logger from '@/lib/logger';
@@ -48,6 +48,9 @@ export async function GET(
                         uploadedBy: {
                             select: { id: true, name: true },
                         },
+                        _count: {
+                            select: { annotations: true },
+                        },
                     },
                     orderBy: { createdAt: 'desc' },
                 },
@@ -64,7 +67,7 @@ export async function GET(
                     select: { id: true, name: true, code: true }
                 },
                 claimant: {
-                    select: { id: true, claimantNumber: true }
+                    select: { id: true, claimantNumber: true, email: true, phone: true }
                 },
                 claimFamily: {
                     select: { id: true, name: true }
@@ -80,8 +83,13 @@ export async function GET(
         }
 
         // The Prisma encryption extension auto-decrypts direct Case/Note/Document fields.
-        // Nested User relations (name) are NOT auto-decrypted and must be done manually.
+        // Nested relations are NOT auto-decrypted and must be done manually.
         const decryptUser = (u: any) => u ? { ...u, name: decrypt(u.name) } : u;
+        const decryptClaimant = (c: any) => c ? {
+            ...c,
+            email: c.email ? decrypt(c.email) : null,
+            phone: c.phone ? decrypt(c.phone) : null,
+        } : c;
 
         // Transform to exclude binary fileData from documents and decrypt nested user names
         let transformedCase: any = {
@@ -96,7 +104,9 @@ export async function GET(
                 category: doc.category,
                 createdAt: doc.createdAt,
                 uploadedBy: decryptUser(doc.uploadedBy),
+                annotationCount: doc._count.annotations,
             })),
+            claimant: decryptClaimant(caseData.claimant),
             contacts: caseData.contacts || [],
             accommodations: caseData.accommodations,
             notes: caseData.notes.map((n: any) => ({
@@ -171,6 +181,16 @@ export async function PATCH(
                 ...(body.clientId && { clientId: body.clientId }),
                 ...(body.medicalDueDate !== undefined && {
                     medicalDueDate: body.medicalDueDate ? new Date(body.medicalDueDate) : null,
+                }),
+                // clientPhone: extension auto-encrypts non-empty strings; clear hash when emptying
+                ...(body.clientPhone !== undefined && {
+                    clientPhone: body.clientPhone || null,
+                    ...(!body.clientPhone && { clientPhoneHash: null }),
+                }),
+                // clientEmail: extension auto-encrypts and sets hash for non-empty strings
+                ...(body.clientEmail !== undefined && {
+                    clientEmail: body.clientEmail || null,
+                    ...(!body.clientEmail && { clientEmailHash: null }),
                 }),
             },
         });
