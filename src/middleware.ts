@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { CSRF_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/constants";
 
 // Paths that require authentication
 const PROTECTED_PATHS = ["/dashboard", "/admin", "/auditor", "/cases"];
@@ -8,8 +9,6 @@ const PROTECTED_PATHS = ["/dashboard", "/admin", "/auditor", "/cases"];
 const ADMIN_PATHS = ["/admin"];
 // Paths for ADMIN or AUDITOR
 const AUDITOR_PATHS = ["/auditor"];
-
-const CSRF_COOKIE_NAME = 'csrf_token';
 
 /**
  * Generate CSRF token using Web Crypto API (Edge Runtime compatible)
@@ -91,7 +90,7 @@ export async function middleware(request: NextRequest) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             path: '/',
-            maxAge: 60 * 60 * 8,
+            maxAge: SESSION_MAX_AGE_SECONDS,
         });
     }
 

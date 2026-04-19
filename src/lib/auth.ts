@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import logger from '@/lib/logger';
+import { SESSION_DURATION, SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
 
 const ALG = "HS256";
 
@@ -25,7 +26,7 @@ function getSecretKey(): Uint8Array {
 export async function signToken(payload: Record<string, unknown>) {
     return new SignJWT(payload)
         .setProtectedHeader({ alg: ALG })
-        .setExpirationTime("8h") // Session duration
+        .setExpirationTime(SESSION_DURATION)
         .sign(getSecretKey());
 }
 
@@ -70,7 +71,7 @@ export async function loginUser(userData: { id: string; email: string; role: str
         secure: useSecureCookie,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60 * 8, // 8 hours
+        maxAge: SESSION_MAX_AGE_SECONDS,
     });
 
     return token;

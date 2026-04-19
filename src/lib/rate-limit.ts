@@ -1,5 +1,12 @@
 import prisma from '@/lib/prisma';
 import logger from '@/lib/logger';
+import {
+    RATE_LIMIT_LOGIN_WINDOW, RATE_LIMIT_LOGIN_MAX,
+    RATE_LIMIT_2FA_WINDOW, RATE_LIMIT_2FA_MAX,
+    RATE_LIMIT_PORTAL_WINDOW, RATE_LIMIT_PORTAL_MAX,
+    RATE_LIMIT_API_WINDOW, RATE_LIMIT_API_MAX,
+    RATE_LIMIT_PASSWORD_RESET_WINDOW, RATE_LIMIT_PASSWORD_RESET_MAX,
+} from '@/lib/constants';
 
 interface RateLimiterConfig {
     maxRequests: number;
@@ -101,8 +108,8 @@ export function createRateLimiter(config: RateLimiterConfig) {
     };
 }
 
-export const loginRateLimiter = createRateLimiter({ maxRequests: 5, windowSeconds: 15 * 60, prefix: 'login' });
-export const twoFactorRateLimiter = createRateLimiter({ maxRequests: 5, windowSeconds: 5 * 60, prefix: '2fa' });
-export const portalLoginRateLimiter = createRateLimiter({ maxRequests: 10, windowSeconds: 15 * 60, prefix: 'portal' });
-export const apiRateLimiter = createRateLimiter({ maxRequests: 100, windowSeconds: 60, prefix: 'api' });
-export const passwordResetRateLimiter = createRateLimiter({ maxRequests: 3, windowSeconds: 60 * 60, prefix: 'pwreset' });
+export const loginRateLimiter = createRateLimiter({ maxRequests: RATE_LIMIT_LOGIN_MAX, windowSeconds: RATE_LIMIT_LOGIN_WINDOW, prefix: 'login' });
+export const twoFactorRateLimiter = createRateLimiter({ maxRequests: RATE_LIMIT_2FA_MAX, windowSeconds: RATE_LIMIT_2FA_WINDOW, prefix: '2fa' });
+export const portalLoginRateLimiter = createRateLimiter({ maxRequests: RATE_LIMIT_PORTAL_MAX, windowSeconds: RATE_LIMIT_PORTAL_WINDOW, prefix: 'portal' });
+export const apiRateLimiter = createRateLimiter({ maxRequests: RATE_LIMIT_API_MAX, windowSeconds: RATE_LIMIT_API_WINDOW, prefix: 'api' });
+export const passwordResetRateLimiter = createRateLimiter({ maxRequests: RATE_LIMIT_PASSWORD_RESET_MAX, windowSeconds: RATE_LIMIT_PASSWORD_RESET_WINDOW, prefix: 'pwreset' });

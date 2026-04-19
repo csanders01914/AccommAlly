@@ -8,11 +8,12 @@ import { comparePassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { createRateLimiter } from '@/lib/rate-limit';
 import logger from '@/lib/logger';
+import { RATE_LIMIT_SUPER_ADMIN_MAX, RATE_LIMIT_SUPER_ADMIN_WINDOW, SUPER_ADMIN_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
 
 // Super-admin login: 5 attempts per 15 minutes, keyed by email hash
 const superAdminLimiter = createRateLimiter({
-    maxRequests: 5,
-    windowSeconds: 15 * 60,
+    maxRequests: RATE_LIMIT_SUPER_ADMIN_MAX,
+    windowSeconds: RATE_LIMIT_SUPER_ADMIN_WINDOW,
     prefix: 'sa-login',
 });
 
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
-            maxAge: 60 * 60 * 4, // 4 hours
+            maxAge: SUPER_ADMIN_SESSION_MAX_AGE_SECONDS,
         });
 
         return NextResponse.json({

@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { portalLoginRateLimiter } from '@/lib/rate-limit';
 import { verifyCredential } from '@/lib/claimant';
 import logger from '@/lib/logger';
+import { PORTAL_SESSION_MAX_AGE_SECONDS } from '@/lib/constants';
 
 export async function POST(request: NextRequest) {
     try {
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
             secure: isSecure,
             sameSite: 'lax',
             path: '/',
-            maxAge: 60 * 60, // 1 hour
+            maxAge: PORTAL_SESSION_MAX_AGE_SECONDS,
         });
 
         await prisma.auditLog.create({

@@ -10,8 +10,7 @@
  * is automatically read from the cookie and added as a header.
  */
 
-const CSRF_COOKIE_NAME = 'csrf_token';
-const CSRF_HEADER_NAME = 'x-csrf-token';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '@/lib/constants';
 
 /**
  * Read a cookie value by name from document.cookies
