@@ -1502,6 +1502,7 @@ export function CaseDetailPage({
                                                                 </span>
                                                                 <button
                                                                     onClick={() => setConfirmingDeleteId(null)}
+                                                                    aria-label={`Cancel delete ${doc.fileName}`}
                                                                     className="px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded transition-colors"
                                                                 >
                                                                     Cancel
@@ -1509,6 +1510,7 @@ export function CaseDetailPage({
                                                                 <button
                                                                     onClick={() => handleDeleteDocument(doc.id)}
                                                                     disabled={deletingDocumentId === doc.id}
+                                                                    aria-label={`Confirm delete ${doc.fileName}`}
                                                                     className="px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
                                                                 >
                                                                     {deletingDocumentId === doc.id ? 'Deleting…' : 'Delete'}
