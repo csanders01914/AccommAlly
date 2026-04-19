@@ -24,7 +24,7 @@ function buildCspHeader(nonce: string): string {
     return [
         `default-src 'self'`,
         `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-        `style-src 'self' 'unsafe-inline'`,
+        `style-src 'self' 'unsafe-inline'`, // required for Tailwind CSS v4 dynamic styles
         `img-src 'self' data: blob:`,
         `font-src 'self' data:`,
         `connect-src 'self'`,
@@ -38,7 +38,8 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Generate a fresh nonce for every request
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    // Use raw random bytes (not a UUID string) for proper cryptographic entropy
+    const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
     const cspHeader = buildCspHeader(nonce);
 
     // Pass nonce to layout via a request header
@@ -56,19 +57,25 @@ export async function middleware(request: NextRequest) {
             // Redirect to login with return URL
             const url = new URL("/", request.url);
             url.searchParams.set("callbackUrl", pathname);
-            return NextResponse.redirect(url);
+            const redirectResponse = NextResponse.redirect(url);
+            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+            return redirectResponse;
         }
 
         // Role-based access control
         const isAdminPath = ADMIN_PATHS.some((path) => pathname.startsWith(path));
         if (isAdminPath && session.role !== "ADMIN" && session.role !== "SUPER_ADMIN") {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+            return redirectResponse;
         }
 
         // Auditor path access control (ADMIN or AUDITOR)
         const isAuditorPath = AUDITOR_PATHS.some((path) => pathname.startsWith(path));
         if (isAuditorPath && session.role !== "ADMIN" && session.role !== "AUDITOR") {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
+            const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+            return redirectResponse;
         }
     }
 
