@@ -42,6 +42,7 @@ import AddNoteModal from './modals/AddNoteModal';
 import { GenerateDecisionModal } from './modals/GenerateDecisionModal';
 import { TimelineView } from './TimelineView';
 import { DecisioningTab } from './case/DecisioningTab';
+import { useRouter as useNextRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 const DocumentViewer = dynamic(() => import('./DocumentViewer'), { ssr: false });
 import { DownloadOptionsModal } from './modals/DownloadOptionsModal';
@@ -86,6 +87,7 @@ type ExtendedTask = Task & {
 
 type ExtendedDocument = Document & {
     uploadedBy: { name: string | null };
+    annotationCount: number;
 };
 
 type ExtendedCase = Case & {
@@ -97,7 +99,7 @@ type ExtendedCase = Case & {
     medicalCondition?: string | null;
     preferredStartDate?: string | null;
     medicalDueDate?: string | null;
-    claimant?: { id: string; claimantNumber: string };
+    claimant?: { id: string; claimantNumber: string; email: string | null; phone: string | null };
     claimFamily?: { id: string; name: string | null };
 };
 
@@ -123,6 +125,7 @@ export function CaseDetailPage({
     onUpdateContact,
     onBack
 }: CaseDetailPageProps) {
+    const nextRouter = useNextRouter();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [caseData, setCaseData] = useState<ExtendedCase | null>(initialData || null);
     const [isLoading, setIsLoading] = useState(!initialData);
@@ -130,12 +133,15 @@ export function CaseDetailPage({
 
     // Modal States
     const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
+    const [noteModalDefaultType, setNoteModalDefaultType] = useState<'GENERAL' | 'PHONE_CALL' | 'MEDICAL_UPDATE' | 'DOCUMENTATION' | 'FOLLOW_UP' | 'CLIENT_REQUEST' | 'AUDIT'>('GENERAL');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDecisionModalOpen, setIsDecisionModalOpen] = useState(false);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
     const [documentToDownload, setDocumentToDownload] = useState<ExtendedDocument | null>(null);
     const [viewingDocument, setViewingDocument] = useState<ExtendedDocument | null>(null);
+    const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+    const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(null);
     const [isAddAccommodationModalOpen, setIsAddAccommodationModalOpen] = useState(false);
     const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
     const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -154,6 +160,46 @@ export function CaseDetailPage({
         caseData?.medicalDueDate ? caseData.medicalDueDate.toString().split('T')[0] : ''
     );
     const [savingMedDue, setSavingMedDue] = useState(false);
+
+    // Claimant contact inline edit state
+    const [editingContactField, setEditingContactField] = useState<'phone' | 'email' | null>(null);
+    const [editContactPhone, setEditContactPhone] = useState('');
+    const [editContactEmail, setEditContactEmail] = useState('');
+    const [savingContactField, setSavingContactField] = useState(false);
+
+    const startEditContact = (field: 'phone' | 'email') => {
+        if (field === 'phone') setEditContactPhone(caseData?.clientPhone || '');
+        else setEditContactEmail(caseData?.clientEmail || '');
+        setEditingContactField(field);
+    };
+
+    const cancelEditContact = () => setEditingContactField(null);
+
+    const saveContactField = async (field: 'phone' | 'email') => {
+        const value = field === 'phone' ? editContactPhone : editContactEmail;
+        setSavingContactField(true);
+        try {
+            const res = await fetch(`/api/cases/${caseData?.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [field === 'phone' ? 'clientPhone' : 'clientEmail']: value }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to save');
+            }
+            setCaseData(prev => prev ? {
+                ...prev,
+                ...(field === 'phone' ? { clientPhone: value } : { clientEmail: value }),
+            } : prev);
+            setEditingContactField(null);
+        } catch (err) {
+            console.error('Failed to save contact field:', err);
+            alert('Failed to save. Please try again.');
+        } finally {
+            setSavingContactField(false);
+        }
+    };
 
     // Re-sync medical due date when caseData is loaded or refreshed
     useEffect(() => {
@@ -190,6 +236,9 @@ export function CaseDetailPage({
     const [uploadError, setUploadError] = useState<string | null>(null);
 
     const [uploadCategory, setUploadCategory] = useState<string>('OTHER');
+    const [uploadEmailMode, setUploadEmailMode] = useState(false);
+    const [lastUploadedDCN, setLastUploadedDCN] = useState<string | null>(null);
+    const [dcnCopied, setDcnCopied] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -276,15 +325,46 @@ export function CaseDetailPage({
                 throw new Error(errorData.error || 'Upload failed');
             }
 
-            // Refresh data
+            const result = await response.json();
+
             await fetchCaseData();
             setIsUploadModalOpen(false);
+
+            if (uploadEmailMode && result.documentControlNumber) {
+                setLastUploadedDCN(result.documentControlNumber);
+            }
+
+            setUploadEmailMode(false);
             if (onRefresh) onRefresh();
 
         } catch (err) {
             setUploadError(err instanceof Error ? err.message : 'Upload failed');
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const openEmailUpload = () => {
+        setUploadEmailMode(true);
+        setUploadCategory('CORRESPONDENCE');
+        setUploadError(null);
+        setIsUploadModalOpen(true);
+    };
+
+    const handleDeleteDocument = async (docId: string) => {
+        setDeletingDocumentId(docId);
+        try {
+            const res = await fetch(`/api/documents/${docId}`, { method: 'DELETE' });
+            if (res.ok) {
+                await fetchCaseData();
+            } else {
+                alert('Failed to delete document. Please try again.');
+            }
+        } catch {
+            alert('Failed to delete document. Please try again.');
+        } finally {
+            setDeletingDocumentId(null);
+            setConfirmingDeleteId(null);
         }
     };
 
@@ -1069,7 +1149,11 @@ export function CaseDetailPage({
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
                                             <p className="font-mono text-gray-900 dark:text-white">{caseData.clientPhone || 'No number'}</p>
                                         </div>
-                                        <button className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors">
+                                        <button
+                                            onClick={() => { setNoteModalDefaultType('PHONE_CALL'); setIsAddNoteModalOpen(true); }}
+                                            title="Log a call"
+                                            className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors"
+                                        >
                                             <Phone className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -1079,7 +1163,21 @@ export function CaseDetailPage({
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
                                             <p className="truncate max-w-[150px] text-gray-900 dark:text-white">{caseData.clientEmail || 'No email'}</p>
                                         </div>
-                                        <button className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors">
+                                        <button
+                                            onClick={() => {
+                                                if (!caseData.clientEmail) return;
+                                                const params = new URLSearchParams({
+                                                    compose: 'true',
+                                                    externalEmail: caseData.clientEmail,
+                                                    externalName: caseData.clientName || '',
+                                                    caseId: caseData.id,
+                                                });
+                                                nextRouter.push(`/messages?${params.toString()}`);
+                                            }}
+                                            disabled={!caseData.clientEmail}
+                                            title="Send email"
+                                            className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                        >
                                             <Send className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -1301,14 +1399,54 @@ export function CaseDetailPage({
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">Documents</h2>
-                                <button
-                                    onClick={() => setIsUploadModalOpen(true)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                                >
-                                    <Upload className="w-4 h-4" />
-                                    Upload Document
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={openEmailUpload}
+                                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                                    >
+                                        <Mail className="w-4 h-4" />
+                                        Upload Email
+                                    </button>
+                                    <button
+                                        onClick={() => { setUploadEmailMode(false); setUploadCategory('OTHER'); setIsUploadModalOpen(true); }}
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                    >
+                                        <Upload className="w-4 h-4" />
+                                        Upload Document
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* Post-upload DCN banner */}
+                            {lastUploadedDCN && (
+                                <div className="flex items-center justify-between gap-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+                                    <div className="flex items-center gap-3">
+                                        <Mail className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
+                                        <div>
+                                            <p className="text-sm font-medium text-green-800 dark:text-green-200">Email uploaded successfully</p>
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
+                                                DCN assigned: <code className="font-mono font-semibold">{lastUploadedDCN}</code>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(lastUploadedDCN);
+                                                setDcnCopied(true);
+                                                setTimeout(() => setDcnCopied(false), 2000);
+                                            }}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                                        >
+                                            <Copy className="w-3.5 h-3.5" />
+                                            {dcnCopied ? 'Copied!' : 'Copy DCN'}
+                                        </button>
+                                        <button onClick={() => setLastUploadedDCN(null)} className="p-1.5 text-green-600 hover:text-green-800 rounded-lg transition-colors">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {caseData.documents.length === 0 ? (
                                 <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-12 text-center">
@@ -1355,30 +1493,55 @@ export function CaseDetailPage({
                                                         <div className="text-xs">by {doc.uploadedBy.name}</div>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                onClick={() => setViewingDocument(doc)}
-                                                                className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                                title="View"
-                                                                aria-label={`View ${doc.fileName}`}
-                                                            >
-                                                                <Eye className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDownloadDocument(doc.id, doc.fileName, doc.fileType)}
-                                                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                                title="Download"
-                                                                aria-label={`Download ${doc.fileName}`}
-                                                            >
-                                                                <Download className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                                aria-label={`Delete ${doc.fileName}`}
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
+                                                        {confirmingDeleteId === doc.id ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-red-600 dark:text-red-400">
+                                                                    {doc.annotationCount > 0
+                                                                        ? `Has ${doc.annotationCount} annotation(s). Delete permanently?`
+                                                                        : 'Delete permanently?'}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => setConfirmingDeleteId(null)}
+                                                                    className="px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded transition-colors"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteDocument(doc.id)}
+                                                                    disabled={deletingDocumentId === doc.id}
+                                                                    className="px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+                                                                >
+                                                                    {deletingDocumentId === doc.id ? 'Deleting…' : 'Delete'}
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => setViewingDocument(doc)}
+                                                                    className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                                    title="View"
+                                                                    aria-label={`View ${doc.fileName}`}
+                                                                >
+                                                                    <Eye className="w-4 h-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDownloadDocument(doc.id, doc.fileName, doc.fileType)}
+                                                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                    title="Download"
+                                                                    aria-label={`Download ${doc.fileName}`}
+                                                                >
+                                                                    <Download className="w-4 h-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setConfirmingDeleteId(doc.id)}
+                                                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    title="Delete"
+                                                                    aria-label={`Delete ${doc.fileName}`}
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -1394,6 +1557,71 @@ export function CaseDetailPage({
                 {
                     activeTab === 'contacts' && (
                         <div className="space-y-6">
+                            {/* Claimant Contact Info */}
+                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Claimant Contact Info</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Phone */}
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <Phone className="w-5 h-5 text-gray-400 shrink-0" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                                            {editingContactField === 'phone' ? (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="tel"
+                                                        value={editContactPhone}
+                                                        onChange={e => setEditContactPhone(e.target.value)}
+                                                        onKeyDown={e => { if (e.key === 'Enter') saveContactField('phone'); if (e.key === 'Escape') cancelEditContact(); }}
+                                                        className="flex-1 px-2 py-1 text-sm border border-blue-400 rounded bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        autoFocus
+                                                        disabled={savingContactField}
+                                                    />
+                                                    <button onClick={() => saveContactField('phone')} disabled={savingContactField} className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors">Save</button>
+                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 transition-colors">Cancel</button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-between">
+                                                    <p className="font-mono text-sm text-gray-900 dark:text-white">{caseData.clientPhone || <span className="text-gray-400 italic text-sm font-normal">Not set</span>}</p>
+                                                    <button onClick={() => startEditContact('phone')} className="ml-2 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors">
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {/* Email */}
+                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <Mail className="w-5 h-5 text-gray-400 shrink-0" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                                            {editingContactField === 'email' ? (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="email"
+                                                        value={editContactEmail}
+                                                        onChange={e => setEditContactEmail(e.target.value)}
+                                                        onKeyDown={e => { if (e.key === 'Enter') saveContactField('email'); if (e.key === 'Escape') cancelEditContact(); }}
+                                                        className="flex-1 px-2 py-1 text-sm border border-blue-400 rounded bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        autoFocus
+                                                        disabled={savingContactField}
+                                                    />
+                                                    <button onClick={() => saveContactField('email')} disabled={savingContactField} className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors">Save</button>
+                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 transition-colors">Cancel</button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-between">
+                                                    <p className="text-sm text-gray-900 dark:text-white truncate">{caseData.clientEmail || <span className="text-gray-400 italic text-sm font-normal">Not set</span>}</p>
+                                                    <button onClick={() => startEditContact('email')} className="ml-2 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors shrink-0">
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">Address Book</h2>
                                 <button
@@ -1483,12 +1711,13 @@ export function CaseDetailPage({
             {/* MODALS */}
             < AddNoteModal
                 isOpen={isAddNoteModalOpen}
-                onClose={() => setIsAddNoteModalOpen(false)}
+                onClose={() => { setIsAddNoteModalOpen(false); setNoteModalDefaultType('GENERAL'); }}
                 onSubmit={handleSubmitNote}
                 claims={[{ id: caseId, caseNumber: caseData.caseNumber }]}
                 coordinatorName={currentUser.name}
                 userRole={currentUser.role as 'ADMIN' | 'AUDITOR' | 'COORDINATOR'}
                 claimantNumber={caseData.claimant?.claimantNumber}
+                defaultNoteType={noteModalDefaultType}
             />
 
             <AddTaskModal
@@ -1515,18 +1744,19 @@ export function CaseDetailPage({
                 }}
             />
 
-            {/* Upload Document Modal */}
+            {/* Upload Document / Email Modal */}
             {
                 isUploadModalOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                         <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-lg">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Upload Document
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                    {uploadEmailMode ? <><Mail className="w-5 h-5 text-blue-500" /> Upload Received Email</> : 'Upload Document'}
                                 </h3>
                                 <button
                                     onClick={() => {
                                         setIsUploadModalOpen(false);
+                                        setUploadEmailMode(false);
                                         setUploadError(null);
                                     }}
                                     className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
@@ -1535,6 +1765,12 @@ export function CaseDetailPage({
                                 </button>
                             </div>
 
+                            {uploadEmailMode && (
+                                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                                    Upload a received email file (.eml or .msg). A DCN will be assigned automatically and shown after upload.
+                                </p>
+                            )}
+
                             {uploadError && (
                                 <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
                                     {uploadError}
@@ -1542,30 +1778,38 @@ export function CaseDetailPage({
                             )}
 
                             <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Category
-                                    </label>
-                                    <select
-                                        value={uploadCategory}
-                                        onChange={(e) => setUploadCategory(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                                    >
-                                        <option value="MEDICAL">Medical</option>
-                                        <option value="LEGAL">Legal</option>
-                                        <option value="HR">HR</option>
-                                        <option value="CORRESPONDENCE">Correspondence</option>
-                                        <option value="OTHER">Other</option>
-                                    </select>
-                                </div>
+                                {uploadEmailMode ? (
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+                                        <Mail className="w-4 h-4 shrink-0" />
+                                        Category: <span className="font-medium">Correspondence</span>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Category
+                                        </label>
+                                        <select
+                                            value={uploadCategory}
+                                            onChange={(e) => setUploadCategory(e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="MEDICAL">Medical</option>
+                                            <option value="LEGAL">Legal</option>
+                                            <option value="HR">HR</option>
+                                            <option value="CORRESPONDENCE">Correspondence</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                )}
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Select File
+                                        {uploadEmailMode ? 'Select Email File (.eml or .msg)' : 'Select File'}
                                     </label>
                                     <input
                                         ref={fileInputRef}
                                         type="file"
+                                        accept={uploadEmailMode ? '.eml,.msg' : undefined}
                                         className="w-full text-sm text-gray-500 dark:text-gray-400
                                                 file:mr-4 file:py-2 file:px-4
                                                 file:rounded-lg file:border-0
@@ -1581,6 +1825,7 @@ export function CaseDetailPage({
                                 <button
                                     onClick={() => {
                                         setIsUploadModalOpen(false);
+                                        setUploadEmailMode(false);
                                         setUploadError(null);
                                     }}
                                     className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -1593,7 +1838,7 @@ export function CaseDetailPage({
                                         if (file) {
                                             handleUploadDocument(file);
                                         } else {
-                                            setUploadError('Please select a file');
+                                            setUploadError(uploadEmailMode ? 'Please select an .eml or .msg file' : 'Please select a file');
                                         }
                                     }}
                                     disabled={isUploading}
