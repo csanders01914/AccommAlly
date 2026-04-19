@@ -128,8 +128,9 @@ export function LandingHeroPage() {
             style={{ color: '#8C8880' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#5C5850')}
             onMouseLeave={e => (e.currentTarget.style.color = '#8C8880')}
+            aria-label="For claimants, visit the portal"
           >
-            For claimants, visit the portal →
+            For claimants, visit the portal <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>
