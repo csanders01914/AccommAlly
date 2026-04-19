@@ -9,8 +9,41 @@ const ADMIN_PATHS = ["/admin"];
 // Paths for ADMIN or AUDITOR
 const AUDITOR_PATHS = ["/auditor"];
 
+const CSRF_COOKIE_NAME = 'csrf_token';
+
+/**
+ * Generate CSRF token using Web Crypto API (Edge Runtime compatible)
+ */
+function generateCsrfToken(): string {
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function buildCspHeader(nonce: string): string {
+    return [
+        `default-src 'self'`,
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+        `style-src 'self' 'unsafe-inline'`,
+        `img-src 'self' data: blob:`,
+        `font-src 'self' data:`,
+        `connect-src 'self'`,
+        `frame-ancestors 'self'`,
+        `base-uri 'self'`,
+        `form-action 'self'`,
+    ].join('; ');
+}
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+
+    // Generate a fresh nonce for every request
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const cspHeader = buildCspHeader(nonce);
+
+    // Pass nonce to layout via a request header
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-nonce', nonce);
 
     // Check if path is protected
     const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
@@ -28,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
         // Role-based access control
         const isAdminPath = ADMIN_PATHS.some((path) => pathname.startsWith(path));
-        if (isAdminPath && session.role !== "ADMIN") {
+        if (isAdminPath && session.role !== "ADMIN" && session.role !== "SUPER_ADMIN") {
             return NextResponse.redirect(new URL("/dashboard", request.url));
         }
 
@@ -39,20 +72,34 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+
+    // Set CSP on every response
+    response.headers.set('Content-Security-Policy', cspHeader);
+
+    // Ensure CSRF cookie is set on every response
+    if (!request.cookies.get(CSRF_COOKIE_NAME)?.value) {
+        response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
+            httpOnly: false, // Must be readable by JavaScript for double-submit
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 60 * 60 * 8,
+        });
+    }
+
+    return response;
 }
 
 export const config = {
     matcher: [
         /*
          * Match all request paths except for the ones starting with:
-         * - api/auth (allow login/logout)
+         * - api (API routes — handled by requireAuth server-side)
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * - login (login page)
-         * - public (public files)
          */
-        '/((?!api/auth|_next/static|_next/image|favicon.ico|login|images|public).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|images|public).*)',
     ],
 };

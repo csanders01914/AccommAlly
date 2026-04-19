@@ -29,7 +29,8 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
-          }
+          },
+          // CSP is set dynamically per-request in middleware.ts with a nonce
         ],
       },
     ];
