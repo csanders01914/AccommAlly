@@ -21,37 +21,42 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                     query: (args: OperationArgs) => Promise<unknown>;
                 }) {
                     const params = args;
+
+                    const isAlreadyEncrypted = (v: string): boolean =>
+                        /^[0-9a-f]{24}:[0-9a-f]{32}:/.test(v) || // GCM: 24-char IV + 32-char authTag + ciphertext
+                        /^[0-9a-f]{32}:[0-9a-f]+$/.test(v);        // CBC legacy: 32-char IV + ciphertext
+
                     // --- WRITE OPERATIONS ---
                     if (['create', 'update', 'upsert', 'createMany'].includes(operation) && params.data) {
                         const processData = (data: DbRecord) => {
                             // User encryption
                             if (model === 'User') {
-                                if (typeof data.email === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.email)) {
+                                if (typeof data.email === 'string' && data.email.length > 0 && !isAlreadyEncrypted(data.email)) {
                                     data.emailHash = hash(data.email);
                                     data.email = encrypt(data.email);
                                 }
-                                if (typeof data.name === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.name)) data.name = encrypt(data.name);
+                                if (typeof data.name === 'string' && data.name.length > 0 && !isAlreadyEncrypted(data.name)) data.name = encrypt(data.name);
                             }
                             // Case encryption
                             if (model === 'Case') {
-                                if (typeof data.clientName === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.clientName)) data.clientName = encrypt(data.clientName);
-                                if (typeof data.clientLastName === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.clientLastName)) data.clientLastName = encrypt(data.clientLastName);
-                                if (typeof data.medicalCondition === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.medicalCondition)) data.medicalCondition = encrypt(data.medicalCondition);
-                                if (typeof data.clientEmail === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.clientEmail)) {
+                                if (typeof data.clientName === 'string' && data.clientName.length > 0 && !isAlreadyEncrypted(data.clientName)) data.clientName = encrypt(data.clientName);
+                                if (typeof data.clientLastName === 'string' && data.clientLastName.length > 0 && !isAlreadyEncrypted(data.clientLastName)) data.clientLastName = encrypt(data.clientLastName);
+                                if (typeof data.medicalCondition === 'string' && data.medicalCondition.length > 0 && !isAlreadyEncrypted(data.medicalCondition)) data.medicalCondition = encrypt(data.medicalCondition);
+                                if (typeof data.clientEmail === 'string' && data.clientEmail.length > 0 && !isAlreadyEncrypted(data.clientEmail)) {
                                     data.clientEmailHash = hash(data.clientEmail);
                                     data.clientEmail = encrypt(data.clientEmail);
                                 }
-                                if (typeof data.clientPhone === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.clientPhone)) {
+                                if (typeof data.clientPhone === 'string' && data.clientPhone.length > 0 && !isAlreadyEncrypted(data.clientPhone)) {
                                     data.clientPhoneHash = hash(data.clientPhone);
                                     data.clientPhone = encrypt(data.clientPhone);
                                 }
-                                if (typeof data.description === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.description)) data.description = encrypt(data.description);
+                                if (typeof data.description === 'string' && data.description.length > 0 && !isAlreadyEncrypted(data.description)) data.description = encrypt(data.description);
                                 // Note: 'reason' is part of description in current route logic, but if adding field, handle it.
                                 // Currently 'reason' is not in schema directly separately (it's concatenated).
                             }
                             // Note encryption
                             if (model === 'Note') {
-                                if (typeof data.content === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.content)) data.content = encrypt(data.content);
+                                if (typeof data.content === 'string' && data.content.length > 0 && !isAlreadyEncrypted(data.content)) data.content = encrypt(data.content);
                             }
                             // Document encryption
                             if (model === 'Document') {
@@ -71,8 +76,8 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                             }
                             // AuditLog encryption
                             if (model === 'AuditLog') {
-                                if (typeof data.oldValue === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.oldValue)) data.oldValue = encrypt(data.oldValue);
-                                if (typeof data.newValue === 'string' && !/^[0-9a-f]{24}:[0-9a-f]{32}:/.test(data.newValue)) data.newValue = encrypt(data.newValue);
+                                if (typeof data.oldValue === 'string' && data.oldValue.length > 0 && !isAlreadyEncrypted(data.oldValue)) data.oldValue = encrypt(data.oldValue);
+                                if (typeof data.newValue === 'string' && data.newValue.length > 0 && !isAlreadyEncrypted(data.newValue)) data.newValue = encrypt(data.newValue);
                             }
                             // MessageAttachment encryption
                             if (model === 'MessageAttachment') {
