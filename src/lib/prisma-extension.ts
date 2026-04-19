@@ -59,6 +59,13 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                                 if (data.oldValue && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.oldValue)) data.oldValue = encrypt(data.oldValue);
                                 if (data.newValue && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.newValue)) data.newValue = encrypt(data.newValue);
                             }
+                            // MessageAttachment encryption
+                            if (model === 'MessageAttachment') {
+                                if (data.data) {
+                                    const buf = Buffer.isBuffer(data.data) ? data.data : Buffer.from(data.data as ArrayBuffer);
+                                    data.data = encryptBuffer(buf);
+                                }
+                            }
                         };
 
                         if (Array.isArray(params.data)) {
@@ -95,22 +102,31 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                     const result = await query(params);
 
                     // --- DECRYPT RESULTS ---
+                    const safeDecrypt = (value: string, field: string, modelName: string): string => {
+                        try {
+                            return decrypt(value);
+                        } catch (e) {
+                            console.error(`[encryption] Failed to decrypt ${modelName}.${field}:`, e);
+                            return '[decryption error]';
+                        }
+                    };
+
                     const decryptItem = (item: any) => {
                         if (!item) return item;
 
                         if (model === 'User') {
-                            if (item.email) item.email = decrypt(item.email);
-                            if (item.name) item.name = decrypt(item.name);
+                            if (item.email) item.email = safeDecrypt(item.email, 'email', 'User');
+                            if (item.name) item.name = safeDecrypt(item.name, 'name', 'User');
                         }
                         if (model === 'Case') {
-                            if (item.clientName) item.clientName = decrypt(item.clientName);
-                            if (item.medicalCondition) item.medicalCondition = decrypt(item.medicalCondition);
-                            if (item.clientEmail) item.clientEmail = decrypt(item.clientEmail);
-                            if (item.clientPhone) item.clientPhone = decrypt(item.clientPhone);
-                            if (item.description) item.description = decrypt(item.description);
+                            if (item.clientName) item.clientName = safeDecrypt(item.clientName, 'clientName', 'Case');
+                            if (item.medicalCondition) item.medicalCondition = safeDecrypt(item.medicalCondition, 'medicalCondition', 'Case');
+                            if (item.clientEmail) item.clientEmail = safeDecrypt(item.clientEmail, 'clientEmail', 'Case');
+                            if (item.clientPhone) item.clientPhone = safeDecrypt(item.clientPhone, 'clientPhone', 'Case');
+                            if (item.description) item.description = safeDecrypt(item.description, 'description', 'Case');
                         }
                         if (model === 'Note') {
-                            if (item.content) item.content = decrypt(item.content);
+                            if (item.content) item.content = safeDecrypt(item.content, 'content', 'Note');
                         }
                         if (model === 'Document') {
                             if (item.fileData) {
@@ -118,21 +134,31 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                                     const buf = Buffer.isBuffer(item.fileData) ? item.fileData : Buffer.from(item.fileData);
                                     item.fileData = decryptBuffer(buf);
                                 } catch (e) {
-                                    // If conversion failed, keep original
-                                    console.error('Decryption buffer conversion error', e);
+                                    console.error('[encryption] Failed to decrypt Document.fileData:', e);
+                                    item.fileData = null;
                                 }
                             }
                         }
-
+                        if (model === 'MessageAttachment') {
+                            if (item.data) {
+                                try {
+                                    const buf = Buffer.isBuffer(item.data) ? item.data : Buffer.from(item.data);
+                                    item.data = decryptBuffer(buf);
+                                } catch (e) {
+                                    console.error('[encryption] Failed to decrypt MessageAttachment.data:', e);
+                                    item.data = null;
+                                }
+                            }
+                        }
                         if (model === 'AuditLog') {
-                            if (item.oldValue && !item.oldValue.startsWith('{')) item.oldValue = decrypt(item.oldValue);
-                            if (item.newValue && !item.newValue.startsWith('{')) item.newValue = decrypt(item.newValue);
+                            if (item.oldValue && !item.oldValue.startsWith('{')) item.oldValue = safeDecrypt(item.oldValue, 'oldValue', 'AuditLog');
+                            if (item.newValue && !item.newValue.startsWith('{')) item.newValue = safeDecrypt(item.newValue, 'newValue', 'AuditLog');
 
                             // Recursively decrypt included relations
                             // The type of item.user is not strictly known here, but if it was included in query, it's an object.
                             if (item.user) {
-                                if (item.user.email) item.user.email = decrypt(item.user.email);
-                                if (item.user.name) item.user.name = decrypt(item.user.name);
+                                if (item.user.email) item.user.email = safeDecrypt(item.user.email, 'email', 'User');
+                                if (item.user.name) item.user.name = safeDecrypt(item.user.name, 'name', 'User');
                             }
                         }
                         return item;
