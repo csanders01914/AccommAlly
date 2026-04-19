@@ -6,6 +6,8 @@ export class NextRequest {
     method: string;
     headers: Headers;
     cookies: any;
+    nextUrl: URL;
+    private _body: string | undefined;
 
     constructor(url: string, init?: any) {
         this.url = url;
@@ -14,6 +16,13 @@ export class NextRequest {
         this.cookies = {
             get: (_name: string) => undefined,
         };
+        this.nextUrl = new URL(url);
+        this._body = init?.body;
+    }
+
+    async json() {
+        if (!this._body) return {};
+        return JSON.parse(this._body);
     }
 }
 
