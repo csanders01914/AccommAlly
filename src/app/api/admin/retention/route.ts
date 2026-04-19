@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized: Admin access required' }, { status: 403 });
         }
 
-        logger.debug(`[Admin: ${session.email}] Initiating 5-Year Data Retention Policy...`);
+        logger.debug({ userId: session.id }, 'Initiating 5-Year Data Retention Policy');
 
         const cutoffDate = subYears(new Date(), 5);
 

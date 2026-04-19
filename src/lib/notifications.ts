@@ -1,6 +1,7 @@
 import logger from '@/lib/logger';
 
 export async function sendEmailNotification(userId: string, subject: string, snippet: string) {
+    // TODO: redact snippet before replacing this mock with a real email provider
     logger.debug({ userId, subject, snippet }, '[MOCK EMAIL] Email notification triggered');
 }
 
