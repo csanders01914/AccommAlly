@@ -354,7 +354,7 @@ export function CaseDetailPage({
     const handleDeleteDocument = async (docId: string) => {
         setDeletingDocumentId(docId);
         try {
-            const res = await fetch(`/api/documents/${docId}`, { method: 'DELETE' });
+            const res = await apiFetch(`/api/documents/${docId}`, { method: 'DELETE' });
             if (res.ok) {
                 await fetchCaseData();
             } else {

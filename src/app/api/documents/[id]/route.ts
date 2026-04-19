@@ -23,19 +23,24 @@ export async function DELETE(
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        // Audit log before delete so we capture fileName and caseId
-        await tenantPrisma.auditLog.create({
-            data: {
-                entityType: 'Document',
-                entityId: id,
-                action: 'DELETE',
-                userId: session.id,
-                metadata: JSON.stringify({ fileName: document.fileName, caseId: document.caseId }),
-            },
-        });
+        if (document.uploadedById !== session.id && !['ADMIN', 'AUDITOR'].includes(session.role)) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
-        // Annotation records are removed automatically via onDelete: Cascade on Annotation.document
-        await tenantPrisma.document.delete({ where: { id } });
+        // Audit log and delete are atomic — a partial state would corrupt the audit trail
+        await tenantPrisma.$transaction(async (tx) => {
+            await tx.auditLog.create({
+                data: {
+                    entityType: 'Document',
+                    entityId: id,
+                    action: 'DELETE',
+                    userId: session.id,
+                    metadata: JSON.stringify({ fileName: document.fileName, caseId: document.caseId }),
+                },
+            });
+            // Annotation records are removed automatically via onDelete: Cascade on Annotation.document
+            await tx.document.delete({ where: { id } });
+        });
 
         return new NextResponse(null, { status: 204 });
 
