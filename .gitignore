@@ -36,6 +36,7 @@ login-debug.old.txt
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -45,3 +46,16 @@ login-debug.old.txt
 next-env.d.ts
 
 /src/generated/prisma
+
+# debug and output artifacts
+debug-*.json
+*-output.json
+*.log
+seed.log
+seed_error.txt
+build_log.txt
+encrypted_message.txt
+lint-*.txt
+verify_output.txt
+login-debug.txt
+test-db.ts
