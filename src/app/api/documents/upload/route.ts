@@ -12,16 +12,21 @@ const ALLOWED_FILE_TYPES = new Set([
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-excel',
     'text/plain',
+    'text/html',
     'text/csv',
     'image/jpeg',
     'image/png',
     'image/gif',
     'image/webp',
+    'message/rfc822',          // .eml
+    'application/vnd.ms-outlook', // .msg
+    'application/octet-stream', // fallback for .eml/.msg when browser omits MIME type
 ]);
 
 const ALLOWED_EXTENSIONS = new Set([
     '.pdf', '.doc', '.docx', '.xlsx', '.xls',
-    '.txt', '.csv', '.jpg', '.jpeg', '.png', '.gif', '.webp',
+    '.txt', '.html', '.csv', '.jpg', '.jpeg', '.png', '.gif', '.webp',
+    '.eml', '.msg',
 ]);
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
@@ -55,7 +60,7 @@ export async function POST(request: NextRequest) {
         const ext = '.' + (file.name.split('.').pop()?.toLowerCase() || '');
         if (!ALLOWED_FILE_TYPES.has(file.type) && !ALLOWED_EXTENSIONS.has(ext)) {
             return NextResponse.json(
-                { error: 'File type not allowed. Accepted: PDF, DOCX, DOC, XLSX, XLS, TXT, CSV, JPG, PNG, GIF, WEBP' },
+                { error: 'File type not allowed. Accepted: PDF, DOCX, DOC, XLSX, XLS, TXT, CSV, JPG, PNG, GIF, WEBP, EML, MSG' },
                 { status: 400 }
             );
         }
@@ -97,6 +102,7 @@ export async function POST(request: NextRequest) {
         // Audit Log: Document Uploaded
         await tenantPrisma.auditLog.create({
             data: {
+                tenantId: session.tenantId,
                 entityType: 'Document',
                 entityId: newDoc.id,
                 action: 'CREATE',

@@ -15,6 +15,7 @@ const ALLOWED_CONTENT_TYPES = new Set([
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/html',
     'text/plain',
     'application/zip',
 ]);

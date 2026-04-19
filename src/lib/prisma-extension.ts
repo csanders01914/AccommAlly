@@ -131,6 +131,12 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                         }
                     };
 
+                    const decryptUser = (user: DbRecord | null | undefined): void => {
+                        if (!user || typeof user !== 'object') return;
+                        if (typeof user.email === 'string') user.email = safeDecrypt(user.email, 'email', 'User');
+                        if (typeof user.name === 'string') user.name = safeDecrypt(user.name, 'name', 'User');
+                    };
+
                     const decryptItem = (item: DbRecord | null): DbRecord | null => {
                         if (!item) return item;
 
@@ -145,11 +151,35 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                             if (typeof item.clientEmail === 'string') item.clientEmail = safeDecrypt(item.clientEmail, 'clientEmail', 'Case');
                             if (typeof item.clientPhone === 'string') item.clientPhone = safeDecrypt(item.clientPhone, 'clientPhone', 'Case');
                             if (typeof item.description === 'string') item.description = safeDecrypt(item.description, 'description', 'Case');
+                            decryptUser(item.createdBy as DbRecord);
+                            if (Array.isArray(item.tasks)) {
+                                (item.tasks as DbRecord[]).forEach(task => {
+                                    decryptUser(task.assignedTo as DbRecord);
+                                    decryptUser(task.createdBy as DbRecord);
+                                });
+                            }
+                            if (Array.isArray(item.notes)) {
+                                (item.notes as DbRecord[]).forEach(note => {
+                                    if (typeof note.content === 'string') note.content = safeDecrypt(note.content, 'content', 'Note');
+                                    decryptUser(note.author as DbRecord);
+                                });
+                            }
+                            if (Array.isArray(item.documents)) {
+                                (item.documents as DbRecord[]).forEach(doc => {
+                                    decryptUser(doc.uploadedBy as DbRecord);
+                                });
+                            }
+                        }
+                        if (model === 'Task') {
+                            decryptUser(item.assignedTo as DbRecord);
+                            decryptUser(item.createdBy as DbRecord);
                         }
                         if (model === 'Note') {
                             if (typeof item.content === 'string') item.content = safeDecrypt(item.content, 'content', 'Note');
+                            decryptUser(item.author as DbRecord);
                         }
                         if (model === 'Document') {
+                            decryptUser(item.uploadedBy as DbRecord);
                             if (item.fileData) {
                                 try {
                                     const buf = Buffer.isBuffer(item.fileData) ? item.fileData : Buffer.from(item.fileData as Buffer);
@@ -159,6 +189,10 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                                     item.fileData = null;
                                 }
                             }
+                        }
+                        if (model === 'Message') {
+                            decryptUser(item.sender as DbRecord);
+                            decryptUser(item.recipient as DbRecord);
                         }
                         if (model === 'MessageAttachment') {
                             if (item.data) {
@@ -174,14 +208,7 @@ export const encryptionExtension = Prisma.defineExtension((client) => {
                         if (model === 'AuditLog') {
                             if (typeof item.oldValue === 'string' && !item.oldValue.startsWith('{')) item.oldValue = safeDecrypt(item.oldValue, 'oldValue', 'AuditLog');
                             if (typeof item.newValue === 'string' && !item.newValue.startsWith('{')) item.newValue = safeDecrypt(item.newValue, 'newValue', 'AuditLog');
-
-                            // Recursively decrypt included relations
-                            // The type of item.user is not strictly known here, but if it was included in query, it's an object.
-                            if (item.user && typeof item.user === 'object' && item.user !== null) {
-                                const user = item.user as DbRecord;
-                                if (typeof user.email === 'string') user.email = safeDecrypt(user.email, 'email', 'User');
-                                if (typeof user.name === 'string') user.name = safeDecrypt(user.name, 'name', 'User');
-                            }
+                            decryptUser(item.user as DbRecord);
                         }
                         return item;
                     };

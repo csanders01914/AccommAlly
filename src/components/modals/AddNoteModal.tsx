@@ -49,6 +49,7 @@ interface AddNoteModalProps {
     coordinatorName?: string;
     userRole?: 'ADMIN' | 'AUDITOR' | 'COORDINATOR';
     claimantNumber?: string | null;
+    defaultNoteType?: NoteType;
 }
 
 // ============================================
@@ -76,9 +77,14 @@ export function AddNoteModal({
     coordinatorName = 'Coordinator',
     userRole,
     claimantNumber,
+    defaultNoteType = 'GENERAL',
 }: AddNoteModalProps) {
     const [content, setContent] = useState('');
-    const [noteType, setNoteType] = useState<NoteType>('GENERAL');
+    const [noteType, setNoteType] = useState<NoteType>(defaultNoteType);
+
+    useEffect(() => {
+        if (isOpen) setNoteType(defaultNoteType);
+    }, [isOpen, defaultNoteType]);
     const [selectedClaimId, setSelectedClaimId] = useState<string>('');
     const [showReturnCall, setShowReturnCall] = useState(false);
     const [returnCallDate, setReturnCallDate] = useState('');

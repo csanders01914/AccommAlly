@@ -91,6 +91,7 @@ export function DocumentViewer({
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const isPdf = fileType === 'application/pdf';
+    const isHtml = fileType === 'text/html' || fileType === 'message/rfc822' || fileType === 'application/vnd.ms-outlook';
     const documentUrl = `/api/documents/${documentId}/view`;
 
     // ============================================
@@ -598,6 +599,17 @@ export function DocumentViewer({
                                 )}
                             </div>
                         </Document>
+                    ) : isHtml ? (
+                        /* HTML viewer for email/HTML documents */
+                        <div className="w-full h-[80vh]">
+                            <iframe
+                                src={documentUrl}
+                                title={fileName}
+                                className="w-full h-full border-0"
+                                sandbox="allow-same-origin"
+                                onLoad={() => setIsLoading(false)}
+                            />
+                        </div>
                     ) : (
                         /* Image viewer for non-PDF files */
                         <div

@@ -90,6 +90,7 @@ async function main() {
     await prisma.case.deleteMany();
     await prisma.claimFamily.deleteMany();
     await prisma.claimant.deleteMany();
+    await prisma.documentTemplate.deleteMany();
     await prisma.client.deleteMany();
     await prisma.user.deleteMany();
     await prisma.tenant.deleteMany();
