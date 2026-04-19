@@ -22,39 +22,44 @@ export function createRateLimiter(config: RateLimiterConfig) {
             const now = new Date();
             const resetAt = new Date(now.getTime() + windowSeconds * 1000);
 
-            const record = await prisma.rateLimit.upsert({
-                where: { key },
-                create: { key, count: 1, resetAt },
-                update: { count: { increment: 1 } },
-                select: { count: true, resetAt: true },
-            });
-
-            // If the stored resetAt has passed, the window expired — reset to fresh window.
-            if (record.resetAt <= now) {
-                await prisma.rateLimit.update({
+            try {
+                const record = await prisma.rateLimit.upsert({
                     where: { key },
-                    data: { count: 1, resetAt },
+                    create: { key, count: 1, resetAt },
+                    update: { count: { increment: 1 } },
+                    select: { count: true, resetAt: true },
                 });
+
+                // If the stored resetAt has passed, the window expired — reset to fresh window.
+                if (record.resetAt <= now) {
+                    await prisma.rateLimit.update({
+                        where: { key },
+                        data: { count: 1, resetAt },
+                    });
+                    return {
+                        allowed: true,
+                        remaining: maxRequests - 1,
+                        resetAt: resetAt.getTime(),
+                        retryAfterSeconds: 0,
+                    };
+                }
+
+                const allowed = record.count <= maxRequests;
+                const remaining = Math.max(0, maxRequests - record.count);
+                const retryAfterSeconds = allowed
+                    ? 0
+                    : Math.ceil((record.resetAt.getTime() - now.getTime()) / 1000);
+
+                return { allowed, remaining, resetAt: record.resetAt.getTime(), retryAfterSeconds };
+            } catch (e) {
+                console.error('[rate-limit] DB error — failing open:', e);
                 return {
                     allowed: true,
-                    remaining: maxRequests - 1,
+                    remaining: maxRequests,
                     resetAt: resetAt.getTime(),
                     retryAfterSeconds: 0,
                 };
             }
-
-            const allowed = record.count <= maxRequests;
-            const remaining = Math.max(0, maxRequests - record.count);
-            const retryAfterSeconds = allowed
-                ? 0
-                : Math.ceil((record.resetAt.getTime() - now.getTime()) / 1000);
-
-            return {
-                allowed,
-                remaining,
-                resetAt: record.resetAt.getTime(),
-                retryAfterSeconds,
-            };
         },
 
         async reset(identifier: string): Promise<void> {
@@ -66,25 +71,31 @@ export function createRateLimiter(config: RateLimiterConfig) {
         async peek(identifier: string): Promise<RateLimitResult> {
             const key = `${prefix}:${identifier}`;
             const now = new Date();
-            const record = await prisma.rateLimit.findUnique({ where: { key } });
-
-            if (!record || record.resetAt <= now) {
-                const resetAt = new Date(now.getTime() + windowSeconds * 1000);
-                return {
-                    allowed: true,
-                    remaining: maxRequests,
-                    resetAt: resetAt.getTime(),
-                    retryAfterSeconds: 0,
-                };
-            }
-
-            const allowed = record.count < maxRequests;
-            return {
-                allowed,
-                remaining: Math.max(0, maxRequests - record.count),
-                resetAt: record.resetAt.getTime(),
-                retryAfterSeconds: allowed ? 0 : Math.ceil((record.resetAt.getTime() - now.getTime()) / 1000),
+            const defaultResult: RateLimitResult = {
+                allowed: true,
+                remaining: maxRequests,
+                resetAt: new Date(now.getTime() + windowSeconds * 1000).getTime(),
+                retryAfterSeconds: 0,
             };
+
+            try {
+                const record = await prisma.rateLimit.findUnique({ where: { key } });
+
+                if (!record || record.resetAt <= now) {
+                    return defaultResult;
+                }
+
+                const allowed = record.count < maxRequests;
+                return {
+                    allowed,
+                    remaining: Math.max(0, maxRequests - record.count),
+                    resetAt: record.resetAt.getTime(),
+                    retryAfterSeconds: allowed ? 0 : Math.ceil((record.resetAt.getTime() - now.getTime()) / 1000),
+                };
+            } catch (e) {
+                console.error('[rate-limit] DB error — failing open:', e);
+                return defaultResult;
+            }
         },
     };
 }

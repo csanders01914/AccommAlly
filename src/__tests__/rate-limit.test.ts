@@ -7,6 +7,7 @@ jest.mock('@/lib/prisma', () => ({
             upsert: jest.fn(),
             findUnique: jest.fn(),
             delete: jest.fn(),
+            update: jest.fn(),
         },
     },
     prisma: {
@@ -14,6 +15,7 @@ jest.mock('@/lib/prisma', () => ({
             upsert: jest.fn(),
             findUnique: jest.fn(),
             delete: jest.fn(),
+            update: jest.fn(),
         },
     },
 }));
@@ -61,5 +63,35 @@ describe('createRateLimiter', () => {
         });
         const limiter = createRateLimiter({ maxRequests: 5, windowSeconds: 60, prefix: 'test' });
         expect(limiter.check('ip')).toBeInstanceOf(Promise);
+    });
+
+    it('resets and allows when window has expired', async () => {
+        const past = new Date(Date.now() - 1000); // expired 1 second ago
+        (prisma.rateLimit.upsert as jest.Mock).mockResolvedValue({
+            count: 99,
+            resetAt: past,
+        });
+        (prisma.rateLimit.update as jest.Mock).mockResolvedValue({
+            count: 1,
+            resetAt: new Date(Date.now() + 60000),
+        });
+
+        const limiter = createRateLimiter({ maxRequests: 5, windowSeconds: 60, prefix: 'test' });
+        const result = await limiter.check('expired-ip');
+
+        expect(result.allowed).toBe(true);
+        expect(result.remaining).toBe(4);
+        expect(prisma.rateLimit.update).toHaveBeenCalledWith(
+            expect.objectContaining({ data: expect.objectContaining({ count: 1 }) })
+        );
+    });
+
+    it('fails open when DB is unavailable', async () => {
+        (prisma.rateLimit.upsert as jest.Mock).mockRejectedValue(new Error('connection refused'));
+
+        const limiter = createRateLimiter({ maxRequests: 5, windowSeconds: 60, prefix: 'test' });
+        const result = await limiter.check('any-ip');
+
+        expect(result.allowed).toBe(true);
     });
 });
