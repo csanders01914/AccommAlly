@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { encrypt } from '@/lib/encryption';
+import { z } from 'zod';
+
+const CreateNoteSchema = z.object({
+    content: z.string().min(1, 'Content is required'),
+    noteType: z.enum(['GENERAL', 'INTAKE', 'DECISION', 'FOLLOWUP', 'SYSTEM', 'AUDIT']).default('GENERAL'),
+});
 
 /**
  * Generate a Document Control Number (DCN) in timestamp format: YYYYMMDDHHmmssSSS
@@ -23,10 +30,10 @@ export async function POST(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const contentType = request.headers.get('content-type') || '';
         let content = '';
@@ -74,12 +81,16 @@ export async function POST(
             if (body.returnCallDate) returnCallDate = new Date(body.returnCallDate);
         }
 
-        if (!content) {
-            return NextResponse.json({ error: 'Content is required' }, { status: 400 });
+        const noteValidation = CreateNoteSchema.safeParse({ content, noteType });
+        if (!noteValidation.success) {
+            return NextResponse.json(
+                { error: 'Validation failed', details: noteValidation.error.issues },
+                { status: 400 }
+            );
         }
 
         // Verify case exists
-        const existingCase = await prisma.case.findUnique({
+        const existingCase = await tenantPrisma.case.findUnique({
             where: { id },
         });
 
@@ -112,7 +123,7 @@ export async function POST(
             documentDCN = generateDCN();
             const buffer = Buffer.from(await file.arrayBuffer());
 
-            await prisma.document.create({
+            await tenantPrisma.document.create({
                 data: {
                     fileName: file.name,
                     fileType: file.type,
@@ -133,7 +144,7 @@ export async function POST(
         const encryptedContent = encrypt(content);
         console.log('DEBUG: Encrypted Content Preview:', encryptedContent.substring(0, 20) + '...');
 
-        const note = await prisma.note.create({
+        const note = await tenantPrisma.note.create({
             data: {
                 content: encryptedContent,
                 noteType,
@@ -149,7 +160,7 @@ export async function POST(
 
         // Create Task if requested
         if (createTask && taskDescription) {
-            await prisma.task.create({
+            await tenantPrisma.task.create({
                 data: {
                     title: taskDescription.length > 50 ? taskDescription.substring(0, 47) + '...' : taskDescription, // Use description as title
                     description: taskDescription,
@@ -166,7 +177,7 @@ export async function POST(
 
         // Create Return Call Task if requested
         if (setReturnCall && returnCallDate) {
-            await prisma.task.create({
+            await tenantPrisma.task.create({
                 data: {
                     title: 'Return Call',
                     description: `Return call requested for ${returnCallDate.toLocaleString()}`,
@@ -183,7 +194,7 @@ export async function POST(
         }
 
         // Create audit log
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Case',
                 entityId: id,

@@ -4,6 +4,15 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt, hash } from '@/lib/encryption';
+import { z } from 'zod';
+
+const SendMessageSchema = z.object({
+    subject: z.string().max(255).optional(),
+    body: z.string().min(1, 'Message body is required'),
+    externalEmail: z.string().email('Invalid email address').optional(),
+    externalName: z.string().optional(),
+    recipientId: z.string().optional(),
+});
 
 export async function GET(request: NextRequest) {
     try {
@@ -145,6 +154,21 @@ export async function POST(request: NextRequest) {
         const externalEmail = formData.get('externalEmail') as string | null;
         const externalName = formData.get('externalName') as string | null;
         const attachmentFiles = formData.getAll('attachments') as File[];
+
+        // Zod validation for content fields
+        const messageValidation = SendMessageSchema.safeParse({
+            subject,
+            body: contentBody,
+            externalEmail: isExternal ? externalEmail : undefined,
+            externalName: isExternal ? externalName : undefined,
+            recipientId: isExternal ? undefined : recipientId,
+        });
+        if (!messageValidation.success) {
+            return NextResponse.json(
+                { error: 'Validation failed', details: messageValidation.error.issues },
+                { status: 400 }
+            );
+        }
 
         // Validation
         if (isExternal) {

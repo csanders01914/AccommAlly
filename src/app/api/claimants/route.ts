@@ -1,16 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt } from '@/lib/encryption';
 import { generateClaimantNumber, createNameHash, hashCredential, validatePin, validatePassphrase } from '@/lib/claimant';
 import crypto from 'crypto';
+import { z } from 'zod';
+
+const CreateClaimantSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    birthdate: z.string().min(1, 'Birthdate is required'),
+    email: z.string().email('Invalid email address').optional().or(z.literal('')),
+    phone: z.string().optional(),
+    credentialType: z.enum(['PIN', 'PASSPHRASE']).default('PIN'),
+    credential: z.string().min(4, 'Credential must be at least 4 characters'),
+});
 
 /**
  * GET /api/claimants - List/search claimants
  */
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -66,7 +81,11 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -77,13 +96,16 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { name, birthdate, email, phone, credentialType, credential } = body;
-
-        if (!name || !birthdate || !credential) {
-            return NextResponse.json({ error: 'Name, birthdate, and credential are required' }, { status: 400 });
+        const validation = CreateClaimantSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: 'Validation failed', details: validation.error.issues },
+                { status: 400 }
+            );
         }
+        const { name, birthdate, email, phone, credentialType, credential } = validation.data;
 
-        const credType = credentialType || 'PIN';
+        const credType = credentialType;
 
         // Validate credential
         if (credType === 'PIN' && !validatePin(credential)) {

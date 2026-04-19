@@ -1,15 +1,31 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { LifecycleStatus, LifecycleSubstatus, AccommodationStatus } from '@prisma/client';
+import { z } from 'zod';
+
+const CreateAccommodationSchema = z.object({
+    caseId: z.string().min(1, 'Case ID is required'),
+    type: z.string().min(1, 'Accommodation type is required'),
+    subtype: z.string().optional(),
+    description: z.string().min(1, 'Description is required'),
+    isLongTerm: z.boolean().optional().default(false),
+    startDate: z.string().min(1, 'Start date is required'),
+    endDate: z.string().optional(),
+});
 
 /**
  * GET /api/accommodations
  * List accommodations for a specific case
  */
 export async function GET(request: NextRequest) {
-    const session = await getSession();
+    const { session, error } = await requireAuth();
+
+    if (error) return error;
+
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -44,26 +60,25 @@ export async function GET(request: NextRequest) {
  * Create a new accommodation request
  */
 export async function POST(request: NextRequest) {
-    const session = await getSession();
+    const { session, error } = await requireAuth();
+
+    if (error) return error;
+
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     try {
         const body = await request.json();
-        const {
-            caseId,
-            type,
-            subtype,
-            description,
-            isLongTerm,
-            startDate,
-            endDate
-        } = body;
-
-        if (!caseId || !type || !description || !startDate) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        const validation = CreateAccommodationSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: 'Validation failed', details: validation.error.issues },
+                { status: 400 }
+            );
         }
+        const { caseId, type, subtype, description, isLongTerm, startDate, endDate } = validation.data;
 
         // Generate next accommodation number (001, 002, etc.)
         const count = await prisma.accommodation.count({
