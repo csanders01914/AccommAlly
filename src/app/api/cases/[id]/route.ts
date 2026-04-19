@@ -164,7 +164,10 @@ export async function PATCH(
                 ...(body.medicalCondition && { medicalCondition: body.medicalCondition }),
                 ...(body.category && { category: body.category }),
                 ...(body.preferredStartDate && { preferredStartDate: body.preferredStartDate }),
-                ...(body.clientName && { clientName: body.clientName }),
+                ...(body.clientName && {
+                    clientName: body.clientName,
+                    clientLastName: body.clientName.trim().split(/\s+/).pop() ?? body.clientName.trim(),
+                }),
                 ...(body.clientId && { clientId: body.clientId }),
                 ...(body.medicalDueDate !== undefined && {
                     medicalDueDate: body.medicalDueDate ? new Date(body.medicalDueDate) : null,

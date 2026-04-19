@@ -278,7 +278,8 @@ export async function POST(request: NextRequest) {
         const encryptedEmail = email ? encrypt(email) : null;
         const encryptedPhone = phone ? encrypt(phone) : null;
 
-        // Extract last name: last whitespace-delimited token of the full name
+        // For single-word names, the full name is stored as the last-name token —
+        // the login fallback path uses the same convention, keeping behavior consistent.
         const clientLastName = fullName.trim().split(/\s+/).pop() ?? fullName.trim();
 
         const newCase = await prisma.case.create({
