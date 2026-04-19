@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import logger from '@/lib/logger';
@@ -28,7 +29,7 @@ export async function DELETE(
         }
 
         // Audit log and delete are atomic — a partial state would corrupt the audit trail
-        await tenantPrisma.$transaction(async (tx) => {
+        await tenantPrisma.$transaction(async (tx: Prisma.TransactionClient) => {
             await tx.auditLog.create({
                 data: {
                     entityType: 'Document',
