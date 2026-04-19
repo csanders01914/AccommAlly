@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
@@ -62,7 +68,7 @@ export async function GET(request: NextRequest) {
                 priority: t.priority,
                 createdAt: t.createdAt,
                 dueDate: t.dueDate,
-                assignedTo: t.assignedTo ? { ...t.assignedTo, name: t.assignedTo.name } : null,
+                assignedTo: t.assignedTo ? { ...t.assignedTo, name: decrypt(t.assignedTo.name) } : null,
                 client: t.case ? { name: decrypt(t.case.clientName), caseNumber: t.case.caseNumber } : null
             }));
 
@@ -91,7 +97,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ messages, rtcs });
 
     } catch (error) {
-        console.error('Error fetching admin comms:', error);
+        logger.error({ err: error }, 'Error fetching admin comms:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

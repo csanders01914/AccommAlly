@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import logger from '@/lib/logger';
 
 export async function POST(
     request: NextRequest,
@@ -38,7 +39,7 @@ export async function POST(
         return NextResponse.json(accommodation);
 
     } catch (error) {
-        console.error('Error creating accommodation:', error);
+        logger.error({ err: error }, 'Error creating accommodation:');
         return NextResponse.json(
             { error: 'Failed to create accommodation' },
             { status: 500 }

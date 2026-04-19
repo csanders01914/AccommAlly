@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/cases/[id] - Fetch a single case with all related data
@@ -78,10 +79,14 @@ export async function GET(
             );
         }
 
-        // Transform to exclude binary fileData from documents
+        // The Prisma encryption extension auto-decrypts direct Case/Note/Document fields.
+        // Nested User relations (name) are NOT auto-decrypted and must be done manually.
+        const decryptUser = (u: any) => u ? { ...u, name: decrypt(u.name) } : u;
+
+        // Transform to exclude binary fileData from documents and decrypt nested user names
         let transformedCase: any = {
             ...caseData,
-            createdBy: caseData.createdBy,
+            createdBy: decryptUser(caseData.createdBy),
             documents: caseData.documents.map((doc: any) => ({
                 id: doc.id,
                 fileName: doc.fileName,
@@ -90,15 +95,18 @@ export async function GET(
                 documentControlNumber: doc.documentControlNumber,
                 category: doc.category,
                 createdAt: doc.createdAt,
-                uploadedBy: doc.uploadedBy,
+                uploadedBy: decryptUser(doc.uploadedBy),
             })),
             contacts: caseData.contacts || [],
             accommodations: caseData.accommodations,
-            notes: caseData.notes,
+            notes: caseData.notes.map((n: any) => ({
+                ...n,
+                author: decryptUser(n.author),
+            })),
             tasks: caseData.tasks.map((t: any) => ({
                 ...t,
-                createdBy: t.createdBy,
-                assignee: t.assignedTo || { id: 'unassigned', name: 'Unassigned' }
+                createdBy: decryptUser(t.createdBy),
+                assignee: t.assignedTo ? decryptUser(t.assignedTo) : { id: 'unassigned', name: 'Unassigned' }
             })),
             clientSSN: undefined,
         };
@@ -116,7 +124,7 @@ export async function GET(
         return NextResponse.json(transformedCase);
 
     } catch (error) {
-        console.error('Error fetching case:', error);
+        logger.error({ err: error }, 'Error fetching case:');
         return NextResponse.json(
             { error: 'Failed to fetch case' },
             { status: 500 }
@@ -170,7 +178,7 @@ export async function PATCH(
         if (error instanceof Error && 'code' in error && (error as { code: string }).code === 'P2025') {
             return NextResponse.json({ error: 'Case not found' }, { status: 404 });
         }
-        console.error('Error updating case:', error);
+        logger.error({ err: error }, 'Error updating case:');
         return NextResponse.json(
             { error: 'Failed to update case' },
             { status: 500 }
@@ -206,7 +214,7 @@ export async function DELETE(
         return NextResponse.json({ success: true, message: 'Case deleted successfully' });
 
     } catch (error) {
-        console.error('Error deleting case:', error);
+        logger.error({ err: error }, 'Error deleting case:');
         return NextResponse.json(
             { error: 'Failed to delete case' },
             { status: 500 }

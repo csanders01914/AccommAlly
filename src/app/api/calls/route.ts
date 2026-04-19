@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 // GET all call requests
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -42,7 +48,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ calls: decryptedCalls });
 
     } catch (error) {
-        console.error('CallRequests GET Error:', error);
+        logger.error({ err: error }, 'CallRequests GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -50,7 +56,11 @@ export async function GET(request: NextRequest) {
 // POST create new call request
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -95,7 +105,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(call, { status: 201 });
 
     } catch (error) {
-        console.error('CallRequests POST Error:', error);
+        logger.error({ err: error }, 'CallRequests POST Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

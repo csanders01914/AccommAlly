@@ -4,6 +4,7 @@ import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { portalLoginRateLimiter } from '@/lib/rate-limit';
 import { verifyCredential } from '@/lib/claimant';
+import logger from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Portal Login Error:', error);
+        logger.error({ err: error }, 'Portal Login Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

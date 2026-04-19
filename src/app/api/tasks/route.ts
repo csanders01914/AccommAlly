@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
-import { decrypt } from '@/lib/encryption';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const CreateTaskSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -20,10 +21,10 @@ const GetTasksSchema = z.object({
 
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const { searchParams } = new URL(request.url);
         const start = searchParams.get('start');
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
             };
         }
 
-        const tasks = await prisma.task.findMany({
+        const tasks = await tenantPrisma.task.findMany({
             where: whereClause,
             orderBy: { dueDate: 'asc' },
             include: {
@@ -54,42 +55,19 @@ export async function GET(request: NextRequest) {
             }
         });
 
-        // Manually decrypt nested case data and assignee name
-        const decryptedTasks = tasks.map((t: any) => {
-            if (t.case && t.case.clientName) {
-                t.case.clientName = decrypt(t.case.clientName);
-            }
-            if (t.assignedTo && t.assignedTo.name) {
-                try {
-                    t.assignedTo.name = decrypt(t.assignedTo.name);
-                } catch (e) {
-                    console.error('Failed to decrypt assignee name', e);
-                    // Fallback or leave as is (likely encrypted)
-                }
-            }
-            if (t.createdBy && t.createdBy.name) {
-                try {
-                    t.createdBy.name = decrypt(t.createdBy.name);
-                } catch (e) {
-                    console.error('Failed to decrypt creator name', e);
-                }
-            }
-            return t;
-        });
-
-        return NextResponse.json({ tasks: decryptedTasks });
+        return NextResponse.json({ tasks });
     } catch (error) {
-        console.error('Task Fetch Error', error);
+        logger.error({ err: error }, 'Task Fetch Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const body = await request.json();
         const validation = CreateTaskSchema.safeParse(body);
@@ -100,7 +78,7 @@ export async function POST(request: NextRequest) {
 
         const { title, description, priority, category, dueDate, caseId } = validation.data;
 
-        const newTask = await prisma.task.create({
+        const newTask = await tenantPrisma.task.create({
             data: {
                 title,
                 description,
@@ -115,7 +93,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Audit Log: Task Created
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Task',
                 entityId: newTask.id,
@@ -132,7 +110,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(newTask);
 
     } catch (error) {
-        console.error('Task Create Error', error);
+        logger.error({ err: error }, 'Task Create Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

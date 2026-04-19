@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
-    const session = await getSession();
+    const { session, error } = await requireAuth();
+
+    if (error) return error;
+
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     if (!session || session.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -17,7 +23,7 @@ export async function GET(request: NextRequest) {
         dbStatus = 'connected';
         dbLatency = Math.round(performance.now() - start);
     } catch (e) {
-        console.error('Database health check failed:', e);
+        logger.error({ err: e }, 'Database health check failed:');
         dbStatus = 'error';
     }
 

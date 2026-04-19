@@ -3,8 +3,10 @@ import prisma from '@/lib/prisma';
 import { generateClaimNumber, type ClaimType } from '@/lib/generateCaseNumber';
 import { encrypt, hash, decrypt } from '@/lib/encryption';
 import { getOrCreateClaimant, validatePin, validatePassphrase } from '@/lib/claimant';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { z } from 'zod';
-
+import logger from '@/lib/logger';
 
 const CaseSchema = z.object({
     fullName: z.string().min(1, "Full name is required"),
@@ -102,6 +104,52 @@ export async function POST(request: NextRequest) {
     try {
         const contentType = request.headers.get('content-type') || '';
 
+        // --- Tenant Resolution ---
+        // For authenticated users, use their session tenantId
+        // For unauthenticated intake forms, resolve from subdomain/domain
+        const { getSession } = await import('@/lib/auth');
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
+        let tenantId: string | null = null;
+
+        if (session?.tenantId) {
+            tenantId = session.tenantId as string;
+        } else {
+            // Public intake form — resolve tenant from subdomain/domain
+            const host = request.headers.get('host') || '';
+            const { resolveTenantId } = await import('@/lib/prisma-tenant');
+            let subdomain: string | undefined;
+            if (host.includes('.')) {
+                subdomain = host.split('.')[0];
+            }
+
+            const result = await resolveTenantId({
+                subdomain,
+                customDomain: host,
+                prisma
+            });
+            if (result) {
+                tenantId = result.tenantId;
+            }
+        }
+
+        if (!tenantId) {
+            logger.error('Failed to resolve tenant for Case creation');
+            return NextResponse.json({ error: 'Tenant context required' }, { status: 400 });
+        }
+
+        // --- Check Limits ---
+        const { checkTenantClaimLimit } = await import('@/lib/tenant-limits');
+        const canCreateCase = await checkTenantClaimLimit(tenantId);
+
+        if (!canCreateCase) {
+            return NextResponse.json({ error: 'Subscription plan active claim limit reached' }, { status: 403 });
+        }
+
+        // --- Parse Body ---
         let data: any = {};
         let supportingDocument: File | null = null;
 
@@ -176,37 +224,38 @@ export async function POST(request: NextRequest) {
             type: claimType,
         });
 
-        // Find or create system user for automated actions
+        // Find or create system user for automated actions (Scoped to Tenant)
         let createdById: string;
         const systemEmailHash = hash('system@accessally.org');
+
+        // Check for system user within this tenant
         let systemUser = await prisma.user.findFirst({
-            where: { emailHash: systemEmailHash },
+            where: {
+                emailHash: systemEmailHash,
+                tenantId
+            },
         });
 
         if (!systemUser) {
-            // Try finding by name as fallback
-            systemUser = await prisma.user.findFirst({
-                where: { name: 'System' },
-            });
-        }
-
-        if (systemUser) {
-            createdById = systemUser.id;
-        } else {
-            // Create system user if it doesn't exist
+            // Create system user if it doesn't exist for this tenant
             const newUser = await prisma.user.create({
                 data: {
+                    tenantId,
                     email: 'system@accessally.org',
                     name: 'System',
                     role: 'COORDINATOR',
+                    active: false // System user shouldn't login
                 },
             });
             createdById = newUser.id;
+        } else {
+            createdById = systemUser.id;
         }
 
         // Auto-match or create claimant
         const birthdateObj = new Date(birthdate);
         const { claimant, isNew: isNewClaimant } = await getOrCreateClaimant({
+            tenantId,
             name: fullName,
             birthdate: birthdateObj,
             email,
@@ -231,6 +280,7 @@ export async function POST(request: NextRequest) {
 
         const newCase = await prisma.case.create({
             data: {
+                tenantId,
                 caseNumber,
                 clientName: fullName,
                 clientEmail: encryptedEmail,
@@ -260,6 +310,7 @@ export async function POST(request: NextRequest) {
 
             await prisma.document.create({
                 data: {
+                    tenantId,
                     fileName: supportingDocument.name,
                     fileType: supportingDocument.type,
                     fileSize: supportingDocument.size,
@@ -291,6 +342,7 @@ export async function POST(request: NextRequest) {
         // Prisma extension handles encryption automatically
         await prisma.note.create({
             data: {
+                tenantId,
                 content: intakeNoteContent,  // Plain text - extension encrypts
                 noteType: 'INTAKE',
                 caseId: newCase.id,
@@ -304,9 +356,10 @@ export async function POST(request: NextRequest) {
         let initialAssigneeId = createdById;
 
         try {
-            // Get all active coordinators (excluding System user)
+            // Get all active coordinators (excluding System user) for this tenant
             const coordinators = await prisma.user.findMany({
                 where: {
+                    tenantId,
                     role: 'COORDINATOR',
                     active: true,
                     name: { not: 'System' } // Exclude System user from assignment
@@ -319,6 +372,7 @@ export async function POST(request: NextRequest) {
                 // Find the most recently assigned 'Initial Case Review' task
                 const lastAssignment = await prisma.task.findFirst({
                     where: {
+                        tenantId,
                         title: 'Initial Case Review',
                         assignedTo: { role: 'COORDINATOR' }
                     },
@@ -335,12 +389,13 @@ export async function POST(request: NextRequest) {
                 }
             }
         } catch (e) {
-            console.error('Error in round-robin assignment:', e);
+            logger.error({ err: e }, 'Error in round-robin assignment:');
             // Fallback to creator/system
         }
 
         await prisma.task.create({
             data: {
+                tenantId,
                 title: 'Initial Case Review',
                 description: `Review new accommodation request from ${fullName}. Contact method preference: ${preferredContact || 'either'}`,
                 status: 'PENDING',
@@ -355,6 +410,7 @@ export async function POST(request: NextRequest) {
         // Create audit log entry
         await prisma.auditLog.create({
             data: {
+                tenantId,
                 entityType: 'Case',
                 entityId: newCase.id,
                 action: 'CREATE',
@@ -376,7 +432,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Error creating case:', error);
+        logger.error({ err: error }, 'Error creating case:');
         return NextResponse.json(
             { error: 'Failed to create case' },
             { status: 500 }
@@ -389,6 +445,12 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
     try {
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        // Use tenant-scoped Prisma
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
+
         const { searchParams } = new URL(request.url);
         const search = searchParams.get('search');
         const status = searchParams.get('status');
@@ -438,18 +500,18 @@ export async function GET(request: NextRequest) {
 
         // Date Ranges
         if (openedStart || openedEnd) {
-            whereClause.createdAt = {};
+            whereClause.createdAt = {} as any;
             if (openedStart) whereClause.createdAt.gte = new Date(openedStart);
             if (openedEnd) whereClause.createdAt.lte = new Date(openedEnd);
         }
 
         if (closedStart || closedEnd) {
-            whereClause.closedAt = {};
+            whereClause.closedAt = {} as any;
             if (closedStart) whereClause.closedAt.gte = new Date(closedStart);
             if (closedEnd) whereClause.closedAt.lte = new Date(closedEnd);
         }
 
-        const cases = await prisma.case.findMany({
+        const cases = await tenantPrisma.case.findMany({
             where: whereClause,
             include: {
                 tasks: {
@@ -486,13 +548,6 @@ export async function GET(request: NextRequest) {
         // Transform documents to exclude binary data from response
         const transformedCases = cases.map((c: any) => ({
             ...c,
-            tasks: c.tasks.map((t: any) => ({
-                ...t,
-                assignedTo: t.assignedTo ? {
-                    ...t.assignedTo,
-                    name: decrypt(t.assignedTo.name)
-                } : null
-            })),
             documents: c.documents.map((doc: any) => ({
                 id: doc.id,
                 fileName: doc.fileName,
@@ -508,7 +563,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(transformedCases);
 
     } catch (error) {
-        console.error('Error fetching cases:', error);
+        logger.error({ err: error }, 'Error fetching cases:');
         return NextResponse.json(
             { error: 'Failed to fetch cases' },
             { status: 500 }

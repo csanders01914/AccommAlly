@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const CreateMeetingSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ meetings });
 
     } catch (error) {
-        console.error('Meetings GET Error:', error);
+        logger.error({ err: error }, 'Meetings GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(meeting, { status: 201 });
 
     } catch (error) {
-        console.error('Meetings POST Error:', error);
+        logger.error({ err: error }, 'Meetings POST Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

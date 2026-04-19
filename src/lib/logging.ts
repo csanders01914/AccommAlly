@@ -1,5 +1,6 @@
 import prisma from './prisma';
 import { randomUUID } from 'crypto';
+import logger from '@/lib/logger';
 
 interface ErrorDetails {
     message: string;
@@ -44,13 +45,13 @@ export async function logError(error: Error | any, context?: Partial<ErrorDetail
             }
         });
 
-        // Also log to console for immediate visibility in server logs
-        console.error(`[TX: ${transactionId}] Error:`, message);
+        // Also log for immediate visibility in server logs
+        logger.error({ transactionId }, message);
 
     } catch (loggingError) {
         // Fallback if DB logging fails
-        console.error('FAILED TO LOG ERROR TO DB:', loggingError);
-        console.error('ORIGINAL ERROR:', error);
+        logger.error({ err: loggingError }, 'FAILED TO LOG ERROR TO DB');
+        logger.error({ err: error }, 'ORIGINAL ERROR');
     }
 
     return transactionId;

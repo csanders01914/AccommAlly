@@ -2,25 +2,36 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import logger from '@/lib/logger';
 
-const rawSecret = process.env.JWT_SECRET;
-if (!rawSecret) {
-    console.warn("SECURITY WARNING: Using default JWT secret. Set JWT_SECRET in .env");
-}
-const SECRET_KEY = new TextEncoder().encode(rawSecret || "default_dev_secret_key_change_me");
 const ALG = "HS256";
 
+// Lazy secret key initialization to avoid crashing at build time
+let _secretKey: Uint8Array | null = null;
+function getSecretKey(): Uint8Array {
+    if (!_secretKey) {
+        const rawSecret = process.env.JWT_SECRET;
+        if (!rawSecret && process.env.NODE_ENV === 'production') {
+            throw new Error('FATAL: JWT_SECRET environment variable is required in production.');
+        }
+        if (!rawSecret) {
+            logger.warn('SECURITY WARNING: JWT_SECRET not set. Using insecure default for development only.');
+        }
+        _secretKey = new TextEncoder().encode(rawSecret || 'default_dev_secret_key_change_me');
+    }
+    return _secretKey;
+}
+
 export async function signToken(payload: Record<string, unknown>) {
-    return await new SignJWT(payload)
+    return new SignJWT(payload)
         .setProtectedHeader({ alg: ALG })
-        .setIssuedAt()
         .setExpirationTime("8h") // Session duration
-        .sign(SECRET_KEY);
+        .sign(getSecretKey());
 }
 
 export async function verifyToken(token: string) {
     try {
-        const { payload } = await jwtVerify(token, SECRET_KEY, {
+        const { payload } = await jwtVerify(token, getSecretKey(), {
             algorithms: [ALG],
         });
         return payload;
@@ -44,13 +55,14 @@ export async function getSession() {
     return await verifyToken(token);
 }
 
-export async function loginUser(userData: { id: string; email: string; role: string; name?: string; isSecure?: boolean }) {
-    const token = await signToken(userData);
+export async function loginUser(userData: { id: string; email: string; role: string; tenantId: string; name?: string; isSecure?: boolean }) {
+    const { isSecure, ...tokenPayload } = userData;
+    const token = await signToken(tokenPayload);
     const cookieStore = await cookies();
 
     // Default to strict production check if isSecure is undefined
-    const useSecureCookie = userData.isSecure !== undefined
-        ? userData.isSecure
+    const useSecureCookie = isSecure !== undefined
+        ? isSecure
         : process.env.NODE_ENV === "production";
 
     cookieStore.set("session_token", token, {

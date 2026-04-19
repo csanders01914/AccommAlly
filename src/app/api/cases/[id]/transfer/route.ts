@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const TransferSchema = z.object({
     newOwnerId: z.string().min(1, 'New Owner ID is required'),
@@ -15,7 +17,11 @@ export async function POST(
         const { id } = await context.params; // Await params
         const caseId = id;
 
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -62,7 +68,7 @@ export async function POST(
         });
 
     } catch (error) {
-        console.error('Case Transfer Error', error);
+        logger.error({ err: error }, 'Case Transfer Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

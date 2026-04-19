@@ -7,6 +7,7 @@ import {
 import { comparePassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { createRateLimiter } from '@/lib/rate-limit';
+import logger from '@/lib/logger';
 
 // Super-admin login: 5 attempts per 15 minutes, keyed by email hash
 const superAdminLimiter = createRateLimiter({
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
             },
         });
     } catch (error) {
-        console.error('Super-Admin login error:', error);
+        logger.error({ err: error }, 'Super-Admin login error:');
         return NextResponse.json(
             { error: 'Authentication failed' },
             { status: 500 }

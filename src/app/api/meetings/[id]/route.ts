@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 // GET single meeting
 export async function GET(
@@ -8,7 +10,11 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -36,7 +42,7 @@ export async function GET(
         return NextResponse.json(meeting);
 
     } catch (error) {
-        console.error('Meeting GET Error:', error);
+        logger.error({ err: error }, 'Meeting GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -47,7 +53,11 @@ export async function PATCH(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -106,7 +116,7 @@ export async function PATCH(
         return NextResponse.json(meeting);
 
     } catch (error) {
-        console.error('Meeting PATCH Error:', error);
+        logger.error({ err: error }, 'Meeting PATCH Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -117,7 +127,11 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -140,7 +154,7 @@ export async function DELETE(
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Meeting DELETE Error:', error);
+        logger.error({ err: error }, 'Meeting DELETE Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

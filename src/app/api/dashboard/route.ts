@@ -1,25 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 export async function GET() {
-    let session = await getSession();
+    const { session, error } = await requireAuth();
+    if (error) return error;
 
-    // Dev mode bypass
-    if (!session && process.env.NODE_ENV !== 'production') {
-        session = { id: 'user-sarah-001', role: 'ADMIN', email: 'sarah@accessally.org' };
-    }
-
-    if (!session || typeof session.id !== 'string') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     const userId = session.id;
 
     try {
         // 1. Fetch User with Preferences
-        const user = await prisma.user.findUnique({
+        const user = await tenantPrisma.user.findUnique({
             where: { id: userId },
             select: {
                 id: true,
@@ -29,6 +24,13 @@ export async function GET() {
                 preferences: true,
                 username: true,
                 notifications: true,
+                tenant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        settings: true
+                    }
+                }
             }
         });
 
@@ -38,7 +40,7 @@ export async function GET() {
 
         // 2. Fetch Tasks Stats & Upcoming
         // We want high priority or due soon tasks for the widget
-        const tasks = await prisma.task.findMany({
+        const tasks = await tenantPrisma.task.findMany({
             where: {
                 assignedToId: userId,
                 status: { not: 'COMPLETED' }
@@ -55,8 +57,8 @@ export async function GET() {
         });
 
         const taskStats = {
-            totalPending: await prisma.task.count({ where: { assignedToId: userId, status: { not: 'COMPLETED' } } }),
-            overdue: await prisma.task.count({
+            totalPending: await tenantPrisma.task.count({ where: { assignedToId: userId, status: { not: 'COMPLETED' } } }),
+            overdue: await tenantPrisma.task.count({
                 where: {
                     assignedToId: userId,
                     status: { not: 'COMPLETED' },
@@ -66,7 +68,7 @@ export async function GET() {
         };
 
         // 3. Fetch Recent Messages
-        const messages = await prisma.message.findMany({
+        const messages = await tenantPrisma.message.findMany({
             where: { recipientId: userId },
             orderBy: { createdAt: 'desc' },
             take: 5,
@@ -75,7 +77,7 @@ export async function GET() {
             }
         });
 
-        const unreadMessagesCount = await prisma.message.count({
+        const unreadMessagesCount = await tenantPrisma.message.count({
             where: { recipientId: userId, read: false }
         });
 
@@ -85,7 +87,7 @@ export async function GET() {
         // For now, let's show all PENDING calls to Coordinators.
         // 4. Fetch Call Requests & Return Call Tasks
         // Fetch standard CallRequests
-        const callRequestsRaw = await prisma.callRequest.findMany({
+        const callRequestsRaw = await tenantPrisma.callRequest.findMany({
             where: { status: 'PENDING' },
             orderBy: [
                 { urgent: 'desc' },
@@ -95,7 +97,7 @@ export async function GET() {
         });
 
         // Fetch Return Call Tasks
-        const returnCallTasks = await prisma.task.findMany({
+        const returnCallTasks = await tenantPrisma.task.findMany({
             where: {
                 category: 'FOLLOW_UP',
                 status: { not: 'COMPLETED' },
@@ -124,7 +126,7 @@ export async function GET() {
                 id: t.case.id,
                 caseNumber: t.case.caseNumber,
                 clientName: decrypt(t.case.clientName),
-                clientPhone: decrypt(t.case.clientPhone)
+                clientPhone: t.case.clientPhone ? decrypt(t.case.clientPhone) : null
             } : null,
             isTask: true // Marker for UI if needed
         }));
@@ -155,7 +157,7 @@ export async function GET() {
         });
 
         // 5. Recent Cases
-        const recentCases = await prisma.case.findMany({
+        const recentCases = await tenantPrisma.case.findMany({
             orderBy: { createdAt: 'desc' },
             take: 5,
             select: {
@@ -185,16 +187,15 @@ export async function GET() {
                 unread: !m.read
             })),
             unreadMessagesCount,
-            callRequests: allCallRequests.slice(0, 10), // Limit to top 10 for widget
-
-            recentCases: recentCases.map((rc: any) => ({
-                ...rc,
-                clientName: decrypt(rc.clientName)
-            }))
+            callRequests: allCallRequests.slice(0, 10),
+            recentCases: recentCases.map((c: any) => ({
+                ...c,
+                clientName: decrypt(c.clientName),
+            })),
         });
 
     } catch (error) {
-        console.error('Dashboard API Error:', error);
+        logger.error({ err: error }, 'Dashboard API Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

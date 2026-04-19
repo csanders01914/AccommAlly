@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 export async function GET() {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -60,7 +66,7 @@ export async function GET() {
         });
 
     } catch (error) {
-        console.error('Admin Intelligence Error:', error);
+        logger.error({ err: error }, 'Admin Intelligence Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

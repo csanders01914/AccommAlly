@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt } from '@/lib/encryption';
 import { createNameHash, hashCredential, validatePin, validatePassphrase } from '@/lib/claimant';
 import crypto from 'crypto';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/claimants/[id] - Get claimant profile with all linked cases
@@ -14,7 +16,11 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -66,7 +72,7 @@ export async function GET(
 
         return NextResponse.json(response);
     } catch (error) {
-        console.error('Error fetching claimant:', error);
+        logger.error({ err: error }, 'Error fetching claimant:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -80,7 +86,11 @@ export async function PATCH(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -173,7 +183,7 @@ export async function PATCH(
         });
 
     } catch (error) {
-        console.error('Error updating claimant:', error);
+        logger.error({ err: error }, 'Error updating claimant:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

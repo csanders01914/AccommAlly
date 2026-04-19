@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hash } from "@/lib/encryption";
+import logger from '@/lib/logger';
 
 export async function GET(
     request: Request,
@@ -20,6 +21,13 @@ export async function GET(
                 theme: true,
                 notifications: true,
                 twoFactorEnabled: true,
+                tenant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        settings: true
+                    }
+                }
             },
         });
 
@@ -29,7 +37,7 @@ export async function GET(
 
         return NextResponse.json(user);
     } catch (error) {
-        console.error("Error fetching user:", error);
+        logger.error({ err: error }, "Error fetching user:");
         return NextResponse.json(
             { error: "Failed to fetch user" },
             { status: 500 }
@@ -77,12 +85,19 @@ export async function PATCH(
                 theme: true,
                 notifications: true,
                 twoFactorEnabled: true,
+                tenant: {
+                    select: {
+                        id: true,
+                        name: true,
+                        settings: true
+                    }
+                }
             },
         });
 
         return NextResponse.json(user);
     } catch (error) {
-        console.error("Error updating user:", error);
+        logger.error({ err: error }, "Error updating user:");
         return NextResponse.json(
             { error: "Failed to update user: " + (error instanceof Error ? error.message : String(error)) },
             { status: 500 }

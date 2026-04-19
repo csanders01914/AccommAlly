@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/documents/[id]/annotations - Get all annotations for a document
@@ -24,7 +25,7 @@ export async function GET(
         return NextResponse.json(annotations);
 
     } catch (error) {
-        console.error('Error fetching annotations:', error);
+        logger.error({ err: error }, 'Error fetching annotations:');
         return NextResponse.json(
             { error: 'Failed to fetch annotations' },
             { status: 500 }
@@ -89,7 +90,7 @@ export async function POST(
         return NextResponse.json(annotation, { status: 201 });
 
     } catch (error) {
-        console.error('Error creating annotation:', error);
+        logger.error({ err: error }, 'Error creating annotation:');
         return NextResponse.json(
             { error: 'Failed to create annotation' },
             { status: 500 }
@@ -129,7 +130,7 @@ export async function PATCH(
         return NextResponse.json(updatedAnnotation);
 
     } catch (error) {
-        console.error('Error updating annotation:', error);
+        logger.error({ err: error }, 'Error updating annotation:');
         return NextResponse.json(
             { error: 'Failed to update annotation' },
             { status: 500 }
@@ -163,7 +164,7 @@ export async function DELETE(
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Error deleting annotation:', error);
+        logger.error({ err: error }, 'Error deleting annotation:');
         return NextResponse.json(
             { error: 'Failed to delete annotation' },
             { status: 500 }

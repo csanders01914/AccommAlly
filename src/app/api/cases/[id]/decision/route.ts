@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { fillTemplate, DecisionType } from '@/lib/templates';
 import { format, addDays } from 'date-fns';
+import logger from '@/lib/logger';
 
 export async function POST(
     request: NextRequest,
     context: { params: Promise<{ id: string }> } // Corrected types for Next.js 15
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
@@ -50,7 +56,7 @@ export async function POST(
         return NextResponse.json(generated);
 
     } catch (error) {
-        console.error('Decision Gen Error:', error);
+        logger.error({ err: error }, 'Decision Gen Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

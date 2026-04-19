@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * POST /api/messages/[id]/move - Move a message to a folder
@@ -11,15 +13,17 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { id: messageId } = await params;
         const { folderId } = await request.json();
-
-        console.log(`API DEBUG: Move Message ${messageId} to Folder ${folderId} for User ${session.id}`);
 
         // Verify message belongs to user (as recipient or sender)
         // Strictly speaking, folders are personal to the user.
@@ -53,7 +57,7 @@ export async function POST(
         await prisma.$transaction(async (tx: any) => {
             // Handle STARRED as a special toggle FIRST (does NOT move message, does NOT change folders)
             if (folderId === 'starred') {
-                console.log('API DEBUG: Toggling starred flag (no folder change, no folder removal)');
+
                 await tx.message.update({
                     where: { id: messageId },
                     data: { starred: true }
@@ -69,9 +73,9 @@ export async function POST(
                         folderId: { in: userFolderIds }
                     }
                 });
-                console.log(`API DEBUG: Deleted ${deleted.count} assignments. User Folders: ${userFolderIds.length} found. IDs: ${JSON.stringify(userFolderIds)}`);
+
             } else {
-                console.log('API DEBUG: No user folders found, skipping delete.');
+
             }
 
             // Handle System Folders (these DO move the message)
@@ -94,7 +98,6 @@ export async function POST(
                 if (folderId === 'junk') updates.inJunk = true;
                 if (folderId === 'archive') updates.archived = true;
 
-                console.log(`API DEBUG: System Move to ${folderId}`, updates);
                 await tx.message.update({
                     where: { id: messageId },
                     data: updates
@@ -119,7 +122,7 @@ export async function POST(
                 });
 
                 // Move out of Inbox (and ensure not in other system folders)
-                console.log('API DEBUG: Custom Folder Move - Clearing flags');
+
                 await tx.message.update({
                     where: { id: messageId },
                     data: {
@@ -160,9 +163,8 @@ export async function POST(
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Move Message Error:', error);
+        logger.error({ err: error }, 'Move Message Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
-
 

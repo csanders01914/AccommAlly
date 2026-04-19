@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import mammoth from 'mammoth';
 import { requireSuperAdmin } from '@/lib/require-super-admin';
+import logger from '@/lib/logger';
 
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -35,7 +36,7 @@ export async function GET(
         if (!template) return NextResponse.json({ error: 'Not found' }, { status: 404 });
         return NextResponse.json({ template });
     } catch (err) {
-        console.error('GET document-template error:', err);
+        logger.error({ err: err }, 'GET document-template error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -85,7 +86,7 @@ export async function PUT(
             const buffer = Buffer.from(await file.arrayBuffer());
             const { value: htmlContent, messages: conversionWarnings } = await mammoth.convertToHtml({ buffer });
             if (conversionWarnings.length > 0) {
-                console.warn('Mammoth conversion warnings:', conversionWarnings);
+                logger.warn({ warnings: conversionWarnings }, 'Mammoth conversion warnings');
             }
             updateData.originalFile = buffer;
             updateData.htmlContent = htmlContent;
@@ -99,7 +100,7 @@ export async function PUT(
 
         return NextResponse.json({ template });
     } catch (err) {
-        console.error('PUT document-template error:', err);
+        logger.error({ err: err }, 'PUT document-template error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -122,7 +123,7 @@ export async function DELETE(
         await prisma.documentTemplate.delete({ where: { id } });
         return NextResponse.json({ success: true });
     } catch (err) {
-        console.error('DELETE document-template error:', err);
+        logger.error({ err: err }, 'DELETE document-template error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

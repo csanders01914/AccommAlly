@@ -5,6 +5,7 @@ import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt, hash } from '@/lib/encryption';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const SendMessageSchema = z.object({
     subject: z.string().max(255).optional(),
@@ -29,8 +30,6 @@ export async function GET(request: NextRequest) {
 
         const whereClause: any = {};
 
-
-
         if (box === 'inbox') {
             // Simplified query matching unread-count logic exactly
             whereClause.recipientId = session.id;
@@ -38,7 +37,6 @@ export async function GET(request: NextRequest) {
             whereClause.inInbox = true;
             whereClause.inTrash = false;
             whereClause.inJunk = false;
-            console.log('API DEBUG: Inbox Query constructed:', JSON.stringify(whereClause));
             // Note: We no longer need to check folderAssignments 'none' because 'inInbox' flag handles it explicitly.
             // This supports "Copy to Folder" (inInbox=true + folderAssignment) vs "Move to Folder" (inInbox=false + folderAssignment).
         } else if (box === 'sent') {
@@ -89,11 +87,9 @@ export async function GET(request: NextRequest) {
         });
 
         if (box === 'inbox') {
-            console.log('--- API DEBUG: Inbox Fetch ---');
-            console.log(`User ID: ${session.id}`);
-            console.log(`Found ${messages.length} messages.`);
+
             messages.forEach((m: any) => {
-                console.log(`msg: ${m.id} | S:${m.senderId} | R:${m.recipientId} | Read:${m.read} | Arch:${m.archived} | Ext:${m.isExternal}`);
+
             });
         }
 
@@ -132,7 +128,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(formattedMessages);
     } catch (error) {
-        console.error('Messages GET Error:', error);
+        logger.error({ err: error }, 'Messages GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -247,13 +243,13 @@ export async function POST(request: NextRequest) {
                 const { applyInboundRules } = await import('@/lib/rules');
                 await applyInboundRules(message.id, recipientId);
             } catch (e) {
-                console.error('Failed to trigger rules:', e);
+                logger.error({ err: e }, 'Failed to trigger rules:');
             }
         }
 
         return NextResponse.json(message, { status: 201 });
     } catch (error) {
-        console.error('Messages POST Error:', error);
+        logger.error({ err: error }, 'Messages POST Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

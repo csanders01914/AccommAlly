@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 import {
     getComplianceMetrics,
     getFinancialMetrics,
     getTrendMetrics,
     getWorkflowMetrics
 } from '@/lib/reports';
-import { getSession } from '@/lib/auth'; // Assuming auth helper exists, or we check session
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant'; // Assuming auth helper exists, or we check session
+import logger from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
     // Check auth - assuming similar pattern to other APIs
-    const session = await getSession();
+    const { session, error } = await requireAuth();
+
+    if (error) return error;
+
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const searchParams = request.nextUrl.searchParams;
@@ -36,7 +43,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(data);
     } catch (error) {
-        console.error('Error fetching report data:', error);
+        logger.error({ err: error }, 'Error fetching report data:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

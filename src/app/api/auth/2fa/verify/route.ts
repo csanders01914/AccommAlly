@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken as verifyTOTP } from '@/lib/totp';
 import { loginUser, verifyToken as verifyJWT } from '@/lib/auth';
 import { twoFactorRateLimiter } from '@/lib/rate-limit';
+import logger from '@/lib/logger';
 
 export async function POST(req: Request) {
     try {
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ user: sessionUser });
 
     } catch (e) {
-        console.error(e);
+        logger.error({ err: e }, 'Unexpected error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

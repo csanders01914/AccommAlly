@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { encrypt, hash } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -29,8 +35,8 @@ export async function PATCH(
             updateData.email = encrypt(email);
             updateData.emailHash = hash(email.toLowerCase().trim());
 
-            // Check uniqueness
-            const existing = await prisma.user.findFirst({
+            // Check uniqueness within tenant
+            const existing = await tenantPrisma.user.findFirst({
                 where: {
                     emailHash: updateData.emailHash,
                     NOT: { id } // Exclude self
@@ -49,13 +55,21 @@ export async function PATCH(
             updateData.loginAttempts = 0;
         }
 
-        const updatedUser = await prisma.user.update({
+        const updatedUser = await tenantPrisma.user.update({
             where: { id },
             data: updateData,
+            select: {
+                id: true,
+                name: true,
+                role: true,
+                active: true,
+                lockedUntil: true,
+                updatedAt: true,
+            }
         });
 
         // Audit Log
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'User',
                 entityId: id,
@@ -64,13 +78,14 @@ export async function PATCH(
                     name, email: email ? 'UPDATED' : undefined, role, active, lock
                 }),
                 userId: session.id as string,
+                tenantId: session.tenantId,
             }
         });
 
         return NextResponse.json({ success: true, user: updatedUser });
 
     } catch (error) {
-        console.error('Admin User Update Error:', error);
+        logger.error({ err: error }, 'Admin User Update Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -80,15 +95,19 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { id } = await params;
 
-        // Check if user exists
-        const user = await prisma.user.findUnique({
+        // Check if user exists within this tenant
+        const user = await tenantPrisma.user.findUnique({
             where: { id },
             include: {
                 _count: {
@@ -114,27 +133,27 @@ export async function DELETE(
             }, { status: 409 });
         }
 
-        // Perform Delete
-        await prisma.user.delete({
+        // Perform Delete — tenantPrisma ensures only own-tenant users can be deleted
+        await tenantPrisma.user.delete({
             where: { id }
         });
 
-        // Audit Log (Logged by the Admin performing the delete)
-        // Note: We can't link validation logic to the deleted user, but we log the action.
-        await prisma.auditLog.create({
+        // Audit Log
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'User',
                 entityId: id,
                 action: 'DELETE',
                 metadata: JSON.stringify({ name: user.name, email: 'DELETED' }),
                 userId: session.id as string,
+                tenantId: session.tenantId,
             }
         });
 
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Admin User Delete Error:', error);
+        logger.error({ err: error }, 'Admin User Delete Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

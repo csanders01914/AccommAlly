@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * POST /api/cases/[id]/portal-reply - Examiner replies to a portal message
@@ -11,7 +13,11 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -82,7 +88,7 @@ export async function POST(
         return NextResponse.json({ success: true, message });
 
     } catch (error) {
-        console.error('Portal Reply Error:', error);
+        logger.error({ err: error }, 'Portal Reply Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -95,7 +101,11 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -133,7 +143,7 @@ export async function GET(
         return NextResponse.json({ messages, pendingCount });
 
     } catch (error) {
-        console.error('Get Portal Messages Error:', error);
+        logger.error({ err: error }, 'Get Portal Messages Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

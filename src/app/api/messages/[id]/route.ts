@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 export async function PATCH(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { id } = await context.params;
@@ -38,7 +44,7 @@ export async function PATCH(
 
         return NextResponse.json(updated);
     } catch (error) {
-        console.error('Message Update Error:', error);
+        logger.error({ err: error }, 'Message Update Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -48,7 +54,11 @@ export async function DELETE(
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { id } = await context.params;
@@ -61,10 +71,6 @@ export async function DELETE(
 
         const isSender = message.senderId === session.id;
         const isRecipient = message.recipientId === session.id;
-
-        console.log(`API DEBUG: Delete Message ${id} | User ${session.id}`);
-        console.log(`isSender: ${isSender} (${message.senderId})`);
-        console.log(`isRecipient: ${isRecipient} (${message.recipientId})`);
 
         // Perform Soft Delete
         if (isSender) {
@@ -102,7 +108,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Message Delete Error:', error);
+        logger.error({ err: error }, 'Message Delete Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

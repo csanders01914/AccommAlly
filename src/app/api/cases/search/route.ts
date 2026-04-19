@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/cases/search?q=... - Search cases by claim number or client name
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ cases });
 
     } catch (error) {
-        console.error('Error searching cases:', error);
+        logger.error({ err: error }, 'Error searching cases:');
         return NextResponse.json(
             { error: 'Failed to search cases' },
             { status: 500 }

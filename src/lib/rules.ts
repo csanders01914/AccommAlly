@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
 import { sendEmailNotification, sendSMSNotification } from '@/lib/notifications';
+import logger from '@/lib/logger';
 
 /**
  * Applies a user's enabled inbound rules to a newly created message.
@@ -156,11 +157,11 @@ export async function applyInboundRules(messageId: string, userId: string): Prom
                 data: assignments,
                 skipDuplicates: true
             });
-            console.log(`[Rules] Applied ${assignments.length} folder assignments for message ${messageId}`);
+            logger.debug({ count: assignments.length, messageId }, '[Rules] Applied folder assignments');
         }
 
     } catch (e) {
-        console.error('[Rules] Failed to apply inbound rules:', e);
+        logger.error({ err: e }, '[Rules] Failed to apply inbound rules');
         // Do not throw, we don't want to break message creation
     }
 }

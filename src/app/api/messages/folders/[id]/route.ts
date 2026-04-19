@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 // PATCH /api/messages/folders/[id] - Update folder
 export async function PATCH(
@@ -9,7 +11,11 @@ export async function PATCH(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -37,7 +43,7 @@ export async function PATCH(
 
         return NextResponse.json(folder);
     } catch (error: any) {
-        console.error('Error updating folder:', error);
+        logger.error({ err: error }, 'Error updating folder:');
 
         if (error.code === 'P2002') {
             return NextResponse.json({ error: 'A folder with this name already exists' }, { status: 409 });
@@ -54,7 +60,11 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -75,7 +85,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error deleting folder:', error);
+        logger.error({ err: error }, 'Error deleting folder:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

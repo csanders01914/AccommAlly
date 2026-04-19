@@ -1,11 +1,23 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt } from '@/lib/encryption';
 import fs from 'fs';
 import path from 'path';
+import logger from '@/lib/logger';
 
 export async function GET() {
-    const session = await getSession();
+    // This debug route must not be available in production
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    const { session, error } = await requireAuth();
+
+    if (error) return error;
+
+    const tenantPrisma = withTenantScope(prisma, session.tenantId);
     if (!session || session.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -59,7 +71,7 @@ export async function GET() {
         return NextResponse.json({ logs: logs.reverse() });
 
     } catch (error) {
-        console.error('Error reading logs:', error);
+        logger.error({ err: error }, 'Error reading logs:');
         return NextResponse.json({ error: 'Failed to read logs' }, { status: 500 });
     }
 }

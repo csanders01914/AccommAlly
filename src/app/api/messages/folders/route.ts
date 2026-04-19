@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 // GET /api/messages/folders - List user's folders
 export async function GET() {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -39,7 +45,7 @@ export async function GET() {
 
         return NextResponse.json(folderData);
     } catch (error) {
-        console.error('Error fetching folders:', error);
+        logger.error({ err: error }, 'Error fetching folders:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -47,7 +53,11 @@ export async function GET() {
 // POST /api/messages/folders - Create new folder
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -76,7 +86,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(folder, { status: 201 });
     } catch (error: any) {
-        console.error('Error creating folder:', error);
+        logger.error({ err: error }, 'Error creating folder:');
 
         // Handle unique constraint violation
         if (error.code === 'P2002') {

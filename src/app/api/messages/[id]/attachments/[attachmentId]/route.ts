@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
+import logger from '@/lib/logger';
 
 export async function GET(
     _request: NextRequest,
@@ -34,7 +35,7 @@ export async function GET(
             },
         });
     } catch (err) {
-        console.error('Attachment download error:', err);
+        logger.error({ err: err }, 'Attachment download error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

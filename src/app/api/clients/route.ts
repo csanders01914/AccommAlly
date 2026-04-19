@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 // GET /api/clients - List all active clients
 export async function GET() {
@@ -18,7 +20,11 @@ export async function GET() {
 // POST /api/clients - Admin create client
 export async function POST(req: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             // User requested "Admins also need the ability".
             // For now enforcing ADMIN.
@@ -72,7 +78,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(client);
     } catch (error: any) {
-        console.error('Error creating client:', error);
+        logger.error({ err: error }, 'Error creating client:');
         // Fallback for other unique constraints (though name is the main one)
         if (error.code === 'P2002') {
             return NextResponse.json({ error: 'Client already exists (constraint violation)' }, { status: 400 });
@@ -84,7 +90,11 @@ export async function POST(req: NextRequest) {
 // DELETE /api/clients?id=... - Soft delete client
 export async function DELETE(req: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
@@ -112,7 +122,7 @@ export async function DELETE(req: NextRequest) {
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error deleting client:', error);
+        logger.error({ err: error }, 'Error deleting client:');
         return NextResponse.json({ error: 'Failed to delete client' }, { status: 500 });
     }
 }

@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import prisma from '@/lib/prisma';
-import { getSession, hashPassword } from '@/lib/auth';
+import { hashPassword } from '@/lib/auth';
 import { decrypt, encrypt, hash } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 export async function GET() {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const users = await prisma.user.findMany({
+        const users = await tenantPrisma.user.findMany({
             select: {
                 id: true,
                 name: true,
@@ -39,14 +46,18 @@ export async function GET() {
 
         return NextResponse.json(decryptedUsers);
     } catch (error) {
-        console.error('Admin Users API Error:', error);
+        logger.error({ err: error }, 'Admin Users API Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || session.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -61,8 +72,8 @@ export async function POST(request: NextRequest) {
         const normalizedEmail = email.toLowerCase().trim();
         const emailHash = hash(normalizedEmail);
 
-        // Check if user already exists
-        const existingUser = await prisma.user.findFirst({
+        // Check if user already exists within this tenant
+        const existingUser = await tenantPrisma.user.findFirst({
             where: { emailHash }
         });
 
@@ -70,36 +81,64 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User already exists' }, { status: 409 });
         }
 
+        // Retrieve current user to get tenantId
+        // Session only has minimal info, so we fetch the full user
+        const currentUser = await prisma.user.findUnique({
+            where: { id: session.id as string },
+            select: { tenantId: true }
+        });
+
+        if (!currentUser) {
+            return NextResponse.json({ error: 'Current user not found' }, { status: 401 });
+        }
+
+        const { tenantId } = currentUser;
+
+        // Check Tenant User Limit
+        const { checkTenantUserLimit } = await import('@/lib/tenant-limits');
+        const canCreateUser = await checkTenantUserLimit(tenantId);
+
+        if (!canCreateUser) {
+            return NextResponse.json({ error: 'Subscription plan user limit reached' }, { status: 403 });
+        }
+
         const hashedPassword = await hashPassword(password);
 
         // Pass plain email - the Prisma extension handles encryption and hashing automatically
-        const newUser = await prisma.user.create({
+        const newUser = await tenantPrisma.user.create({
             data: {
+                tenantId,
                 name,
                 email: normalizedEmail,  // Plain email - extension will encrypt/hash
                 role,
                 passwordHash: hashedPassword,
                 active: true
+            },
+            select: {
+                id: true,
+                name: true,
+                role: true,
+                active: true,
+                createdAt: true,
             }
         });
 
-        console.log('Created user with ID:', newUser.id);
-
         // Audit Log
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'User',
                 entityId: newUser.id,
                 action: 'CREATE',
                 metadata: JSON.stringify({ name, role }),
                 userId: session.id as string,
+                tenantId,
             }
         });
 
         return NextResponse.json(newUser);
 
     } catch (error) {
-        console.error('Create User Error:', error);
+        logger.error({ err: error }, 'Create User Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

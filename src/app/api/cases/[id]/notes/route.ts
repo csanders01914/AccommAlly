@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { encrypt } from '@/lib/encryption';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const CreateNoteSchema = z.object({
     content: z.string().min(1, 'Content is required'),
@@ -141,9 +142,7 @@ export async function POST(
             content += `\n\n[Attached Document: ${file.name} (${documentDCN})]`;
         }
 
-        console.log('DEBUG: Encryption Key Length:', process.env.ENCRYPTION_KEY?.length);
         const encryptedContent = encrypt(content);
-        console.log('DEBUG: Encrypted Content Preview:', encryptedContent.substring(0, 20) + '...');
 
         const note = await tenantPrisma.note.create({
             data: {
@@ -217,7 +216,7 @@ export async function POST(
             content: content // The original plain text with optional attachment text
         });
     } catch (error) {
-        console.error('Error creating note:', error);
+        logger.error({ err: error }, 'Error creating note:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

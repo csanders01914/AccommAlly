@@ -1,13 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
+
+// Allowed file types for upload
+const ALLOWED_FILE_TYPES = new Set([
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    'text/plain',
+    'text/csv',
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+]);
+
+const ALLOWED_EXTENSIONS = new Set([
+    '.pdf', '.doc', '.docx', '.xlsx', '.xls',
+    '.txt', '.csv', '.jpg', '.jpeg', '.png', '.gif', '.webp',
+]);
+
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        // Use tenant-scoped Prisma
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const formData = await request.formData();
         const file = formData.get('file') as File;
@@ -18,8 +43,25 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Validate case exists
-        const caseExists = await prisma.case.findUnique({
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+            return NextResponse.json(
+                { error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+                { status: 400 }
+            );
+        }
+
+        // Validate file type
+        const ext = '.' + (file.name.split('.').pop()?.toLowerCase() || '');
+        if (!ALLOWED_FILE_TYPES.has(file.type) && !ALLOWED_EXTENSIONS.has(ext)) {
+            return NextResponse.json(
+                { error: 'File type not allowed. Accepted: PDF, DOCX, DOC, XLSX, XLS, TXT, CSV, JPG, PNG, GIF, WEBP' },
+                { status: 400 }
+            );
+        }
+
+        // Validate case exists within tenant
+        const caseExists = await tenantPrisma.case.findUnique({
             where: { id: caseId }
         });
 
@@ -39,10 +81,7 @@ export async function POST(request: NextRequest) {
             now.getSeconds().toString().padStart(2, '0') +
             now.getMilliseconds().toString().padStart(3, '0');
 
-        // Check if DCN exists (highly unlikely with ms precision, but good practice)
-        // Or assume unique for now.
-
-        const newDoc = await prisma.document.create({
+        const newDoc = await tenantPrisma.document.create({
             data: {
                 fileName: file.name,
                 fileType: file.type,
@@ -56,11 +95,11 @@ export async function POST(request: NextRequest) {
         });
 
         // Audit Log: Document Uploaded
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Document',
                 entityId: newDoc.id,
-                action: 'CREATE', // or UPLOAD
+                action: 'CREATE',
                 userId: session.id,
                 metadata: JSON.stringify({
                     fileName: file.name,
@@ -69,21 +108,18 @@ export async function POST(request: NextRequest) {
                 })
             }
         });
-        // The select block was part of the original document.create call.
-        // To maintain the original return structure, we need to fetch the selected fields
-        // from newDoc or adjust the return. Assuming the original intent was to return
-        // these fields, we'll construct the return object based on newDoc.
+
         const document = {
             id: newDoc.id,
             fileName: newDoc.fileName,
             documentControlNumber: newDoc.documentControlNumber,
-            createdAt: newDoc.createdAt // Assuming createdAt is automatically added by Prisma
+            createdAt: newDoc.createdAt
         };
 
         return NextResponse.json(document);
 
     } catch (error) {
-        console.error('Upload error:', error);
+        logger.error({ err: error }, 'Upload error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

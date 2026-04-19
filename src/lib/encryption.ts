@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import logger from '@/lib/logger';
 
 const IV_LENGTH = 12; // GCM standard nonce length
 const AUTH_TAG_LENGTH = 16; // 128-bit auth tag
@@ -9,7 +10,7 @@ function getKey() {
   const ENCRYPTION_KEY = rawKey.substring(0, 64);
 
   if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 64) {
-    console.error('Invalid ENCRYPTION_KEY. Key length: ' + ENCRYPTION_KEY?.length);
+    logger.error({ keyLength: ENCRYPTION_KEY?.length }, 'Invalid ENCRYPTION_KEY');
     throw new Error('Invalid ENCRYPTION_KEY');
   }
 

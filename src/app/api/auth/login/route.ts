@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { comparePassword, loginUser, signToken } from "@/lib/auth";
 import { loginRateLimiter } from "@/lib/rate-limit";
+import logger from '@/lib/logger';
 
 export async function POST(request: Request) {
     try {
@@ -151,7 +152,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, user: userData });
 
     } catch (error) {
-        console.error("Login Error:", error);
+        logger.error({ err: error }, "Login Error:");
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

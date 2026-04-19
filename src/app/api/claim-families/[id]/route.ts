@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * PATCH /api/claim-families/[id] - Add/remove cases from family
@@ -11,7 +13,11 @@ export async function PATCH(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -96,7 +102,7 @@ export async function PATCH(
 
         return NextResponse.json(updated);
     } catch (error) {
-        console.error('Error updating claim family:', error);
+        logger.error({ err: error }, 'Error updating claim family:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -110,7 +116,11 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -139,7 +149,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error deleting claim family:', error);
+        logger.error({ err: error }, 'Error deleting claim family:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

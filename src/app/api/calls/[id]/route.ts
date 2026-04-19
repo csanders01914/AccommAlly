@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt } from '@/lib/encryption';
+import logger from '@/lib/logger';
 
 // GET single call request
 export async function GET(
@@ -9,7 +11,11 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -41,7 +47,7 @@ export async function GET(
         return NextResponse.json(decrypted);
 
     } catch (error) {
-        console.error('CallRequest GET Error:', error);
+        logger.error({ err: error }, 'CallRequest GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -52,7 +58,11 @@ export async function PATCH(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -60,7 +70,6 @@ export async function PATCH(
         const { id } = await params;
         const body = await request.json();
         const { scheduledFor, status, urgent, reason, note, caseId, phoneNumberUsed } = body;
-
 
         const updateData: any = {};
 
@@ -108,7 +117,6 @@ export async function PATCH(
             });
         }
 
-
         // Decrypt for response
         const decrypted = {
             ...call,
@@ -123,7 +131,7 @@ export async function PATCH(
         return NextResponse.json(decrypted);
 
     } catch (error) {
-        console.error('CallRequest PATCH Error:', error);
+        logger.error({ err: error }, 'CallRequest PATCH Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -134,7 +142,11 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -157,7 +169,7 @@ export async function DELETE(
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('CallRequest DELETE Error:', error);
+        logger.error({ err: error }, 'CallRequest DELETE Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireSuperAdmin } from '@/lib/require-super-admin';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/super-admin/document-templates/[id]/download
@@ -30,7 +31,7 @@ export async function GET(
             },
         });
     } catch (err) {
-        console.error('Download document-template error:', err);
+        logger.error({ err: err }, 'Download document-template error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

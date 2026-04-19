@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * Generate a Document Control Number (DCN) as timestamp: YYYYMMDDHHmmssSSS
@@ -24,10 +27,14 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id: caseId } = await params;
+        const { session, error } = await requireAuth({ request });
+        if (error) return error;
 
-        // Verify case exists
-        const caseExists = await prisma.case.findUnique({
+        const { id: caseId } = await params;
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
+
+        // Verify case exists within the tenant
+        const caseExists = await tenantPrisma.case.findUnique({
             where: { id: caseId },
             select: { id: true },
         });
@@ -60,24 +67,12 @@ export async function POST(
             );
         }
 
-        // Get uploader (use first coordinator for now - in production, get from session)
-        const uploader = await prisma.user.findFirst({
-            where: { role: 'COORDINATOR' },
-        });
-
-        if (!uploader) {
-            return NextResponse.json(
-                { error: 'No uploading user found' },
-                { status: 500 }
-            );
-        }
-
         // Generate DCN and read file data
         const documentControlNumber = generateDCN();
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        // Create document record
-        const document = await prisma.document.create({
+        // Create document record — uploadedById is the authenticated user, not a random coordinator
+        const document = await tenantPrisma.document.create({
             data: {
                 fileName: file.name,
                 fileType: file.type,
@@ -86,7 +81,7 @@ export async function POST(
                 documentControlNumber,
                 category,
                 caseId,
-                uploadedById: uploader.id,
+                uploadedById: session.id,
             },
             include: {
                 uploadedBy: {
@@ -108,7 +103,7 @@ export async function POST(
         });
 
     } catch (error) {
-        console.error('Error uploading document:', error);
+        logger.error({ err: error }, 'Error uploading document:');
         return NextResponse.json(
             { error: 'Failed to upload document' },
             { status: 500 }

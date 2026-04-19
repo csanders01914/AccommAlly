@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { verifyCredential } from '@/lib/claimant';
+import logger from '@/lib/logger';
 
 /**
  * POST /api/claimants/[id]/verify - Verify PIN/passphrase
@@ -12,7 +14,11 @@ export async function POST(
 ) {
     try {
         const { id } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,8 +31,8 @@ export async function POST(
             return NextResponse.json({ error: 'Credential is required' }, { status: 400 });
         }
 
-        // Find claimant by ID or claimantNumber
-        const claimant = await prisma.claimant.findFirst({
+        // Find claimant by ID or claimantNumber — tenantPrisma scopes to current tenant
+        const claimant = await tenantPrisma.claimant.findFirst({
             where: {
                 OR: [
                     { id },
@@ -56,7 +62,7 @@ export async function POST(
 
         // Log the verification attempt if caseId provided
         if (caseId) {
-            await prisma.identityVerification.create({
+            await tenantPrisma.identityVerification.create({
                 data: {
                     caseId,
                     noteId: noteId || null,
@@ -74,7 +80,7 @@ export async function POST(
         });
 
     } catch (error) {
-        console.error('Error verifying claimant:', error);
+        logger.error({ err: error }, 'Error verifying claimant:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

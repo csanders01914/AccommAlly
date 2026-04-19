@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * PATCH /api/notes/[noteId] - Edit a note (within 24 hours only)
@@ -11,7 +13,11 @@ export async function PATCH(
 ) {
     try {
         const { noteId } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -80,7 +86,7 @@ export async function PATCH(
 
         return NextResponse.json({ success: true, note: updatedNote });
     } catch (error) {
-        console.error('Error updating note:', error);
+        logger.error({ err: error }, 'Error updating note:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

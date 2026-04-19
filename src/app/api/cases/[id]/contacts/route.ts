@@ -1,7 +1,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * POST /api/cases/[id]/contacts - Create a new contact for a case
@@ -11,7 +13,11 @@ export async function POST(
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -61,7 +67,7 @@ export async function POST(
         return NextResponse.json(newContact);
 
     } catch (error) {
-        console.error('Error creating contact:', error);
+        logger.error({ err: error }, 'Error creating contact:');
         return NextResponse.json(
             { error: 'Failed to create contact' },
             { status: 500 }

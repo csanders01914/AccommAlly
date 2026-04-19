@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import mammoth from 'mammoth';
 import { requireSuperAdmin } from '@/lib/require-super-admin';
+import logger from '@/lib/logger';
 
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ templates });
     } catch (err) {
-        console.error('GET document-templates error:', err);
+        logger.error({ err: err }, 'GET document-templates error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const { value: htmlContent, messages: conversionWarnings } = await mammoth.convertToHtml({ buffer });
         if (conversionWarnings.length > 0) {
-            console.warn('Mammoth conversion warnings:', conversionWarnings);
+            logger.warn({ warnings: conversionWarnings }, 'Mammoth conversion warnings');
         }
 
         let variableMappings: unknown = [];
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ template }, { status: 201 });
     } catch (err) {
-        console.error('POST document-templates error:', err);
+        logger.error({ err: err }, 'POST document-templates error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

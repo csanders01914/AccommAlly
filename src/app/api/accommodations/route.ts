@@ -5,6 +5,7 @@ import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { LifecycleStatus, LifecycleSubstatus, AccommodationStatus } from '@prisma/client';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const CreateAccommodationSchema = z.object({
     caseId: z.string().min(1, 'Case ID is required'),
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(accommodations);
     } catch (error) {
-        console.error('Error fetching accommodations:', error);
+        logger.error({ err: error }, 'Error fetching accommodations');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(accommodation, { status: 201 });
 
     } catch (error) {
-        console.error('Error creating accommodation:', error);
+        logger.error({ err: error }, 'Error creating accommodation');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 // POST /api/messages/[id]/folders - Add message to folder(s)
 export async function POST(
@@ -9,7 +11,11 @@ export async function POST(
 ) {
     try {
         const { id: messageId } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -62,7 +68,7 @@ export async function POST(
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error adding message to folder:', error);
+        logger.error({ err: error }, 'Error adding message to folder:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -74,7 +80,11 @@ export async function DELETE(
 ) {
     try {
         const { id: messageId } = await params;
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -100,7 +110,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error removing message from folder:', error);
+        logger.error({ err: error }, 'Error removing message from folder:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

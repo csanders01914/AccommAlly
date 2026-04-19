@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/audit-logs/export - Export audit logs to PDF
  */
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || (session.role !== 'ADMIN' && session.role !== 'AUDITOR')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -34,8 +40,8 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        // Fetch ALL matching logs (no pagination)
-        const logs = await prisma.auditLog.findMany({
+        // Fetch ALL matching logs (no pagination) — scoped to tenant
+        const logs = await tenantPrisma.auditLog.findMany({
             where,
             include: {
                 user: {
@@ -70,7 +76,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(logs);
 
     } catch (error) {
-        console.error('Error exporting audit logs:', error);
+        logger.error({ err: error }, 'Error exporting audit logs:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const { id } = await params;
         const body = await request.json();
@@ -19,7 +21,7 @@ export async function PATCH(
         const { title, description, status, priority, dueDate, assignedToId } = body;
 
         // Verify ownership/permission - include assignee role for permission checks
-        const task = await prisma.task.findUnique({
+        const task = await tenantPrisma.task.findUnique({
             where: { id },
             include: {
                 case: { select: { id: true, caseNumber: true } },
@@ -61,7 +63,7 @@ export async function PATCH(
         // Check if task is being completed (status changing to COMPLETED)
         const isBeingCompleted = status === 'COMPLETED' && task.status !== 'COMPLETED';
 
-        const updatedTask = await prisma.task.update({
+        const updatedTask = await tenantPrisma.task.update({
             where: { id },
             data: {
                 ...(title && { title }),
@@ -78,7 +80,7 @@ export async function PATCH(
         });
 
         // Audit Log: Task Updated
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Task',
                 entityId: updatedTask.id,
@@ -110,7 +112,7 @@ export async function PATCH(
                 `**Completed At:** ${completedDate}`
             ].filter(Boolean).join('\n');
 
-            await prisma.note.create({
+            await tenantPrisma.note.create({
                 data: {
                     content: noteContent,
                     noteType: 'TASK_COMPLETION',
@@ -123,7 +125,7 @@ export async function PATCH(
         return NextResponse.json(updatedTask);
 
     } catch (error) {
-        console.error('Task Update Error', error);
+        logger.error({ err: error }, 'Task Update Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -133,15 +135,15 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { session, error } = await requireAuth();
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
         const { id } = await params;
 
         // Verify ownership
-        const task = await prisma.task.findUnique({ where: { id } });
+        const task = await tenantPrisma.task.findUnique({ where: { id } });
         if (!task) return NextResponse.json({ error: 'Task not found' }, { status: 404 });
 
         if (task.createdById !== session.id && session.role !== 'ADMIN') {
@@ -149,7 +151,7 @@ export async function DELETE(
         }
 
         // Audit Log: Task Deleted
-        await prisma.auditLog.create({
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Task',
                 entityId: id,
@@ -159,12 +161,12 @@ export async function DELETE(
             }
         });
 
-        await prisma.task.delete({ where: { id } });
+        await tenantPrisma.task.delete({ where: { id } });
 
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error('Task Delete Error', error);
+        logger.error({ err: error }, 'Task Delete Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -1,22 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
-
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || "default_dev_secret_key_change_me");
-const ALG = "HS256";
-
-async function getPortalSession() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("portal_token")?.value;
-    if (!token) return null;
-    try {
-        const { payload } = await jwtVerify(token, SECRET_KEY, { algorithms: [ALG] });
-        return payload;
-    } catch {
-        return null;
-    }
-}
+import { getPortalSession } from '@/lib/portal-auth';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/public/portal/messages - Get messages for the claimant's case
@@ -24,13 +9,15 @@ async function getPortalSession() {
 export async function GET(request: NextRequest) {
     try {
         const session = await getPortalSession();
-        if (!session || session.role !== 'CLAIMANT') {
+        if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const messages = await prisma.message.findMany({
             where: {
-                caseId: session.caseId as string,
+                caseId: session.caseId,
+                // Enforce tenant isolation alongside caseId
+                case: { id: session.caseId, tenantId: session.tenantId },
                 direction: { in: ['PORTAL_INBOUND', 'PORTAL_OUTBOUND'] }
             },
             orderBy: { createdAt: 'asc' },
@@ -47,7 +34,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ messages });
 
     } catch (error) {
-        console.error('Portal Messages Error:', error);
+        logger.error({ err: error }, 'Portal Messages Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -58,7 +45,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const session = await getPortalSession();
-        if (!session || session.role !== 'CLAIMANT') {
+        if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -68,9 +55,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
         }
 
-        // Get case info to find the examiner
-        const caseData = await prisma.case.findUnique({
-            where: { id: session.caseId as string },
+        if (content.length > 10000) {
+            return NextResponse.json({ error: 'Message content too long' }, { status: 400 });
+        }
+
+        // Get case info — must belong to the session's tenant and case
+        const caseData = await prisma.case.findFirst({
+            where: { id: session.caseId, tenantId: session.tenantId },
             select: {
                 id: true,
                 createdById: true,
@@ -89,9 +80,9 @@ export async function POST(request: NextRequest) {
                 subject: subject || 'Portal Message',
                 content: content.trim(),
                 caseId: caseData.id,
-                recipientId: caseData.createdById, // Send to examiner
+                recipientId: caseData.createdById,
                 isExternal: false,
-                direction: 'PORTAL_INBOUND', // From claimant to examiner
+                direction: 'PORTAL_INBOUND',
             },
             select: {
                 id: true,
@@ -107,7 +98,7 @@ export async function POST(request: NextRequest) {
                 content: `**Portal Message from Claimant**\n\n${subject ? `Subject: ${subject}\n\n` : ''}${content.trim()}`,
                 noteType: 'PORTAL_MESSAGE',
                 caseId: caseData.id,
-                authorId: caseData.createdById // Attributed to examiner for visibility
+                authorId: caseData.createdById
             }
         });
 
@@ -119,7 +110,7 @@ export async function POST(request: NextRequest) {
                 status: 'PENDING',
                 priority: 'HIGH',
                 category: 'FOLLOW_UP',
-                dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Due in 24 hours
+                dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
                 caseId: caseData.id,
                 assignedToId: caseData.createdById,
                 createdById: caseData.createdById
@@ -131,13 +122,13 @@ export async function POST(request: NextRequest) {
             const { applyInboundRules } = await import('@/lib/rules');
             await applyInboundRules(message.id, caseData.createdById);
         } catch (e) {
-            console.error('Failed to trigger rules for portal message:', e);
+            logger.error({ err: e }, 'Failed to trigger rules for portal message:');
         }
 
         return NextResponse.json({ success: true, message });
 
     } catch (error) {
-        console.error('Portal Send Message Error:', error);
+        logger.error({ err: error }, 'Portal Send Message Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

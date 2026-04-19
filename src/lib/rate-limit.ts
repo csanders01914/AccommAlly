@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import logger from '@/lib/logger';
 
 interface RateLimiterConfig {
     maxRequests: number;
@@ -52,7 +53,7 @@ export function createRateLimiter(config: RateLimiterConfig) {
 
                 return { allowed, remaining, resetAt: record.resetAt.getTime(), retryAfterSeconds };
             } catch (e) {
-                console.error('[rate-limit] DB error — failing open:', e);
+                logger.error({ err: e }, '[rate-limit] DB error — failing open');
                 return {
                     allowed: true,
                     remaining: maxRequests,
@@ -93,7 +94,7 @@ export function createRateLimiter(config: RateLimiterConfig) {
                     retryAfterSeconds: allowed ? 0 : Math.ceil((record.resetAt.getTime() - now.getTime()) / 1000),
                 };
             } catch (e) {
-                console.error('[rate-limit] DB error — failing open:', e);
+                logger.error({ err: e }, '[rate-limit] DB error — failing open');
                 return defaultResult;
             }
         },

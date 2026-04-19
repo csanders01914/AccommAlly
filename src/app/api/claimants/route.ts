@@ -6,6 +6,7 @@ import { decrypt, encrypt } from '@/lib/encryption';
 import { generateClaimantNumber, createNameHash, hashCredential, validatePin, validatePassphrase } from '@/lib/claimant';
 import crypto from 'crypto';
 import { z } from 'zod';
+import logger from '@/lib/logger';
 
 const CreateClaimantSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(decryptedClaimants);
     } catch (error) {
-        console.error('Error fetching claimants:', error);
+        logger.error({ err: error }, 'Error fetching claimants:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -180,7 +181,7 @@ export async function POST(request: NextRequest) {
         }, { status: 201 });
 
     } catch (error) {
-        console.error('Error creating claimant:', error);
+        logger.error({ err: error }, 'Error creating claimant:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/document-templates
@@ -21,7 +22,7 @@ export async function GET() {
 
         return NextResponse.json({ templates });
     } catch (err) {
-        console.error('GET /api/document-templates error:', err);
+        logger.error({ err: err }, 'GET /api/document-templates error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

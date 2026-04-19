@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
  * GET /api/admin/inventory
@@ -8,7 +10,11 @@ import { getSession } from '@/lib/auth';
  */
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
@@ -24,7 +30,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(items);
 
     } catch (error) {
-        console.error('Inventory GET Error:', error);
+        logger.error({ err: error }, 'Inventory GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -35,7 +41,11 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
     try {
-        const session = await getSession();
+        const { session, error } = await requireAuth();
+
+        if (error) return error;
+
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
         if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(newItem, { status: 201 });
 
     } catch (error) {
-        console.error('Inventory POST Error:', error);
+        logger.error({ err: error }, 'Inventory POST Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

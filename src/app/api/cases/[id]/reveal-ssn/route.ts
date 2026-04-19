@@ -1,36 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
-import { getSession } from '@/lib/auth';
+import { requireAuth } from '@/lib/require-auth';
+import { withTenantScope } from '@/lib/prisma-tenant';
+import logger from '@/lib/logger';
 
 /**
- * GET /api/cases/[id]/reveal-ssn
- * Reveal the full decrypted SSN for a case
+ * POST /api/cases/[id]/reveal-ssn
+ * Reveal the full decrypted SSN for a case (POST to prevent caching of sensitive response)
  */
-export async function GET(
+export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;
 
-        const session = await getSession();
+        const { session, error } = await requireAuth({ request, roles: ['ADMIN', 'COORDINATOR'] });
+        if (error) return error;
 
-        if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-        }
+        // Use tenant-scoped Prisma
+        const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
-        // Verify user exists in DB (handle stale sessions after seed/wipe)
-        const userExists = await prisma.user.findUnique({
-            where: { id: session.id as string },
-            select: { id: true }
-        });
-
-        if (!userExists) {
-            return NextResponse.json({ error: 'Session invalid or expired. Please log in again.' }, { status: 401 });
-        }
-
-        const caseData = await prisma.case.findUnique({
+        const caseData = await tenantPrisma.case.findUnique({
             where: { id },
             select: {
                 clientSSN: true,
@@ -41,7 +33,6 @@ export async function GET(
         });
 
         if (!caseData) {
-            console.error('Case not found for ID:', id);
             return NextResponse.json(
                 { error: 'Case not found' },
                 { status: 404 }
@@ -55,40 +46,39 @@ export async function GET(
                 const prefix = decrypt(caseData.clientSSNPrefix);
                 const suffix = decrypt(caseData.clientSSNSuffix);
                 const full = prefix + suffix;
-                // Reformat as SSN 000-00-0000
                 if (full.length === 9) {
                     decryptedSSN = `${full.slice(0, 3)}-${full.slice(3, 5)}-${full.slice(5)}`;
                 } else {
-                    decryptedSSN = full; // Should not happen ideally
+                    decryptedSSN = full;
                 }
             } else if (caseData.clientSSN) {
                 decryptedSSN = decrypt(caseData.clientSSN);
             }
         } catch (decryptError) {
-            console.error('Decryption failed:', decryptError);
-            // Continue, will return null or empty ssn
+            logger.error({ err: decryptError }, 'Decryption failed:');
         }
 
-
-        const auditUserId = session.id;
-
-        // Log the access
-        await prisma.auditLog.create({
+        // Log the access — include tenantId for proper tenant-scoped audit queries
+        await tenantPrisma.auditLog.create({
             data: {
                 entityType: 'Case',
                 entityId: id,
                 action: 'REVEAL_SSN',
-                userId: auditUserId,
+                userId: session.id,
+                tenantId: session.tenantId,
                 metadata: JSON.stringify({ ip: request.headers.get('x-forwarded-for') || 'unknown' }),
             }
         });
 
-        return NextResponse.json({ ssn: decryptedSSN });
+        const response = NextResponse.json({ ssn: decryptedSSN });
+        response.headers.set('Cache-Control', 'no-store, private');
+        response.headers.set('Pragma', 'no-cache');
+        return response;
 
     } catch (error) {
-        console.error('Error revealing SSN:', error);
+        logger.error({ err: error }, 'Error revealing SSN:');
         return NextResponse.json(
-            { error: 'Failed to reveal SSN', details: error instanceof Error ? error.message : String(error) },
+            { error: 'Failed to reveal SSN' },
             { status: 500 }
         );
     }

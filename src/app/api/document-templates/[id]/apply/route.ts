@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { applyTemplate, TEMPLATE_FIELDS } from '@/lib/document-templates';
 import type { VariableMapping, TemplateField, CaseTemplateData } from '@/lib/document-templates';
+import logger from '@/lib/logger';
 
 /**
  * POST /api/document-templates/[id]/apply
@@ -39,6 +40,7 @@ export async function POST(
         const caseData = await tenantPrisma.case.findUnique({
             where: { id: caseId },
             select: {
+                tenantId: true,
                 clientName: true,
                 clientEmail: true,
                 caseNumber: true,
@@ -83,7 +85,7 @@ export async function POST(
 
         return NextResponse.json({ html });
     } catch (err) {
-        console.error('POST /api/document-templates/[id]/apply error:', err);
+        logger.error({ err: err }, 'POST /api/document-templates/[id]/apply error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

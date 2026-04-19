@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { encrypt, decrypt, hash, encryptBuffer, decryptBuffer } from './encryption';
+import logger from '@/lib/logger';
 
 export const encryptionExtension = Prisma.defineExtension((client: any) => {
     return client.$extends({
@@ -106,7 +107,7 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                         try {
                             return decrypt(value);
                         } catch (e) {
-                            console.error(`[encryption] Failed to decrypt ${modelName}.${field}:`, e);
+                            logger.error({ err: e, model: modelName, field }, '[encryption] Failed to decrypt field');
                             return '[decryption error]';
                         }
                     };
@@ -134,7 +135,7 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                                     const buf = Buffer.isBuffer(item.fileData) ? item.fileData : Buffer.from(item.fileData);
                                     item.fileData = decryptBuffer(buf);
                                 } catch (e) {
-                                    console.error('[encryption] Failed to decrypt Document.fileData:', e);
+                                    logger.error({ err: e }, '[encryption] Failed to decrypt Document.fileData');
                                     item.fileData = null;
                                 }
                             }
@@ -145,7 +146,7 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                                     const buf = Buffer.isBuffer(item.data) ? item.data : Buffer.from(item.data);
                                     item.data = decryptBuffer(buf);
                                 } catch (e) {
-                                    console.error('[encryption] Failed to decrypt MessageAttachment.data:', e);
+                                    logger.error({ err: e }, '[encryption] Failed to decrypt MessageAttachment.data');
                                     item.data = null;
                                 }
                             }
