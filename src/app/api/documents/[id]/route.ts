@@ -32,6 +32,7 @@ export async function DELETE(
         await tenantPrisma.$transaction(async (tx: Prisma.TransactionClient) => {
             await tx.auditLog.create({
                 data: {
+                    tenantId: session.tenantId,
                     entityType: 'Document',
                     entityId: id,
                     action: 'DELETE',
