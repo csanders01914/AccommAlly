@@ -278,11 +278,15 @@ export async function POST(request: NextRequest) {
         const encryptedEmail = email ? encrypt(email) : null;
         const encryptedPhone = phone ? encrypt(phone) : null;
 
+        // Extract last name: last whitespace-delimited token of the full name
+        const clientLastName = fullName.trim().split(/\s+/).pop() ?? fullName.trim();
+
         const newCase = await prisma.case.create({
             data: {
                 tenantId,
                 caseNumber,
                 clientName: fullName,
+                clientLastName,
                 clientEmail: encryptedEmail,
                 clientEmailHash: email ? hash(email) : null,
                 clientPhone: encryptedPhone,

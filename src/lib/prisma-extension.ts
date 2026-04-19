@@ -22,6 +22,7 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                             // Case encryption
                             if (model === 'Case') {
                                 if (data.clientName && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.clientName)) data.clientName = encrypt(data.clientName);
+                                if (data.clientLastName && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.clientLastName)) data.clientLastName = encrypt(data.clientLastName);
                                 if (data.medicalCondition && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.medicalCondition)) data.medicalCondition = encrypt(data.medicalCondition);
                                 if (data.clientEmail && !/^[0-9a-f]{32}:[0-9a-f]+$/.test(data.clientEmail)) {
                                     data.clientEmailHash = hash(data.clientEmail);
@@ -121,6 +122,7 @@ export const encryptionExtension = Prisma.defineExtension((client: any) => {
                         }
                         if (model === 'Case') {
                             if (item.clientName) item.clientName = safeDecrypt(item.clientName, 'clientName', 'Case');
+                            if (item.clientLastName) item.clientLastName = safeDecrypt(item.clientLastName, 'clientLastName', 'Case');
                             if (item.medicalCondition) item.medicalCondition = safeDecrypt(item.medicalCondition, 'medicalCondition', 'Case');
                             if (item.clientEmail) item.clientEmail = safeDecrypt(item.clientEmail, 'clientEmail', 'Case');
                             if (item.clientPhone) item.clientPhone = safeDecrypt(item.clientPhone, 'clientPhone', 'Case');

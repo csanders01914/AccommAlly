@@ -131,6 +131,7 @@ model Case {
   tenantId              String
   caseNumber            String                 @unique
   clientName            String
+  clientLastName        String?   // Encrypted — last name only, used for portal identity check
   clientEmail           String?
   clientEmailHash       String?
   clientPhone           String?

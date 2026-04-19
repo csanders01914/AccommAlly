@@ -51,9 +51,10 @@ export async function POST(request: NextRequest) {
             return invalidCredentialsResponse;
         }
 
-        // Verify Last Name — exact match only, no substring fallback
-        const nameParts = targetCase.clientName.trim().split(' ');
-        const caseLastName = nameParts[nameParts.length - 1];
+        // Verify Last Name — use dedicated field; fall back to splitting for legacy cases without clientLastName
+        const caseLastName = targetCase.clientLastName
+            ?? targetCase.clientName.trim().split(/\s+/).pop()
+            ?? '';
 
         if (caseLastName.toLowerCase() !== lastName.toLowerCase()) {
             await prisma.auditLog.create({
