@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt } from '@/lib/encryption';
 import { generateClaimantNumber, createNameHash, hashCredential, validatePin, validatePassphrase } from '@/lib/claimant';
+import { parsePagination, buildPaginatedResponse } from '@/lib/pagination';
 import crypto from 'crypto';
 import { z } from 'zod';
 import logger from '@/lib/logger';
@@ -33,31 +34,24 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url);
         const search = searchParams.get('search');
-        const limit = parseInt(searchParams.get('limit') || '50');
+        const { page, limit, skip } = parsePagination(searchParams);
 
-        let claimants;
+        const whereClause = search
+            ? { claimantNumber: { contains: search } }
+            : {};
 
-        if (search) {
-            // Search by claimant number
-            claimants = await prisma.claimant.findMany({
-                where: {
-                    claimantNumber: { contains: search }
-                },
+        const [total, claimants] = await Promise.all([
+            prisma.claimant.count({ where: whereClause }),
+            prisma.claimant.findMany({
+                where: whereClause,
+                skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
                 include: {
                     _count: { select: { cases: true } }
                 }
-            });
-        } else {
-            claimants = await prisma.claimant.findMany({
-                take: limit,
-                orderBy: { createdAt: 'desc' },
-                include: {
-                    _count: { select: { cases: true } }
-                }
-            });
-        }
+            }),
+        ]);
 
         // Decrypt names for display
         const decryptedClaimants = claimants.map((c: typeof claimants[0]) => ({
@@ -70,7 +64,7 @@ export async function GET(request: NextRequest) {
             createdAt: c.createdAt
         }));
 
-        return NextResponse.json(decryptedClaimants);
+        return NextResponse.json(buildPaginatedResponse(decryptedClaimants, total, { page, limit, skip }));
     } catch (error) {
         logger.error({ err: error }, 'Error fetching claimants:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

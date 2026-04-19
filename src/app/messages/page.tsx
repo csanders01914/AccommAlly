@@ -209,7 +209,7 @@ function MessagesContent() {
             const url = `/api/messages?box=${activeBox}`;
             const res = await fetch(url);
             if (res.ok) {
-                const data = await res.json();
+                const { data } = await res.json();
                 setMessages(data);
             }
         } catch (e) {

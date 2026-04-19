@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
+import { parsePagination, buildPaginatedResponse } from '@/lib/pagination';
 import { z } from 'zod';
 import logger from '@/lib/logger';
 
@@ -29,6 +30,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const start = searchParams.get('start');
         const end = searchParams.get('end');
+        const { page, limit, skip } = parsePagination(searchParams);
 
         const whereClause: any = {};
 
@@ -39,23 +41,28 @@ export async function GET(request: NextRequest) {
             };
         }
 
-        const tasks = await tenantPrisma.task.findMany({
-            where: whereClause,
-            orderBy: { dueDate: 'asc' },
-            include: {
-                case: {
-                    select: { id: true, caseNumber: true, clientName: true }
+        const [total, tasks] = await Promise.all([
+            tenantPrisma.task.count({ where: whereClause }),
+            tenantPrisma.task.findMany({
+                where: whereClause,
+                orderBy: { dueDate: 'asc' },
+                skip,
+                take: limit,
+                include: {
+                    case: {
+                        select: { id: true, caseNumber: true, clientName: true }
+                    },
+                    assignedTo: {
+                        select: { id: true, name: true }
+                    },
+                    createdBy: {
+                        select: { id: true, name: true }
+                    }
                 },
-                assignedTo: {
-                    select: { id: true, name: true }
-                },
-                createdBy: {
-                    select: { id: true, name: true }
-                }
-            }
-        });
+            }),
+        ]);
 
-        return NextResponse.json({ tasks });
+        return NextResponse.json(buildPaginatedResponse(tasks, total, { page, limit, skip }));
     } catch (error) {
         logger.error({ err: error }, 'Task Fetch Error');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

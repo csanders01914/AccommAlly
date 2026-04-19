@@ -5,6 +5,7 @@ import { encrypt, hash, decrypt } from '@/lib/encryption';
 import { getOrCreateClaimant, validatePin, validatePassphrase } from '@/lib/claimant';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
+import { parsePagination, buildPaginatedResponse } from '@/lib/pagination';
 import { z } from 'zod';
 import logger from '@/lib/logger';
 
@@ -516,39 +517,46 @@ export async function GET(request: NextRequest) {
             if (closedEnd) whereClause.closedAt.lte = new Date(closedEnd);
         }
 
-        const cases = await tenantPrisma.case.findMany({
-            where: whereClause,
-            include: {
-                tasks: {
-                    include: {
-                        assignedTo: {
-                            select: { id: true, name: true },
+        const { page, limit, skip } = parsePagination(searchParams);
+
+        const [total, cases] = await Promise.all([
+            tenantPrisma.case.count({ where: whereClause }),
+            tenantPrisma.case.findMany({
+                where: whereClause,
+                include: {
+                    tasks: {
+                        include: {
+                            assignedTo: {
+                                select: { id: true, name: true },
+                            },
                         },
+                        orderBy: { dueDate: 'asc' },
                     },
-                    orderBy: { dueDate: 'asc' },
-                },
-                createdBy: {
-                    select: { id: true, name: true },
-                },
-                notes: {
-                    include: {
-                        author: {
-                            select: { id: true, name: true },
+                    createdBy: {
+                        select: { id: true, name: true },
+                    },
+                    notes: {
+                        include: {
+                            author: {
+                                select: { id: true, name: true },
+                            },
                         },
+                        orderBy: { createdAt: 'desc' },
                     },
-                    orderBy: { createdAt: 'desc' },
-                },
-                documents: {
-                    include: {
-                        uploadedBy: {
-                            select: { id: true, name: true },
+                    documents: {
+                        include: {
+                            uploadedBy: {
+                                select: { id: true, name: true },
+                            },
                         },
+                        orderBy: { createdAt: 'desc' },
                     },
-                    orderBy: { createdAt: 'desc' },
                 },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+            }),
+        ]);
 
         // Transform documents to exclude binary data from response
         const transformedCases = cases.map((c: any) => ({
@@ -565,7 +573,7 @@ export async function GET(request: NextRequest) {
             })),
         }));
 
-        return NextResponse.json(transformedCases);
+        return NextResponse.json(buildPaginatedResponse(transformedCases, total, { page, limit, skip }));
 
     } catch (error) {
         logger.error({ err: error }, 'Error fetching cases:');

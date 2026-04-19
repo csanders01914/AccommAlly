@@ -1,4 +1,5 @@
 'use client';
+import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -88,8 +89,8 @@ export default function CasesPage() {
         const fetchMetadata = async () => {
             try {
                 const [uRes, cRes] = await Promise.all([
-                    fetch('/api/users?role=COORDINATOR'),
-                    fetch('/api/clients')
+                    apiFetch('/api/users?role=COORDINATOR'),
+                    apiFetch('/api/clients')
                 ]);
                 if (uRes.ok) setUsers(await uRes.json());
                 if (cRes.ok) setClients(await cRes.json());
@@ -98,32 +99,53 @@ export default function CasesPage() {
         fetchMetadata();
     }, []);
 
-    // Main Data Load
+    // State for initialization
+    const [isUserLoaded, setIsUserLoaded] = useState(false);
+
+    // Initial User Fetch
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
+        const fetchUser = async () => {
             try {
-                // Fetch User
-                const userRes = await fetch('/api/auth/me');
+                const userRes = await apiFetch('/api/auth/me');
                 if (userRes.ok) {
                     const userData = await userRes.json();
                     setCurrentUser(userData.user);
 
-                    // Load Column Preferences if they exist
+                    // Load Column Preferences
                     if (userData.user?.preferences?.caseDashboardColumns) {
                         setColumns(userData.user.preferences.caseDashboardColumns);
                         setInitialColumns(userData.user.preferences.caseDashboardColumns);
                     }
-                }
 
-                // Fetch Unread
-                const unreadRes = await fetch('/api/messages/unread-count');
-                if (unreadRes.ok) {
-                    const { count } = await unreadRes.json();
-                    setUnreadCount(count);
+                    // Default filter to current user
+                    setFilters(prev => ({ ...prev, assignedTo: userData.user.id }));
                 }
+            } catch (e) {
+                console.error('User load error', e);
+            } finally {
+                setIsUserLoaded(true);
+            }
+        };
 
-                // Fetch Cases
+        const fetchUnread = async () => {
+            const unreadRes = await apiFetch('/api/messages/unread-count');
+            if (unreadRes.ok) {
+                const { count } = await unreadRes.json();
+                setUnreadCount(count);
+            }
+        }
+
+        fetchUser();
+        fetchUnread();
+    }, []);
+
+    // Main Data Load (Cases)
+    useEffect(() => {
+        if (!isUserLoaded) return;
+
+        const loadCases = async () => {
+            setLoading(true);
+            try {
                 const params = new URLSearchParams();
                 if (debouncedSearch) params.append('search', debouncedSearch);
                 if (statusFilter !== 'ALL') params.append('status', statusFilter);
@@ -137,7 +159,7 @@ export default function CasesPage() {
 
                 const res = await fetch(`/api/cases?${params.toString()}`);
                 if (res.ok) {
-                    const data = await res.json();
+                    const { data } = await res.json();
                     setCases(data);
                 }
             } catch (error) {
@@ -147,8 +169,8 @@ export default function CasesPage() {
             }
         };
 
-        loadData();
-    }, [debouncedSearch, statusFilter, filters]);
+        loadCases();
+    }, [debouncedSearch, statusFilter, filters, isUserLoaded]);
 
     // Client-side Filtering (Column Filters)
     useEffect(() => {
@@ -243,13 +265,13 @@ export default function CasesPage() {
 
 
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="flex min-h-screen app-background">
             {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
 
             <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
 
                 {/* Header */}
-                <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20">
+                <header className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-2xl mx-6 mt-6 mb-2 shadow-lg transition-all">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between h-16">
                             <div className="flex items-center gap-4">
@@ -271,222 +293,226 @@ export default function CasesPage() {
 
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
 
-                    {/* Collapsible Filter Section */}
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-t-xl border border-gray-200 dark:border-gray-700 mb-0">
-                        <div
-                            className="bg-gray-200/50 dark:bg-gray-700/50 px-4 py-3 flex items-center justify-between cursor-pointer rounded-t-xl"
-                            onClick={() => setFilterOpen(!filterOpen)}
-                        >
-                            <h2 className="text-gray-700 dark:text-gray-200 text-lg font-medium">Search & Filters</h2>
-                            <ChevronDown className={cn("text-gray-500 w-5 h-5 transition-transform", filterOpen ? "rotate-180" : "")} />
-                        </div>
+                    {/* Main Glassmorphic Container */}
+                    <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden">
 
-                        {filterOpen && (
-                            <div className="p-6 pt-2 transition-all animate-in fade-in slide-in-from-top-2">
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Search</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Name, Case #..."
-                                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700"
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Status</label>
-                                        <select
-                                            value={statusFilter}
-                                            onChange={(e) => setStatusFilter(e.target.value)}
-                                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700"
-                                        >
-                                            <option value="ALL">All Statuses</option>
-                                            <option value="OPEN">Open</option>
-                                            <option value="IN_PROGRESS">In Progress</option>
-                                            <option value="PENDING_REVIEW">Pending Review</option>
-                                            <option value="CLOSED">Closed</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Assigned To</label>
-                                        <select
-                                            value={filters.assignedTo}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, assignedTo: e.target.value }))}
-                                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700"
-                                        >
-                                            <option value="">Any User</option>
-                                            {users.filter(u => u.name !== 'System').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Client</label>
-                                        <select
-                                            value={filters.clientId}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, clientId: e.target.value }))}
-                                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700"
-                                        >
-                                            <option value="">Any Client</option>
-                                            {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Program</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. Wellness"
-                                            value={filters.program}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, program: e.target.value }))}
-                                            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Opened</label>
-                                        <div className="flex gap-2">
-                                            <input type="date" className="w-full px-2 py-1.5 text-sm border rounded bg-white dark:bg-gray-700" value={filters.openedStart} onChange={e => setFilters(p => ({ ...p, openedStart: e.target.value }))} />
-                                            <input type="date" className="w-full px-2 py-1.5 text-sm border rounded bg-white dark:bg-gray-700" value={filters.openedEnd} onChange={e => setFilters(p => ({ ...p, openedEnd: e.target.value }))} />
+                        {/* Collapsible Filter Section */}
+                        <div className="bg-transparent border-b border-white/10 dark:border-gray-700/30 mb-0">
+                            <div
+                                className="bg-white/10 dark:bg-gray-700/20 px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-white/20 dark:hover:bg-gray-700/30 transition-colors"
+                                onClick={() => setFilterOpen(!filterOpen)}
+                            >
+                                <h2 className="text-gray-700 dark:text-gray-200 text-lg font-medium">Search & Filters</h2>
+                                <ChevronDown className={cn("text-gray-500 w-5 h-5 transition-transform", filterOpen ? "rotate-180" : "")} />
+                            </div>
+
+                            {filterOpen && (
+                                <div className="p-6 pt-2 transition-all animate-in fade-in slide-in-from-top-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Search</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Name, Case #..."
+                                                className="w-full px-3 py-1.5 border border-white/20 dark:border-gray-600 rounded text-sm bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Status</label>
+                                            <select
+                                                value={statusFilter}
+                                                onChange={(e) => setStatusFilter(e.target.value)}
+                                                className="w-full px-3 py-1.5 border border-white/20 dark:border-gray-600 rounded text-sm bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                            >
+                                                <option value="ALL">All Statuses</option>
+                                                <option value="OPEN">Open</option>
+                                                <option value="IN_PROGRESS">In Progress</option>
+                                                <option value="PENDING_REVIEW">Pending Review</option>
+                                                <option value="CLOSED">Closed</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Assigned To</label>
+                                            <select
+                                                value={filters.assignedTo}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, assignedTo: e.target.value }))}
+                                                className="w-full px-3 py-1.5 border border-white/20 dark:border-gray-600 rounded text-sm bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                            >
+                                                <option value="">Any User</option>
+                                                {users.filter(u => u.name !== 'System').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Client</label>
+                                            <select
+                                                value={filters.clientId}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, clientId: e.target.value }))}
+                                                className="w-full px-3 py-1.5 border border-white/20 dark:border-gray-600 rounded text-sm bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                            >
+                                                <option value="">Any Client</option>
+                                                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Program</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Wellness"
+                                                value={filters.program}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, program: e.target.value }))}
+                                                className="w-full px-3 py-1.5 border border-white/20 dark:border-gray-600 rounded text-sm bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs font-semibold text-gray-500 uppercase">Opened</label>
+                                            <div className="flex gap-2">
+                                                <input type="date" className="w-full px-2 py-1.5 text-sm border border-white/20 rounded bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all" value={filters.openedStart} onChange={e => setFilters(p => ({ ...p, openedStart: e.target.value }))} />
+                                                <input type="date" className="w-full px-2 py-1.5 text-sm border border-white/20 rounded bg-white/50 dark:bg-gray-700/50 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all" value={filters.openedEnd} onChange={e => setFilters(p => ({ ...p, openedEnd: e.target.value }))} />
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="flex justify-end border-t border-white/10 dark:border-gray-700/30 pt-4">
+                                        <button
+                                            onClick={() => {
+                                                setFilters({ assignedTo: '', clientId: '', openedStart: '', openedEnd: '', closedStart: '', closedEnd: '', program: '' });
+                                                setSearchTerm('');
+                                                setStatusFilter('ALL');
+                                                setColumnFilters({});
+                                            }}
+                                            className="text-sm text-red-600 hover:text-red-700 font-medium px-4 py-1"
+                                        >
+                                            Reset Filters
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex justify-end border-t border-gray-200 dark:border-gray-700 pt-4">
-                                    <button
-                                        onClick={() => {
-                                            setFilters({ assignedTo: '', clientId: '', openedStart: '', openedEnd: '', closedStart: '', closedEnd: '', program: '' });
-                                            setSearchTerm('');
-                                            setStatusFilter('ALL');
-                                            setColumnFilters({});
-                                        }}
-                                        className="text-sm text-red-600 hover:text-red-700 font-medium px-4 py-1"
-                                    >
-                                        Reset Filters
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Table Controls */}
-                    <div className="bg-white dark:bg-gray-900 border-x border-b border-gray-200 dark:border-gray-700 p-2 flex items-center justify-between">
-                        <div className="flex gap-2">
-                            {/* Placeholder for future bulk actions */}
-                        </div>
-                        <div className="flex gap-2">
-                            {hasColumnChanges && (
-                                <button
-                                    onClick={handleSaveColumnPreferences}
-                                    className="px-3 py-1 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 animate-in fade-in"
-                                >
-                                    Save View Layout
-                                </button>
                             )}
                         </div>
-                    </div>
 
-                    {/* Sortable Table */}
-                    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-x-auto min-h-[400px]">
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragEnd={handleDragEnd}
-                        >
-                            <table className="w-full text-left border-collapse" style={{ tableLayout: 'fixed', minWidth: '1000px' }}>
-                                <thead className="bg-gray-50 dark:bg-gray-800">
-                                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                                        <SortableContext
-                                            items={columns.map(c => c.id)}
-                                            strategy={horizontalListSortingStrategy}
-                                        >
-                                            {columns.map((col) => (
-                                                <SortableHeader
-                                                    key={col.id}
-                                                    id={col.id}
-                                                    width={col.width}
-                                                    onResize={(w) => handleResize(col.id, w)}
-                                                    onFilter={(val) => setColumnFilters(prev => ({ ...prev, [col.id]: val }))}
-                                                    filterValue={columnFilters[col.id]}
-                                                >
-                                                    {col.label}
-                                                </SortableHeader>
-                                            ))}
-                                        </SortableContext>
-                                        <th className="w-16 px-4 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan={columns.length + 1} className="h-64 text-center">
-                                                <div className="flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>
-                                            </td>
-                                        </tr>
-                                    ) : filteredCases.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={columns.length + 1} className="h-64 text-center text-gray-500">
-                                                No cases found matching criteria.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        filteredCases.map((c) => (
-                                            <tr
-                                                key={c.id}
-                                                onClick={() => router.push(`/cases/${c.id}`)}
-                                                className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+                        {/* Table Controls */}
+                        <div className="bg-white/5 dark:bg-gray-900/10 border-b border-white/10 dark:border-gray-700/30 p-2 flex items-center justify-between">
+                            <div className="flex gap-2">
+                                {/* Placeholder for future bulk actions */}
+                            </div>
+                            <div className="flex gap-2">
+                                {hasColumnChanges && (
+                                    <button
+                                        onClick={handleSaveColumnPreferences}
+                                        className="px-3 py-1 bg-green-600/90 hover:bg-green-600 text-white text-xs font-medium rounded animate-in fade-in transition-colors shadow-sm"
+                                    >
+                                        Save View Layout
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Sortable Table */}
+                        <div className="border-t border-white/10 dark:border-gray-700/30 bg-transparent overflow-x-auto min-h-[400px]">
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <table className="w-full text-left border-collapse" style={{ tableLayout: 'fixed', minWidth: '1000px' }}>
+                                    <thead className="bg-white/10 dark:bg-gray-800/30">
+                                        <tr className="border-b border-white/10 dark:border-gray-700/30">
+                                            <SortableContext
+                                                items={columns.map(c => c.id)}
+                                                strategy={horizontalListSortingStrategy}
                                             >
-                                                {columns.map((col) => {
-                                                    // Cell Rendering
-                                                    let content: React.ReactNode = '';
-                                                    switch (col.id) {
-                                                        case 'caseNumber':
-                                                            content = <span className="font-mono text-sm font-medium text-blue-600 dark:text-blue-400">{c.caseNumber}</span>;
-                                                            break;
-                                                        case 'clientName':
-                                                            content = <span className="font-medium text-gray-900 dark:text-white">{c.clientName}</span>;
-                                                            break;
-                                                        case 'status':
-                                                            content = <span className={cn(
-                                                                "px-2.5 py-0.5 rounded-full text-xs font-medium border",
-                                                                statusColors[c.status] || statusColors.CLOSED
-                                                            )}>{c.status.replace('_', ' ')}</span>;
-                                                            break;
-                                                        case 'program':
-                                                            content = <span className="text-sm text-gray-500">{c.program || '-'}</span>;
-                                                            break;
-                                                        case 'createdAt':
-                                                            content = <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                                <Calendar className="w-3.5 h-3.5" />
-                                                                {format(new Date(c.createdAt), 'MMM d, yyyy')}
-                                                            </div>;
-                                                            break;
-                                                        case 'assignedTo':
-                                                            content = <span className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                                                <User className="w-3.5 h-3.5 text-gray-400" />
-                                                                {getActiveAssignee(c)}
-                                                            </span>;
-                                                            break;
-                                                        default:
-                                                            content = null;
-                                                    }
-
-                                                    return (
-                                                        <td key={col.id} className="px-4 py-3 align-middle overflow-hidden text-ellipsis whitespace-nowrap">
-                                                            {content}
-                                                        </td>
-                                                    );
-                                                })}
-                                                <td className="px-4 py-3 text-right">
-                                                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors inline-block" />
+                                                {columns.map((col) => (
+                                                    <SortableHeader
+                                                        key={col.id}
+                                                        id={col.id}
+                                                        width={col.width}
+                                                        onResize={(w) => handleResize(col.id, w)}
+                                                        onFilter={(val) => setColumnFilters(prev => ({ ...prev, [col.id]: val }))}
+                                                        filterValue={columnFilters[col.id]}
+                                                    >
+                                                        {col.label}
+                                                    </SortableHeader>
+                                                ))}
+                                            </SortableContext>
+                                            <th className="w-16 px-4 py-3 bg-transparent border-b border-white/10 dark:border-gray-700/30"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/10 dark:divide-gray-800/30">
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan={columns.length + 1} className="h-64 text-center">
+                                                    <div className="flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </DndContext>
-                    </div>
+                                        ) : filteredCases.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={columns.length + 1} className="h-64 text-center text-gray-500">
+                                                    No cases found matching criteria.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            filteredCases.map((c, idx) => (
+                                                <tr
+                                                    key={c.id}
+                                                    onClick={() => router.push(`/cases/${c.id}`)}
+                                                    className={cn("group hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors cursor-pointer", idx % 2 === 0 ? "bg-white/5 dark:bg-gray-900/10" : "bg-transparent")}
+                                                >
+                                                    {columns.map((col) => {
+                                                        // Cell Rendering
+                                                        let content: React.ReactNode = '';
+                                                        switch (col.id) {
+                                                            case 'caseNumber':
+                                                                content = <span className="font-mono text-sm font-medium text-blue-600 dark:text-blue-400">{c.caseNumber}</span>;
+                                                                break;
+                                                            case 'clientName':
+                                                                content = <span className="font-medium text-gray-900 dark:text-white">{c.clientName}</span>;
+                                                                break;
+                                                            case 'status':
+                                                                content = <span className={cn(
+                                                                    "px-2.5 py-0.5 rounded-full text-xs font-medium border",
+                                                                    statusColors[c.status] || statusColors.CLOSED
+                                                                )}>{c.status.replace('_', ' ')}</span>;
+                                                                break;
+                                                            case 'program':
+                                                                content = <span className="text-sm text-gray-500">{c.program || '-'}</span>;
+                                                                break;
+                                                            case 'createdAt':
+                                                                content = <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                                    <Calendar className="w-3.5 h-3.5" />
+                                                                    {format(new Date(c.createdAt), 'MMM d, yyyy')}
+                                                                </div>;
+                                                                break;
+                                                            case 'assignedTo':
+                                                                content = <span className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                                    <User className="w-3.5 h-3.5 text-gray-400" />
+                                                                    {getActiveAssignee(c)}
+                                                                </span>;
+                                                                break;
+                                                            default:
+                                                                content = null;
+                                                        }
 
-                    {/* Pagination - Simple for now */}
-                    <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                        <div>Showing {filteredCases.length} cases</div>
+                                                        return (
+                                                            <td key={col.id} className="px-4 py-3 align-middle overflow-hidden text-ellipsis whitespace-nowrap">
+                                                                {content}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                    <td className="px-4 py-3 text-right">
+                                                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors inline-block" />
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </DndContext>
+                        </div>
+
+                        {/* Pagination - Simple for now */}
+                        <div className="bg-white/10 dark:bg-gray-900/10 border-t border-white/10 dark:border-gray-700/30 p-3 flex items-center justify-between text-sm text-gray-500">
+                            <div>Showing {filteredCases.length} cases</div>
+                        </div>
                     </div>
                 </div>
             </div>

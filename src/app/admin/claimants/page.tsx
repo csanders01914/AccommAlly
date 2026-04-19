@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Plus, Filter, User, Calendar, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import CreateClaimantModal from '@/components/CreateClaimantModal';
+import CreateClaimantModal from '@/components/modals/CreateClaimantModal';
 
 interface Claimant {
     id: string;
@@ -31,7 +31,7 @@ export default function AdminClaimantsPage() {
 
             const res = await fetch(`/api/claimants?${params.toString()}`);
             if (res.ok) {
-                const data = await res.json();
+                const { data } = await res.json();
                 setClaimants(data);
             }
         } catch (error) {
@@ -49,7 +49,7 @@ export default function AdminClaimantsPage() {
     }, [search]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans p-8">
+        <div className="min-h-screen font-sans p-8">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Header */}
@@ -60,7 +60,7 @@ export default function AdminClaimantsPage() {
                     </div>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-colors font-medium"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition-colors font-medium"
                     >
                         <Plus className="w-4 h-4" />
                         New Claimant
@@ -68,13 +68,13 @@ export default function AdminClaimantsPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                <div className="bg-white/30 dark:bg-gray-900/30 rounded-2xl shadow-sm border border-white/20 dark:border-gray-700/30 p-4 backdrop-blur-md">
                     <div className="relative max-w-md">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search by name or claimant ID..."
-                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-gray-500"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -82,15 +82,15 @@ export default function AdminClaimantsPage() {
                 </div>
 
                 {/* List */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white/30 dark:bg-gray-900/30 rounded-2xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden backdrop-blur-md">
                     {isLoading ? (
                         <div className="flex justify-center py-12">
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
                         </div>
                     ) : claimants.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                                <thead className="bg-white/20 dark:bg-gray-800/50 border-b border-white/10 dark:border-gray-700/30">
                                     <tr>
                                         <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Name / ID</th>
                                         <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Date of Birth</th>
@@ -99,17 +99,17 @@ export default function AdminClaimantsPage() {
                                         <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Created</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
                                     {claimants.map((c) => (
                                         <tr
                                             key={c.id}
-                                            className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+                                            className="hover:bg-white/20 dark:hover:bg-gray-800/30 transition-colors cursor-pointer"
                                             onClick={() => router.push(`/claimants/${c.id}`)}
                                         >
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
                                                     <span className="font-medium text-gray-900 dark:text-white">{c.name}</span>
-                                                    <span className="text-xs text-blue-600 dark:text-blue-400 font-mono mt-0.5">#{c.claimantNumber}</span>
+                                                    <span className="text-xs text-indigo-600 dark:text-indigo-400 font-mono mt-0.5">#{c.claimantNumber}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
@@ -120,14 +120,14 @@ export default function AdminClaimantsPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${c.credentialType === 'PIN'
-                                                    ? 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30'
-                                                    : 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30'
+                                                    ? 'bg-blue-50/50 text-blue-700 border-blue-100/50 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30'
+                                                    : 'bg-indigo-50/50 text-indigo-700 border-indigo-100/50 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30'
                                                     }`}>
                                                     {c.credentialType}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="inline-flex items-center justify-center min-w-[1.5rem] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 font-medium text-gray-600 dark:text-gray-300 text-xs">
+                                                <span className="inline-flex items-center justify-center min-w-[1.5rem] px-2 py-0.5 rounded bg-white/40 dark:bg-gray-700/50 font-medium text-gray-600 dark:text-gray-300 text-xs shadow-sm">
                                                     {c.casesCount || 0}
                                                 </span>
                                             </td>

@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import { decrypt, encrypt, hash } from '@/lib/encryption';
+import { parsePagination, buildPaginatedResponse } from '@/lib/pagination';
 import { z } from 'zod';
 import logger from '@/lib/logger';
 
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url);
         const box = searchParams.get('box') || 'inbox'; // 'inbox', 'sent', 'starred', 'archived'
-        const limit = parseInt(searchParams.get('limit') || '50');
+        const { page, limit, skip } = parsePagination(searchParams);
 
         const whereClause: any = {};
 
@@ -74,24 +75,21 @@ export async function GET(request: NextRequest) {
             whereClause.inJunk = false;
         }
 
-        const messages = await prisma.message.findMany({
-            where: whereClause,
-            orderBy: { createdAt: 'desc' },
-            take: limit,
-            include: {
-                sender: { select: { id: true, name: true, email: true } },
-                recipient: { select: { id: true, name: true, email: true } },
-                case: { select: { id: true, caseNumber: true, clientName: true } },
-                attachments: { select: { id: true, filename: true, size: true, mimeType: true } },
-            }
-        });
-
-        if (box === 'inbox') {
-
-            messages.forEach((m: any) => {
-
-            });
-        }
+        const [total, messages] = await Promise.all([
+            prisma.message.count({ where: whereClause }),
+            prisma.message.findMany({
+                where: whereClause,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+                include: {
+                    sender: { select: { id: true, name: true, email: true } },
+                    recipient: { select: { id: true, name: true, email: true } },
+                    case: { select: { id: true, caseNumber: true, clientName: true } },
+                    attachments: { select: { id: true, filename: true, size: true, mimeType: true } },
+                },
+            }),
+        ]);
 
         // Decrypt names and map fields for frontend compatibility
         const formattedMessages = messages.map((m: any) => ({
@@ -126,7 +124,7 @@ export async function GET(request: NextRequest) {
             attachments: (m as any).attachments ?? [],
         }));
 
-        return NextResponse.json(formattedMessages);
+        return NextResponse.json(buildPaginatedResponse(formattedMessages, total, { page, limit, skip }));
     } catch (error) {
         logger.error({ err: error }, 'Messages GET Error:');
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
