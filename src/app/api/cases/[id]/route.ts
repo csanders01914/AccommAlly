@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { decrypt, hash } from '@/lib/encryption';
+import { decrypt } from '@/lib/encryption';
 import { requireAuth } from '@/lib/require-auth';
 import { withTenantScope } from '@/lib/prisma-tenant';
 import logger from '@/lib/logger';
