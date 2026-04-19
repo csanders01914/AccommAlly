@@ -84,10 +84,11 @@ export async function POST(
         const noteValidation = CreateNoteSchema.safeParse({ content, noteType });
         if (!noteValidation.success) {
             return NextResponse.json(
-                { error: 'Validation failed', details: noteValidation.error.issues },
+                { error: 'Validation Error', details: noteValidation.error.issues },
                 { status: 400 }
             );
         }
+        const { noteType: validNoteType } = noteValidation.data;
 
         // Verify case exists
         const existingCase = await tenantPrisma.case.findUnique({
@@ -109,7 +110,7 @@ export async function POST(
         }
 
         // Validate AUDIT note type - only ADMIN and AUDITOR can create audit notes
-        if (noteType === 'AUDIT') {
+        if (validNoteType === 'AUDIT') {
             if (session.role !== 'ADMIN' && session.role !== 'AUDITOR') {
                 return NextResponse.json({
                     error: 'Only Admins and Auditors can create audit notes'
@@ -147,7 +148,7 @@ export async function POST(
         const note = await tenantPrisma.note.create({
             data: {
                 content: encryptedContent,
-                noteType,
+                noteType: validNoteType,
                 caseId: id,
                 authorId: session.id,
             },

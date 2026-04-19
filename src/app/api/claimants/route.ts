@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         const validation = CreateClaimantSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json(
-                { error: 'Validation failed', details: validation.error.issues },
+                { error: 'Validation Error', details: validation.error.issues },
                 { status: 400 }
             );
         }

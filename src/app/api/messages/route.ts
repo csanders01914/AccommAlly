@@ -165,20 +165,9 @@ export async function POST(request: NextRequest) {
         });
         if (!messageValidation.success) {
             return NextResponse.json(
-                { error: 'Validation failed', details: messageValidation.error.issues },
+                { error: 'Validation Error', details: messageValidation.error.issues },
                 { status: 400 }
             );
-        }
-
-        // Validation
-        if (isExternal) {
-            if (!externalEmail || !externalName || !contentBody) {
-                return NextResponse.json({ error: 'External Email, Name, and Body are required' }, { status: 400 });
-            }
-        } else {
-            if (!recipientId || !contentBody) {
-                return NextResponse.json({ error: 'Recipient and Body are required' }, { status: 400 });
-            }
         }
 
         // Attachment validation

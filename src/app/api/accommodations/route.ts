@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 const CreateAccommodationSchema = z.object({
     caseId: z.string().min(1, 'Case ID is required'),
-    type: z.string().min(1, 'Accommodation type is required'),
+    type: z.enum(['CHANGE_IN_FUNCTIONS', 'ENVIRONMENTAL_MODIFICATION', 'JOB_AID', 'LEAVE_OF_ABSENCE', 'PHYSICAL_ACCOMMODATION', 'SCHEDULE_MODIFICATION'] as const),
     subtype: z.string().optional(),
     description: z.string().min(1, 'Description is required'),
     isLongTerm: z.boolean().optional().default(false),
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         const validation = CreateAccommodationSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json(
-                { error: 'Validation failed', details: validation.error.issues },
+                { error: 'Validation Error', details: validation.error.issues },
                 { status: 400 }
             );
         }
