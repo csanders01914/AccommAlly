@@ -142,4 +142,11 @@ describe('decryptBuffer — error handling', () => {
         const fakeEncrypted = Buffer.alloc(30, 0xab);
         expect(() => decryptBuffer(fakeEncrypted)).toThrow();
     });
+
+    it('correctly round-trips a zero-byte buffer', () => {
+        const empty = Buffer.alloc(0);
+        const encrypted = encryptBuffer(empty);
+        const decrypted = decryptBuffer(encrypted);
+        expect(decrypted).toEqual(empty);
+    });
 });

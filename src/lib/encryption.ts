@@ -97,7 +97,7 @@ export function decryptBuffer(buffer: Buffer): Buffer {
   const IV_LEN = 12;
   const AUTH_TAG_LEN = 16;
 
-  if (buffer.length > IV_LEN + AUTH_TAG_LEN) {
+  if (buffer.length >= IV_LEN + AUTH_TAG_LEN) {
     // Try GCM first
     const iv = buffer.subarray(0, IV_LEN);
     const authTag = buffer.subarray(IV_LEN, IV_LEN + AUTH_TAG_LEN);
