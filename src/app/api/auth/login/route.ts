@@ -1,62 +1,50 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { comparePassword, loginUser } from "@/lib/auth";
-import { encrypt, hash } from "@/lib/encryption";
-import fs from 'fs';
-import path from 'path';
-
-function logToFile(message: string) {
-    try {
-        const logPath = path.join(process.cwd(), 'login-debug.txt');
-        const timestamp = new Date().toISOString();
-        // Encrypt the entire log line including timestamp to ensure confidentiality
-        const logEntry = `[${timestamp}] ${message}`;
-        const encryptedEntry = encrypt(logEntry);
-        fs.appendFileSync(logPath, `${encryptedEntry}\n`);
-    } catch (e) {
-        // ignore logging errors
-    }
-}
+import { comparePassword, loginUser, signToken } from "@/lib/auth";
+import { loginRateLimiter } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
     try {
+        // Rate limit by IP
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const rateLimit = await loginRateLimiter.check(ip);
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: `Too many login attempts. Try again in ${rateLimit.retryAfterSeconds} seconds.` },
+                { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+            );
+        }
+
         const body = await request.json();
         const { email, password } = body;
 
-        logToFile(`--- New Login Request ---`);
-
         if (!email || !password) {
-            logToFile(`Missing fields`);
             return NextResponse.json({ error: "Email and password required" }, { status: 400 });
         }
 
         // 1. Find user by hashed email (blind indexing)
+        // The Prisma encryption extension automatically converts email -> emailHash for lookup
         const normalizedEmail = email.toLowerCase().trim();
-        const emailHash = hash(normalizedEmail);
-        logToFile(`Login Attempt Email: ${normalizedEmail}`);
-        logToFile(`Login Computed Hash: ${emailHash}`);
 
         const user = await prisma.user.findFirst({
-            where: { emailHash },
+            where: { email: normalizedEmail },
+            include: { tenant: true }
         });
 
         if (!user) {
-            logToFile('Login Failed: User not found by emailHash');
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
-        logToFile(`Login: User found (ID: ${user.id})`);
 
         // 2. Check Lockout
         if (user.lockedUntil && user.lockedUntil > new Date()) {
-            logToFile('Login Failed: User locked out');
-
             // Audit Log: Login Blocked
             await prisma.auditLog.create({
                 data: {
                     entityType: 'User',
                     entityId: user.id,
                     action: 'LOGIN_BLOCKED',
-                    userId: user.id, // User is known, so we can log it against them
+                    userId: user.id,
+                    tenantId: user.tenantId,
                     metadata: JSON.stringify({ reason: 'account_locked', lockedUntil: user.lockedUntil })
                 }
             });
@@ -69,20 +57,17 @@ export async function POST(request: Request) {
 
         // 3. Verify Password
         if (!user.passwordHash) {
-            logToFile('Login Failed: No password hash stored');
             return NextResponse.json({ error: "Account setup incomplete" }, { status: 401 });
         }
 
         const isValid = await comparePassword(password, user.passwordHash);
-        logToFile(`Login: Password valid? ${isValid}`);
 
         if (!isValid) {
-            logToFile('Login Failed: Password mismatch');
             // Increment attempts
             const newAttempts = user.loginAttempts + 1;
-            let updateData: any = { loginAttempts: newAttempts };
+            const updateData: { loginAttempts: number; lockedUntil?: Date } = { loginAttempts: newAttempts };
 
-            // Lock if > 5 attempts
+            // Lock if >= 5 attempts
             if (newAttempts >= 5) {
                 updateData.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 min lock
             }
@@ -99,6 +84,7 @@ export async function POST(request: Request) {
                     entityId: user.id,
                     action: 'LOGIN_FAILURE',
                     userId: user.id,
+                    tenantId: user.tenantId,
                     metadata: JSON.stringify({ reason: 'invalid_password', attempts: newAttempts })
                 }
             });
@@ -116,21 +102,26 @@ export async function POST(request: Request) {
             }
         });
 
-        // 2FA Check
+        // 2FA Check — issue a short-lived pending token instead of exposing userId
         if (user.twoFactorEnabled) {
-            logToFile('Login: 2FA Required');
+            const pendingToken = await signToken({
+                userId: user.id,
+                tenantId: user.tenantId,
+                purpose: '2fa_pending',
+            });
             return NextResponse.json({
                 twoFactorRequired: true,
-                userId: user.id
+                pendingToken,
             });
         }
 
         const isSecure = request.url.startsWith("https:");
 
-        const token = await loginUser({
+        await loginUser({
             id: user.id,
             email: email,
             role: user.role,
+            tenantId: user.tenantId,
             name: user.name,
             isSecure
         });
@@ -142,15 +133,24 @@ export async function POST(request: Request) {
                 entityId: user.id,
                 action: 'LOGIN_SUCCESS',
                 userId: user.id,
+                tenantId: user.tenantId,
                 metadata: JSON.stringify({ ip: request.headers.get('x-forwarded-for') || 'unknown' })
             }
         });
 
-        logToFile('Login Success');
-        return NextResponse.json({ success: true, user: { name: user.name, role: user.role } });
+        const userData = {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            tenant: {
+                id: user.tenant.id,
+                name: user.tenant.name,
+                settings: user.tenant.settings
+            }
+        };
+        return NextResponse.json({ success: true, user: userData });
 
     } catch (error) {
-        logToFile(`Login Error: ${error}`);
         console.error("Login Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

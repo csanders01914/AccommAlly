@@ -1,71 +1,141 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { SignJWT } from 'jose';
+import { signToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
-
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET || "default_dev_secret_key_change_me");
-const ALG = "HS256";
+import { portalLoginRateLimiter } from '@/lib/rate-limit';
+import { verifyCredential } from '@/lib/claimant';
 
 export async function POST(request: NextRequest) {
     try {
-        const { identifier, lastName } = await request.json();
+        // Rate limit by IP
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const rateLimit = await portalLoginRateLimiter.check(ip);
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: `Too many attempts. Try again in ${rateLimit.retryAfterSeconds} seconds.` },
+                { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+            );
+        }
 
-        if (!identifier || !lastName) {
+        const { identifier, lastName, pin } = await request.json();
+
+        if (!identifier || !lastName || !pin) {
             return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
         }
 
-        // Find Case by Claim Number OR Claimant ID
+        // Find Case by Claim Number OR Claimant ID, including linked claimant
         const targetCase = await prisma.case.findFirst({
             where: {
                 OR: [
                     { caseNumber: { equals: identifier, mode: 'insensitive' } },
                     { claimantRef: identifier }
                 ]
+            },
+            include: {
+                claimant: {
+                    select: {
+                        id: true,
+                        pinHash: true,
+                        passphraseHash: true,
+                        credentialType: true,
+                    }
+                }
             }
         });
 
+        // Use a generic error message for case-not-found to prevent case number enumeration
+        const invalidCredentialsResponse = NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+
         if (!targetCase) {
-            return NextResponse.json({ error: 'Case not found' }, { status: 404 });
+            return invalidCredentialsResponse;
         }
 
-        // Verify Last Name (Case-insensitive check against clientName)
+        // Verify Last Name — exact match only, no substring fallback
         const nameParts = targetCase.clientName.trim().split(' ');
-        const caseLastName = nameParts[nameParts.length - 1]; // Simple last name extraction
+        const caseLastName = nameParts[nameParts.length - 1];
 
         if (caseLastName.toLowerCase() !== lastName.toLowerCase()) {
-            // Logic check: What if client has multiple last names? 
-            // Ideally we check if `clientName` includes `lastName`
-            if (!targetCase.clientName.toLowerCase().includes(lastName.toLowerCase())) {
-                return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-            }
+            await prisma.auditLog.create({
+                data: {
+                    entityType: 'Portal',
+                    entityId: targetCase.id,
+                    action: 'PORTAL_LOGIN_FAILED',
+                    tenantId: targetCase.tenantId,
+                    metadata: JSON.stringify({ reason: 'last_name_mismatch', ip }),
+                }
+            }).catch(() => {});
+            return invalidCredentialsResponse;
         }
 
-        // Generate Portal Token
-        const token = await new SignJWT({
-            claimantId: targetCase.claimantRef,
+        // Require a linked claimant with a PIN set
+        const claimant = targetCase.claimant;
+        if (!claimant) {
+            return NextResponse.json(
+                { error: 'Portal access is not yet set up for this case. Please contact your examiner.' },
+                { status: 403 }
+            );
+        }
+
+        const credentialHash = claimant.credentialType === 'PIN'
+            ? claimant.pinHash
+            : claimant.passphraseHash;
+
+        if (!credentialHash) {
+            return NextResponse.json(
+                { error: 'No PIN has been set for this case. Please contact your examiner to enable portal access.' },
+                { status: 403 }
+            );
+        }
+
+        // Verify the PIN / passphrase
+        const pinValid = await verifyCredential(pin, credentialHash);
+        if (!pinValid) {
+            await prisma.auditLog.create({
+                data: {
+                    entityType: 'Portal',
+                    entityId: targetCase.id,
+                    action: 'PORTAL_LOGIN_FAILED',
+                    tenantId: targetCase.tenantId,
+                    metadata: JSON.stringify({ reason: 'invalid_pin', ip }),
+                }
+            }).catch(() => {});
+            return invalidCredentialsResponse;
+        }
+
+        // All factors verified — issue portal token
+        const token = await signToken({
+            claimantId: claimant.id,
             caseId: targetCase.id,
-            role: 'CLAIMANT'
-        })
-            .setProtectedHeader({ alg: ALG })
-            .setIssuedAt()
-            .setExpirationTime("1h")
-            .sign(SECRET_KEY);
+            tenantId: targetCase.tenantId,
+            role: 'CLAIMANT',
+            purpose: 'portal',
+        });
 
         const cookieStore = await cookies();
         const isSecure = request.nextUrl.protocol === 'https:';
 
-        cookieStore.set("portal_token", token, {
+        cookieStore.set('portal_token', token, {
             httpOnly: true,
             secure: isSecure,
-            sameSite: "lax",
-            path: "/",
+            sameSite: 'lax',
+            path: '/',
             maxAge: 60 * 60, // 1 hour
         });
+
+        await prisma.auditLog.create({
+            data: {
+                entityType: 'Portal',
+                entityId: targetCase.id,
+                action: 'PORTAL_LOGIN_SUCCESS',
+                tenantId: targetCase.tenantId,
+                metadata: JSON.stringify({ claimantId: claimant.id, ip }),
+            }
+        }).catch(() => {});
 
         return NextResponse.json({ success: true });
 
     } catch (error) {
-        console.error("Portal Login Error:", error);
+        console.error('Portal Login Error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

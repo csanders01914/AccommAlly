@@ -759,6 +759,15 @@ model BugReport {
   @@index([userId])
 }
 
+/// Per-key rate limit counters used for distributed rate limiting across serverless instances
+model RateLimit {
+  key     String   @id
+  count   Int      @default(1)
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
 enum TenantStatus {
   PENDING
   ACTIVE
