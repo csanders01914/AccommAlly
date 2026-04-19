@@ -103,7 +103,7 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
 
     const handleLogout = async () => {
         await apiFetch('/api/auth/logout', { method: 'POST' });
-        window.location.href = '/';
+        window.location.href = '/login';
     };
 
     const isActive = (href: string) => {

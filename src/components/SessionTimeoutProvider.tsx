@@ -91,8 +91,9 @@ export default function SessionTimeoutProvider({ children }: { children: React.R
         };
     }, [logout]);
 
-    // Don't show timeout logic on the login page itself to avoid loops or annoyance before login
-    if (pathname === '/') {
+    // Don't show timeout logic on public pages to avoid loops or annoyance before login
+    const PUBLIC_PATHS = ['/', '/login', '/about'];
+    if (PUBLIC_PATHS.includes(pathname)) {
         // Reset timer when on login page so timer starts fresh on navigation
         lastActivityRef.current = Date.now();
         return <>{children}</>;
