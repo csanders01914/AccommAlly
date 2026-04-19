@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { comparePassword, loginUser, signToken } from "@/lib/auth";
 import { loginRateLimiter } from "@/lib/rate-limit";
+import { RATE_LIMIT_LOGIN_MAX, RATE_LIMIT_LOGIN_WINDOW } from "@/lib/constants";
 import logger from '@/lib/logger';
 
 export async function POST(request: Request) {
@@ -68,9 +69,8 @@ export async function POST(request: Request) {
             const newAttempts = user.loginAttempts + 1;
             const updateData: { loginAttempts: number; lockedUntil?: Date } = { loginAttempts: newAttempts };
 
-            // Lock if >= 5 attempts
-            if (newAttempts >= 5) {
-                updateData.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 min lock
+            if (newAttempts >= RATE_LIMIT_LOGIN_MAX) {
+                updateData.lockedUntil = new Date(Date.now() + RATE_LIMIT_LOGIN_WINDOW * 1000);
             }
 
             await prisma.user.update({

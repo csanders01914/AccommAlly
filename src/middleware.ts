@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
-import { CSRF_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/constants";
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/constants";
 
 // Paths that require authentication
 const PROTECTED_PATHS = ["/dashboard", "/admin", "/auditor", "/cases"];
