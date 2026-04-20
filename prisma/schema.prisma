@@ -457,7 +457,7 @@ model AnnotationComment {
   message    Message?              @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   parentId   String?
-  parent     AnnotationComment?    @relation("Replies", fields: [parentId], references: [id])
+  parent     AnnotationComment?    @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
   replies    AnnotationComment[]   @relation("Replies")
 
   type       AnnotationCommentType
@@ -485,9 +485,10 @@ model AnnotationComment {
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
 
-  @@index([tenantId, documentId])
-  @@index([tenantId, messageId])
+  @@index([tenantId, documentId, deletedAt])
+  @@index([tenantId, messageId, deletedAt])
   @@index([tenantId, createdById])
+  @@index([parentId])
 }
 
 /// Secure internal messaging between users with external email support
