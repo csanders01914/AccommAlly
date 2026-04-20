@@ -389,3 +389,53 @@ describe('DELETE /api/documents/[id]/annotation-comments/[cid]', () => {
         expect(res.status).toBe(410);
     });
 });
+
+// -------------------------------------------------------
+// POST /api/documents/[id]/annotation-comments/[cid]/replies
+// -------------------------------------------------------
+describe('POST /api/documents/[id]/annotation-comments/[cid]/replies', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        prismaMock.auditLog.create.mockResolvedValue({});
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(mockSession);
+    });
+
+    it('returns 400 when parent is itself a reply', async () => {
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-2', parentId: 'cmt-1', tenantId: 'tenant-1', deletedAt: null,
+        });
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/replies/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-2/replies',
+            'POST',
+            { content: 'nested reply' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-2' }) });
+        expect(res.status).toBe(400);
+    });
+
+    it('creates a reply and returns 201', async () => {
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', parentId: null, tenantId: 'tenant-1', deletedAt: null,
+            type: 'HIGHLIGHT_PDF', documentId: 'doc-1', messageId: null,
+        });
+        const created = {
+            id: 'cmt-reply', parentId: 'cmt-1', tenantId: 'tenant-1',
+            type: 'HIGHLIGHT_PDF', content: 'A reply', deletedAt: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-1', name: 'Test User' },
+        };
+        prismaMock.annotationComment.create.mockResolvedValue(created);
+
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/replies/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1/replies',
+            'POST',
+            { content: 'A reply' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(201);
+        expect(prismaMock.auditLog.create).toHaveBeenCalledTimes(1);
+    });
+});
