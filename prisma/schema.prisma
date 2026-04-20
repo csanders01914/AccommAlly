@@ -21,7 +21,7 @@ model Tenant {
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   accommodations        Accommodation[]
-  annotations           Annotation[]
+  annotationComments    AnnotationComment[]
   auditLogs             AuditLog[]
   bugReports            BugReport[]
   callRequests          CallRequest[]
@@ -101,7 +101,7 @@ model User {
   lockedUntil            DateTime?
   emailSignature         String?
   decidedAccommodations  Accommodation[]   @relation("DecisionMaker")
-  annotations            Annotation[]
+  annotationComments     AnnotationComment[]
   auditLogs              AuditLog[]
   bugReports             BugReport[]
   createdCases           Case[]            @relation("CaseCreatedBy")
@@ -407,7 +407,7 @@ model Document {
   updatedAt             DateTime     @updatedAt
   caseId                String
   uploadedById          String
-  annotations           Annotation[]
+  annotationComments    AnnotationComment[]
   case                  Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
   tenant                Tenant       @relation(fields: [tenantId], references: [id])
   uploadedBy            User         @relation(fields: [uploadedById], references: [id])
@@ -437,26 +437,57 @@ model DocumentTemplate {
   @@index([tenantId])
 }
 
-/// Persistent annotations/highlights on Documents
-model Annotation {
-  id          String   @id @default(cuid())
-  tenantId    String
-  documentId  String
-  pageNumber  Int
-  color       String   @default("#FFFF00")
-  x           Float
-  y           Float
-  width       Float
-  height      Float
-  createdById String
-  createdAt   DateTime @default(now())
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+enum AnnotationCommentType {
+  HIGHLIGHT_PDF
+  HIGHLIGHT_EMAIL
+  DOCUMENT_NOTE
+  EMAIL_NOTE
+}
 
-  @@index([tenantId])
-  @@index([documentId])
-  @@index([createdById])
+/// Unified annotation comments for documents and messages
+model AnnotationComment {
+  id         String                @id @default(cuid())
+  tenantId   String
+  tenant     Tenant                @relation(fields: [tenantId], references: [id])
+
+  documentId String?
+  document   Document?             @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  messageId  String?
+  message    Message?              @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  parentId   String?
+  parent     AnnotationComment?    @relation("Replies", fields: [parentId], references: [id])
+  replies    AnnotationComment[]   @relation("Replies")
+
+  type       AnnotationCommentType
+
+  content    String
+  deletedAt  DateTime?
+
+  // Highlight color — applies to HIGHLIGHT_PDF and HIGHLIGHT_EMAIL (null for notes)
+  color      String?               @default("#FFFF00")
+
+  // PDF highlight geometry fields (null for email highlights and notes)
+  pageNumber Int?
+  x          Float?
+  y          Float?
+  width      Float?
+  height     Float?
+
+  // Email text selection fields (null for PDF highlights and notes)
+  selectedText   String?
+  selectionStart Int?
+  selectionEnd   Int?
+
+  createdById String
+  createdBy   User                 @relation(fields: [createdById], references: [id])
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([tenantId, documentId])
+  @@index([tenantId, messageId])
+  @@index([tenantId, createdById])
 }
 
 /// Secure internal messaging between users with external email support
@@ -496,6 +527,7 @@ model Message {
   tenant             Tenant                    @relation(fields: [tenantId], references: [id])
   folderAssignments  MessageFolderAssignment[]
   attachments        MessageAttachment[]
+  annotationComments AnnotationComment[]
 
   @@index([tenantId])
   @@index([senderId])
