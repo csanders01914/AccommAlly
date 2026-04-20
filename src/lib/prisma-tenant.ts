@@ -23,7 +23,7 @@ const TENANT_SCOPED_MODELS = [
   'note',
   'auditLog',
   'document',
-  'annotation',
+  'annotationComment',
   'message',
   'messageFolder',
   'inboundRule',
