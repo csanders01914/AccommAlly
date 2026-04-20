@@ -33,7 +33,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         }
 
         const body = await request.json();
-        if (!body.content || typeof body.content !== 'string') {
+        if (!body.content || typeof body.content !== 'string' || !body.content.trim()) {
             return NextResponse.json({ error: 'content is required' }, { status: 400 });
         }
 

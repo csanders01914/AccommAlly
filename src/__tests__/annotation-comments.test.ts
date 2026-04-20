@@ -313,6 +313,42 @@ describe('PATCH /api/documents/[id]/annotation-comments/[cid]', () => {
         expect(res.status).toBe(200);
         expect(prismaMock.auditLog.create).toHaveBeenCalledTimes(1);
     });
+
+    it('returns 410 when annotation is already soft-deleted', async () => {
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'user-1',
+            createdAt: new Date(), deletedAt: new Date(),
+        });
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'updated' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(410);
+    });
+
+    it('allows ADMIN to edit annotation older than 24 hours', async () => {
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue({ ...mockSession, role: 'ADMIN' });
+        const old = new Date(Date.now() - 25 * 60 * 60 * 1000);
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'other-user',
+            createdAt: old, deletedAt: null,
+        });
+        prismaMock.annotationComment.update.mockResolvedValue({
+            id: 'cmt-1', content: 'admin edit', createdBy: { id: 'other-user', name: 'Other' },
+        });
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'admin edit' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(200);
+    });
 });
 
 // -------------------------------------------------------
