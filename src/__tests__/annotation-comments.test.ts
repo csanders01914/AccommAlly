@@ -237,3 +237,119 @@ describe('POST /api/documents/[id]/annotation-comments', () => {
         expect(res.status).toBe(201);
     });
 });
+
+// -------------------------------------------------------
+// PATCH /api/documents/[id]/annotation-comments/[cid]
+// -------------------------------------------------------
+describe('PATCH /api/documents/[id]/annotation-comments/[cid]', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        prismaMock.auditLog.create.mockResolvedValue({});
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(mockSession);
+    });
+
+    it('returns 401 when unauthenticated', async () => {
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(null);
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'updated' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 409 when annotation is older than 24 hours and user is not ADMIN', async () => {
+        const old = new Date(Date.now() - 25 * 60 * 60 * 1000);
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'user-1',
+            createdAt: old, deletedAt: null,
+        });
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'updated' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(409);
+    });
+
+    it('returns 403 when user is not the creator', async () => {
+        const recent = new Date(Date.now() - 5 * 60 * 1000);
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'other-user',
+            createdAt: recent, deletedAt: null,
+        });
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'updated' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(403);
+    });
+
+    it('updates content within 24 hours', async () => {
+        const recent = new Date(Date.now() - 5 * 60 * 1000);
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'user-1',
+            createdAt: recent, deletedAt: null,
+        });
+        prismaMock.annotationComment.update.mockResolvedValue({
+            id: 'cmt-1', content: 'updated', createdBy: { id: 'user-1', name: 'Test User' },
+        });
+        const { PATCH } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments/cmt-1',
+            'PATCH',
+            { content: 'updated' }
+        );
+        const res = await PATCH(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(200);
+        expect(prismaMock.auditLog.create).toHaveBeenCalledTimes(1);
+    });
+});
+
+// -------------------------------------------------------
+// DELETE /api/documents/[id]/annotation-comments/[cid]
+// -------------------------------------------------------
+describe('DELETE /api/documents/[id]/annotation-comments/[cid]', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        prismaMock.auditLog.create.mockResolvedValue({});
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(mockSession);
+    });
+
+    it('soft deletes an annotation comment', async () => {
+        const recent = new Date(Date.now() - 5 * 60 * 1000);
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'user-1',
+            createdAt: recent, deletedAt: null,
+        });
+        prismaMock.annotationComment.update.mockResolvedValue({ id: 'cmt-1', deletedAt: new Date() });
+        const { DELETE } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest('http://localhost/api/documents/doc-1/annotation-comments/cmt-1', 'DELETE');
+        const res = await DELETE(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(200);
+        expect(prismaMock.annotationComment.update).toHaveBeenCalledWith(
+            expect.objectContaining({ data: expect.objectContaining({ deletedAt: expect.any(Date), content: '[deleted]' }) })
+        );
+    });
+
+    it('returns 410 when already soft-deleted', async () => {
+        prismaMock.annotationComment.findUnique.mockResolvedValue({
+            id: 'cmt-1', tenantId: 'tenant-1', createdById: 'user-1',
+            createdAt: new Date(), deletedAt: new Date(),
+        });
+        const { DELETE } = await import('@/app/api/documents/[id]/annotation-comments/[cid]/route');
+        const req = makeRequest('http://localhost/api/documents/doc-1/annotation-comments/cmt-1', 'DELETE');
+        const res = await DELETE(req, { params: Promise.resolve({ id: 'doc-1', cid: 'cmt-1' }) });
+        expect(res.status).toBe(410);
+    });
+});
