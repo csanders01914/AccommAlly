@@ -105,6 +105,26 @@ describe('GET /api/documents/[id]/annotation-comments', () => {
         expect(data[0].replies).toHaveLength(1);
         expect(data[0].replies[0].id).toBe('cmt-2');
     });
+
+    it('replaces content with [deleted] for soft-deleted comments', async () => {
+        const deletedRoot = {
+            id: 'cmt-deleted', parentId: null, tenantId: 'tenant-1', documentId: 'doc-1',
+            type: 'DOCUMENT_NOTE', content: 'original content', deletedAt: new Date(),
+            color: null, pageNumber: null, x: null, y: null, width: null, height: null,
+            selectedText: null, selectionStart: null, selectionEnd: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-1', name: 'Test User' },
+        };
+        prismaMock.annotationComment.findMany.mockResolvedValue([deletedRoot]);
+
+        const { GET } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest('http://localhost/api/documents/doc-1/annotation-comments');
+        const res = await GET(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(200);
+        const data = await res.json();
+        expect(data[0].content).toBe('[deleted]');
+        expect(data[0].replies).toHaveLength(0);
+    });
 });
 
 // -------------------------------------------------------
