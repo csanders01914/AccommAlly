@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { LoadTemplateModal } from '@/components/modals/LoadTemplateModal';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
@@ -36,7 +36,11 @@ import {
     FolderDown,
     Copy,
     CheckCircle,
+    Highlighter,
+    StickyNote,
+    MessageSquare,
 } from 'lucide-react';
+import { AnnotationThreadPanel } from '@/components/AnnotationThreadPanel';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -759,6 +763,8 @@ function MessagesContent() {
                                 onArchive={() => handleArchive(selectedMessage)}
                                 onDelete={() => handleDelete(selectedMessage)}
                                 onAddToCalendar={() => handleAddToCalendar(selectedMessage)}
+                                currentUserId={currentUser?.id ?? ''}
+                                currentUserName={currentUser?.name ?? ''}
                             />
                         ) : (
                             <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
@@ -815,7 +821,9 @@ function MessageDetail({
     onStar,
     onArchive,
     onDelete,
-    onAddToCalendar
+    onAddToCalendar,
+    currentUserId,
+    currentUserName,
 }: {
     message: Message;
     activeBox: BoxType;
@@ -825,11 +833,145 @@ function MessageDetail({
     onArchive: () => void;
     onDelete: () => void;
     onAddToCalendar: () => void;
+    currentUserId: string;
+    currentUserName: string;
 }) {
     const [savingToCase, setSavingToCase] = useState(false);
     const [savedDCN, setSavedDCN] = useState<string | null>(null);
     const [dcnCopied, setDcnCopied] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+
+    // Annotation state
+    const [emailAnnotations, setEmailAnnotations] = useState<any[]>([]);
+    const [selectionToolbar, setSelectionToolbar] = useState<{
+        top: number; left: number;
+        selectedText: string; selectionStart: number; selectionEnd: number;
+    } | null>(null);
+    const [selectedHighlightColor, setSelectedHighlightColor] = useState('#FFFF00');
+    const [openEmailThreadId, setOpenEmailThreadId] = useState<string | null>(null);
+    const [showEmailNotePanel, setShowEmailNotePanel] = useState(false);
+    const emailBodyRef = useRef<HTMLDivElement>(null);
+
+    const fetchEmailAnnotations = useCallback(async (msgId: string) => {
+        try {
+            const res = await fetch(`/api/messages/${msgId}/annotation-comments`);
+            if (res.ok) setEmailAnnotations(await res.json());
+        } catch {
+            // ignore
+        }
+    }, []);
+
+    useEffect(() => {
+        setEmailAnnotations([]);
+        setOpenEmailThreadId(null);
+        setShowEmailNotePanel(false);
+        fetchEmailAnnotations(message.id);
+    }, [message.id, fetchEmailAnnotations]);
+
+    const handleEmailMouseUp = useCallback(() => {
+        if (!emailBodyRef.current) return;
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed || !selection.toString().trim()) {
+            setSelectionToolbar(null);
+            return;
+        }
+        const selectedText = selection.toString().trim();
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const containerRect = emailBodyRef.current.getBoundingClientRect();
+        const bodyText = emailBodyRef.current.innerText ?? '';
+        const selectionStart = bodyText.indexOf(selectedText);
+        const selectionEnd = selectionStart >= 0 ? selectionStart + selectedText.length : -1;
+        setSelectionToolbar({
+            top: rect.top - containerRect.top - 44,
+            left: rect.left - containerRect.left,
+            selectedText,
+            selectionStart: Math.max(0, selectionStart),
+            selectionEnd: Math.max(0, selectionEnd),
+        });
+    }, []);
+
+    const saveEmailHighlight = useCallback(async () => {
+        if (!selectionToolbar) return;
+        try {
+            const res = await apiFetch(`/api/messages/${message.id}/annotation-comments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'HIGHLIGHT_EMAIL',
+                    content: '',
+                    color: selectedHighlightColor,
+                    selectedText: selectionToolbar.selectedText,
+                    selectionStart: selectionToolbar.selectionStart,
+                    selectionEnd: selectionToolbar.selectionEnd,
+                }),
+            });
+            if (res.ok) {
+                const created = await res.json();
+                setEmailAnnotations(prev => [...prev, { ...created, replies: [] }]);
+                setSelectionToolbar(null);
+                window.getSelection()?.removeAllRanges();
+            }
+        } catch {
+            // ignore
+        }
+    }, [selectionToolbar, selectedHighlightColor, message.id]);
+
+    useEffect(() => {
+        if (!emailBodyRef.current) return;
+        const highlights = emailAnnotations.filter(a => a.type === 'HIGHLIGHT_EMAIL' && !a.deleted);
+        if (highlights.length === 0) return;
+
+        highlights.forEach((h: any) => {
+            if (!h.selectedText || h.selectionStart < 0) return;
+            const bodyEl = emailBodyRef.current!;
+            const bodyText = bodyEl.innerText ?? '';
+            const startSearch = h.selectionStart - 5 >= 0 ? h.selectionStart - 5 : 0;
+            const idx = bodyText.indexOf(h.selectedText, startSearch);
+            if (idx < 0) return;
+
+            const walker = document.createTreeWalker(bodyEl, NodeFilter.SHOW_TEXT);
+            let charCount = 0;
+            let startNode: Text | null = null;
+            let startOffset = 0;
+            let endNode: Text | null = null;
+            let endOffset = 0;
+            let node: Text | null;
+
+            while ((node = walker.nextNode() as Text | null)) {
+                const nodeLen = node.length;
+                if (!startNode && charCount + nodeLen > idx) {
+                    startNode = node;
+                    startOffset = idx - charCount;
+                }
+                if (startNode && charCount + nodeLen >= idx + h.selectedText.length) {
+                    endNode = node;
+                    endOffset = idx + h.selectedText.length - charCount;
+                    break;
+                }
+                charCount += nodeLen;
+            }
+
+            if (startNode && endNode) {
+                try {
+                    const range = document.createRange();
+                    range.setStart(startNode, startOffset);
+                    range.setEnd(endNode, endOffset);
+                    const mark = document.createElement('mark');
+                    mark.style.backgroundColor = h.color ? `${h.color}66` : 'rgba(255,255,0,0.4)';
+                    mark.style.cursor = 'pointer';
+                    mark.dataset.annotationId = h.id;
+                    mark.addEventListener('click', () => {
+                        setOpenEmailThreadId(h.id);
+                        setShowEmailNotePanel(false);
+                    });
+                    range.surroundContents(mark);
+                } catch {
+                    // Range may span multiple nodes — skip gracefully
+                }
+            }
+        });
+    }, [emailAnnotations]);
 
     const handleSaveToCase = async () => {
         if (!message.case?.id) return;
@@ -900,7 +1042,9 @@ function MessageDetail({
     const displayInitial = displayName[0]?.toUpperCase() || '?';
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="relative min-h-full flex">
+        <div className="flex-1 p-6">
+        <div className="max-w-4xl mx-auto">
             <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden">
                 {/* External Email Warning Banner */}
                 {isExternalInbound && (
@@ -1037,18 +1181,50 @@ function MessageDetail({
                                     📁 Case: {message.case.caseNumber} - {message.case.clientName}
                                 </Link>
                             )}
+                            <button
+                                onClick={() => { setShowEmailNotePanel(true); setOpenEmailThreadId(null); }}
+                                className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 mt-1 font-medium"
+                            >
+                                <StickyNote className="w-3.5 h-3.5" /> Add Note
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Body */}
                 <div className="p-6">
-                    <div
-                        className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed"
-                        dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(message.body),
-                        }}
-                    />
+                    <div className="relative">
+                        {selectionToolbar && (
+                            <div
+                                className="absolute z-20 flex items-center gap-1 bg-gray-900 rounded-lg px-2 py-1 shadow-lg"
+                                style={{ top: selectionToolbar.top, left: selectionToolbar.left }}
+                            >
+                                {['#FFFF00', '#00FF00', '#0096FF', '#FF6496', '#FFA500'].map(hex => (
+                                    <button
+                                        key={hex}
+                                        onClick={() => setSelectedHighlightColor(hex)}
+                                        className={`w-5 h-5 rounded-full border-2 ${selectedHighlightColor === hex ? 'border-white' : 'border-transparent'}`}
+                                        style={{ backgroundColor: `${hex}CC` }}
+                                    />
+                                ))}
+                                <button
+                                    onClick={saveEmailHighlight}
+                                    className="ml-1 text-xs px-2 py-0.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                                >
+                                    Highlight
+                                </button>
+                                <button onClick={() => setSelectionToolbar(null)} className="text-gray-400 hover:text-white ml-1">
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        )}
+                        <div
+                            ref={emailBodyRef}
+                            className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.body) }}
+                            onMouseUp={handleEmailMouseUp}
+                        />
+                    </div>
                 </div>
 
                 {/* Attachments */}
@@ -1088,6 +1264,24 @@ function MessageDetail({
                     </button>
                 </div>
             </div>
+        </div>
+        </div>
+        {(openEmailThreadId !== null || showEmailNotePanel) && (
+            <AnnotationThreadPanel
+                resourceType="message"
+                resourceId={message.id}
+                rootCommentId={openEmailThreadId}
+                initialType={showEmailNotePanel ? 'EMAIL_NOTE' : 'HIGHLIGHT_EMAIL'}
+                currentUserId={currentUserId}
+                currentUserName={currentUserName}
+                onClose={() => { setOpenEmailThreadId(null); setShowEmailNotePanel(false); }}
+                onCreated={comment => {
+                    setEmailAnnotations(prev => [...prev, { ...comment, replies: [] }]);
+                    setShowEmailNotePanel(false);
+                    setOpenEmailThreadId(comment.id);
+                }}
+            />
+        )}
         </div>
     );
 }

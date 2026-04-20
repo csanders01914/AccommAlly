@@ -14,11 +14,15 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         const { id: documentId } = await params;
         const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
+        type CommentRow = {
+            id: string; parentId: string | null; deletedAt: Date | null; content: string;
+            createdAt: Date; updatedAt: Date; createdBy: { id: string; name: string };
+        };
         const comments = await tenantPrisma.annotationComment.findMany({
             where: { documentId },
             include: { createdBy: { select: { id: true, name: true } } },
             orderBy: { createdAt: 'asc' },
-        });
+        }) as CommentRow[];
 
         const roots = comments.filter(c => !c.parentId);
         // One level of threading only — replies-to-replies are not supported and will not appear.

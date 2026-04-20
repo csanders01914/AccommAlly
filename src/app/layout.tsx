@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   description: "Accommodation Tracking System",
   icons: {
     icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
 };
 

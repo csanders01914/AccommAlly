@@ -49,7 +49,7 @@ export async function GET(
                             select: { id: true, name: true },
                         },
                         _count: {
-                            select: { annotations: true },
+                            select: { annotationComments: true },
                         },
                     },
                     orderBy: { createdAt: 'desc' },
@@ -104,7 +104,7 @@ export async function GET(
                 category: doc.category,
                 createdAt: doc.createdAt,
                 uploadedBy: decryptUser(doc.uploadedBy),
-                annotationCount: doc._count.annotations,
+                annotationCount: doc._count.annotationComments,
             })),
             claimant: decryptClaimant(caseData.claimant),
             contacts: caseData.contacts || [],

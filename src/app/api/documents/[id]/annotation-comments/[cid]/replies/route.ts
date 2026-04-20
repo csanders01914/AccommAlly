@@ -21,6 +21,9 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         if (parent.parentId) {
             return NextResponse.json({ error: 'Cannot reply to a reply — only one level of threading allowed' }, { status: 400 });
         }
+        if (parent.deletedAt) {
+            return NextResponse.json({ error: 'Cannot reply to a deleted annotation' }, { status: 410 });
+        }
 
         const body = await request.json();
         if (!body.content || typeof body.content !== 'string' || !body.content.trim()) {

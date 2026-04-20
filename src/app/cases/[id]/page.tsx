@@ -68,21 +68,21 @@ export default function CaseDetailPageWrapper() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+            <div className="min-h-screen flex items-center justify-center bg-[#1C1A17]">
+                <Loader2 className="w-10 h-10 animate-spin text-[#0D9488]" />
             </div>
         );
     }
 
     if (error || !caseData) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+            <div className="min-h-screen flex items-center justify-center bg-[#1C1A17]">
                 <div className="text-center">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Error Loading Case</h2>
-                    <p className="text-gray-500 mb-4">{error}</p>
+                    <h2 className="text-xl font-semibold text-[#F0EEE8] mb-2">Error Loading Case</h2>
+                    <p className="text-[#8C8880] mb-4">{error}</p>
                     <button
                         onClick={() => router.push('/cases')}
-                        className="text-blue-600 hover:text-blue-700 font-medium"
+                        className="text-[#0D9488] hover:text-[#2DD4BF] font-medium transition-colors"
                     >
                         Back to Cases
                     </button>
@@ -94,7 +94,7 @@ export default function CaseDetailPageWrapper() {
 
 
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+        <div className="flex min-h-screen bg-[#1C1A17]">
             {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
 
             <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>

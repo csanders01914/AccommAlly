@@ -3,16 +3,10 @@
 import { useState, useEffect } from 'react';
 import {
     Search,
-    ChevronDown,
     ArrowUpDown,
     Edit2,
     CheckCircle,
-    User,
     Calendar,
-    Clock,
-    AlertCircle,
-    X,
-    Filter
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -36,7 +30,7 @@ import { SortableHeader } from '@/components/SortableHeader';
 export type ExtendedTask = Task & {
     assignee: { id?: string; name: string | null };
     createdBy?: { id?: string; name: string | null };
-    case?: { caseNumber: string }; // Optional if needed for display
+    case?: { caseNumber: string };
 };
 
 interface CaseTasksTableProps {
@@ -48,6 +42,8 @@ interface CaseTasksTableProps {
     onEdit: (task: ExtendedTask) => void;
 }
 
+const selectCls = 'border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#1C1A17] bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+
 export function CaseTasksTable({
     tasks,
     users,
@@ -56,20 +52,16 @@ export function CaseTasksTable({
     onDelete,
     onEdit
 }: CaseTasksTableProps) {
-    // State
     const [filteredTasks, setFilteredTasks] = useState<ExtendedTask[]>(tasks);
     const [searchQuery, setSearchQuery] = useState('');
     const [showClosedTasks, setShowClosedTasks] = useState(false);
-    // Initialize reassignFrom to current assignee of first open task
     const [reassignFrom, setReassignFrom] = useState('');
     const [reassignTo, setReassignTo] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
-
-    // Columns State for Reordering
     const [columns, setColumns] = useState([
-        { id: 'select', label: '', sortable: false, width: 'w-10' },
-        { id: 'edit', label: '', sortable: false, width: 'w-10' },
+        { id: 'select', label: '', sortable: false },
+        { id: 'edit', label: '', sortable: false },
         { id: 'claimNumber', label: 'Claim Number', sortable: true },
         { id: 'lob', label: 'LOB', sortable: false },
         { id: 'dueDate', label: 'Due Date', sortable: true },
@@ -78,11 +70,8 @@ export function CaseTasksTable({
         { id: 'assignedTo', label: 'Assigned To', sortable: false },
         { id: 'createdBy', label: 'Created By', sortable: false },
     ]);
-
-    // Column Filters
     const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
 
-    // Dnd Sensors
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor)
@@ -99,25 +88,15 @@ export function CaseTasksTable({
         }
     };
 
-    // Removed default assignee filter to show all tasks by default
-
-    // Filter Logic
     useEffect(() => {
         let result = [...tasks];
 
-        // 1. Open/Closed Filter - Default is OPEN (!showClosedTasks)
         if (showClosedTasks) {
-            // Show ONLY Closed? Or Toggle to Show All/Closed?
-            // Usually "Show Closed" means include them or switch view.
-            // Screenshot had "Closed Tasks" [Toggle] "Open Tasks"
-            // If toggle is "Closed Tasks" (active), show Closed. If "Open Tasks", show Open.
             result = result.filter(t => t.status === 'COMPLETED' || t.status === 'CANCELLED');
         } else {
             result = result.filter(t => t.status !== 'COMPLETED' && t.status !== 'CANCELLED');
         }
 
-
-        // 2. Search
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             result = result.filter(t =>
@@ -127,19 +106,16 @@ export function CaseTasksTable({
             );
         }
 
-        // 3. Reassign From
         if (reassignFrom) {
             result = result.filter(t => t.assignedToId === reassignFrom);
         }
 
-        // 4. Sort
         result.sort((a, b) => {
             const dateA = new Date(a.dueDate).getTime();
             const dateB = new Date(b.dueDate).getTime();
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
-        // 5. Column Filters
         Object.entries(columnFilters).forEach(([colId, filterVal]) => {
             if (!filterVal) return;
             const q = filterVal.toLowerCase();
@@ -162,23 +138,20 @@ export function CaseTasksTable({
     const handleBulkComplete = async () => {
         if (selectedTaskIds.size === 0) return;
         if (!confirm(`Mark ${selectedTaskIds.size} tasks as complete?`)) return;
-
         for (const taskId of selectedTaskIds) {
             await onStatusChange(taskId, 'COMPLETED');
         }
-        setSelectedTaskIds(new Set()); // Clear selection
+        setSelectedTaskIds(new Set());
     };
 
     const handleBulkReassign = async () => {
         if (!reassignTo || selectedTaskIds.size === 0) return;
         if (!confirm(`Reassign ${selectedTaskIds.size} tasks to the selected user?`)) return;
-
-        // Execute sequentially or parallel
         for (const taskId of selectedTaskIds) {
             await onReassign(taskId, reassignTo);
         }
-        setSelectedTaskIds(new Set()); // Clear selection
-        setReassignTo(''); // Clear target
+        setSelectedTaskIds(new Set());
+        setReassignTo('');
     };
 
     const toggleSelectAll = () => {
@@ -198,15 +171,15 @@ export function CaseTasksTable({
         const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
         const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
 
-        let primaryColor = "text-gray-900 dark:text-white";
-        let secondaryColor = "text-gray-600 dark:text-gray-300";
+        let primaryColor = 'text-[#1C1A17]';
+        let secondaryColor = 'text-[#5C5850]';
 
         if (isOverdue) {
-            primaryColor = "text-red-600 dark:text-red-400 font-medium";
-            secondaryColor = "text-red-500 dark:text-red-400";
+            primaryColor = 'text-red-600 font-medium';
+            secondaryColor = 'text-red-500';
         } else if (isDueToday) {
-            primaryColor = "text-blue-600 dark:text-blue-400 font-medium";
-            secondaryColor = "text-blue-500 dark:text-blue-400";
+            primaryColor = 'text-[#0D9488] font-medium';
+            secondaryColor = 'text-[#0D9488]';
         }
 
         switch (colId) {
@@ -219,7 +192,6 @@ export function CaseTasksTable({
                             const newSet = new Set(selectedTaskIds);
                             if (e.target.checked) {
                                 newSet.add(task.id);
-                                // Auto-select assignee in filter if not already set
                                 if (!reassignFrom && task.assignee.id) {
                                     setReassignFrom(task.assignee.id);
                                 }
@@ -228,117 +200,134 @@ export function CaseTasksTable({
                             }
                             setSelectedTaskIds(newSet);
                         }}
-                        className="rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                        className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
                     />
                 );
             case 'edit':
                 return (
-                    <button onClick={() => onEdit(task)} className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">
+                    <button onClick={() => onEdit(task)} className="text-[#C8C4BB] hover:text-[#0D9488] transition-colors">
                         <Edit2 className="w-4 h-4" />
                     </button>
                 );
             case 'claimNumber':
-                return (
-                    <div className={cn("font-medium", primaryColor)}>
-                        {task.case?.caseNumber || 'N/A'}
-                    </div>
-                );
-            case 'lob': return <span className="text-xs font-mono text-gray-500 dark:text-gray-400">AR</span>;
+                return <div className={cn('font-mono text-sm font-medium', primaryColor)}>{task.case?.caseNumber || 'N/A'}</div>;
+            case 'lob':
+                return <span className="text-xs font-mono text-[#8C8880]">AR</span>;
             case 'dueDate':
                 return (
-                    <div className={cn("flex items-center gap-1", primaryColor)}>
+                    <div className={cn('flex items-center gap-1', primaryColor)}>
                         <Calendar className="w-3 h-3" />
                         {task.dueDate ? format(new Date(task.dueDate), 'MM/dd/yyyy') : '-'}
                     </div>
                 );
-            case 'description': return <span className={primaryColor}>{task.title}</span>;
-            case 'type': return <span className={cn("text-xs uppercase", secondaryColor)}>{task.category.replace('_', ' ')}</span>;
-            case 'assignedTo': return <span className={secondaryColor}>{task.assignee.name || 'Unassigned'}</span>;
-            case 'createdBy': return <span className={secondaryColor}>{task.createdBy?.name || 'System'}</span>;
-            default: return null;
+            case 'description':
+                return <span className={primaryColor}>{task.title}</span>;
+            case 'type':
+                return <span className={cn('text-xs uppercase font-medium text-[#0D9488]', secondaryColor === 'text-[#5C5850]' ? 'text-[#0D9488]' : secondaryColor)}>{task.category.replace('_', ' ')}</span>;
+            case 'assignedTo':
+                return <span className={secondaryColor}>{task.assignee.name || 'Unassigned'}</span>;
+            case 'createdBy':
+                return <span className={secondaryColor}>{task.createdBy?.name || 'System'}</span>;
+            default:
+                return null;
         }
     };
+
     return (
-        <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden flex flex-col h-full bg-white dark:bg-gray-900 shadow-sm transition-colors">
-            {/* Header Controls */}
-            <div className="bg-white dark:bg-gray-900 px-4 py-4 dark:text-white text-gray-900">
-                {/* Reassign Row */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Reassign From:</span>
-                        <select
-                            value={reassignFrom}
-                            onChange={(e) => setReassignFrom(e.target.value)}
-                            className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-sm px-2 py-1 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select User</option>
-                            {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                        </select>
-                        <span className="text-sm ml-2 text-gray-500 dark:text-gray-400">Reassign to:</span>
-                        <select
-                            value={reassignTo}
-                            onChange={(e) => setReassignTo(e.target.value)}
-                            className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-sm px-2 py-1 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select User</option>
-                            {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                        </select>
+        <div className="border border-[#E5E2DB] rounded-xl overflow-hidden flex flex-col bg-[#ffffff] shadow-[0_1px_3px_rgba(28,26,23,0.06)]">
+            {/* Reassign / Search bar */}
+            <div className="px-4 py-3 bg-[#F8F7F5] border-b border-[#E5E2DB] flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign From:</span>
+                    <select value={reassignFrom} onChange={(e) => setReassignFrom(e.target.value)} className={selectCls}>
+                        <option value="">Select User</option>
+                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                    </select>
+                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign to:</span>
+                    <select value={reassignTo} onChange={(e) => setReassignTo(e.target.value)} className={selectCls}>
+                        <option value="">Select User</option>
+                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                    </select>
+                </div>
+                <div className="flex items-center gap-2 ml-auto">
+                    <div className="relative">
+                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8C8880]" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-8 pr-3 py-1.5 border border-[#E5E2DB] rounded-lg text-sm bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] w-48 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+                        />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className="relative">
-                            <Search className="w-4 h-4 absolute left-2 top-2 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-8 pr-4 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-sm w-48 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {selectedTaskIds.size > 0 && (
-                            <button
-                                onClick={handleBulkComplete}
-                                className="text-sm px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded transition-colors font-medium flex items-center gap-1"
-                            >
-                                <CheckCircle className="w-3.5 h-3.5" />
-                                Complete
-                            </button>
+                    {selectedTaskIds.size > 0 && (
+                        <button
+                            onClick={handleBulkComplete}
+                            className="text-sm px-3 py-1.5 bg-[#0D9488] text-[#ffffff] hover:bg-[#0F766E] rounded-lg transition-colors font-medium flex items-center gap-1"
+                        >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Complete
+                        </button>
+                    )}
+                    <button
+                        onClick={handleBulkReassign}
+                        disabled={!reassignTo || selectedTaskIds.size === 0}
+                        className={cn(
+                            'text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors',
+                            reassignTo && selectedTaskIds.size > 0
+                                ? 'text-[#0D9488] hover:text-[#0F766E]'
+                                : 'text-[#C8C4BB] cursor-not-allowed'
                         )}
-                        <button onClick={handleBulkReassign} className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium">Reassign</button>
-                    </div>
+                    >
+                        Reassign
+                    </button>
                 </div>
             </div>
 
-            {/* Filters Row */}
-            <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-3">
-                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            {/* Open / Closed toggle + controls */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#E5E2DB]">
+                <div className="flex items-center gap-1 bg-[#F3F1EC] p-1 rounded-lg">
                     <button
                         onClick={() => setShowClosedTasks(true)}
-                        className={cn("px-3 py-1 rounded-md text-xs font-medium transition-all", showClosedTasks ? "bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-0" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white")}
+                        className={cn(
+                            'px-3 py-1 rounded-md text-xs font-medium transition-all',
+                            showClosedTasks
+                                ? 'bg-[#ffffff] text-[#1C1A17] shadow-sm ring-1 ring-black/5'
+                                : 'text-[#8C8880] hover:text-[#1C1A17]'
+                        )}
                     >
                         Closed Tasks
                     </button>
                     <button
                         onClick={() => setShowClosedTasks(false)}
-                        className={cn("px-3 py-1 rounded-md text-xs font-medium transition-all", !showClosedTasks ? "bg-white dark:bg-blue-600 text-blue-600 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-0" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white")}
+                        className={cn(
+                            'px-3 py-1 rounded-md text-xs font-medium transition-all',
+                            !showClosedTasks
+                                ? 'bg-[#ffffff] text-[#1C1A17] shadow-sm ring-1 ring-black/5'
+                                : 'text-[#8C8880] hover:text-[#1C1A17]'
+                        )}
                     >
                         Open Tasks
                     </button>
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={() => { setSearchQuery(''); setReassignFrom(''); }} className="px-3 py-1 border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Clear Table Filters</button>
-                    <button className="px-3 py-1 border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Save Column Preferences</button>
+                    <button
+                        onClick={() => { setSearchQuery(''); setReassignFrom(''); setColumnFilters({}); }}
+                        className="px-3 py-1 border border-[#E5E2DB] text-[#5C5850] text-xs rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors"
+                    >
+                        Clear Table Filters
+                    </button>
+                    <button className="px-3 py-1 border border-[#E5E2DB] text-[#5C5850] text-xs rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors">
+                        Save Column Preferences
+                    </button>
                 </div>
             </div>
 
-
             {/* Table */}
-            <div className="flex-1 overflow-auto bg-white dark:bg-gray-900">
+            <div className="flex-1 overflow-auto">
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 text-xs uppercase font-medium border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+                        <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] sticky top-0 z-10">
                             <tr>
                                 <SortableContext items={columns.map(col => col.id)} strategy={horizontalListSortingStrategy}>
                                     {columns.map(col => (
@@ -354,51 +343,54 @@ export function CaseTasksTable({
                                                         type="checkbox"
                                                         checked={filteredTasks.length > 0 && selectedTaskIds.size === filteredTasks.length}
                                                         onChange={toggleSelectAll}
-                                                        className="rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                                                        className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-white cursor-pointer py-1" onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
+                                                <div
+                                                    className="flex items-center gap-1 hover:text-[#1C1A17] cursor-pointer py-1"
+                                                    onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                                >
                                                     {col.label}
                                                     {col.sortable && <ArrowUpDown className="w-3 h-3" />}
                                                 </div>
                                             )}
                                         </SortableHeader>
-                                    ))
-                                    }
+                                    ))}
                                 </SortableContext>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300">
+                        <tbody className="divide-y divide-[#F3F1EC] bg-[#ffffff] text-[#5C5850]">
                             {filteredTasks.length > 0 ? filteredTasks.map((task) => (
-                                <tr key={task.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                                <tr key={task.id} className="hover:bg-[#F8F7F5] transition-colors">
                                     {columns.map(col => (
-                                        <td key={col.id} className="px-4 py-3 border-gray-100 dark:border-gray-800">
+                                        <td key={col.id} className="px-4 py-3">
                                             {renderCell(task, col.id)}
                                         </td>
                                     ))}
                                 </tr>
                             )) : (
-                                <tr><td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">No tasks found</td></tr>
+                                <tr>
+                                    <td colSpan={columns.length} className="px-4 py-8 text-center text-[#8C8880]">
+                                        No tasks found
+                                    </td>
+                                </tr>
                             )}
                         </tbody>
                     </table>
                 </DndContext>
             </div>
-            {/* Footer / Pagination Placeholder */}
-            <div className="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 p-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
-                <div className="flex gap-2">
-                    <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&lt;</button>
-                    <button className="bg-blue-600 text-white px-2 py-1 rounded">1</button>
-                    <button className="px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">&gt;</button>
+
+            {/* Footer / Pagination */}
+            <div className="bg-[#F8F7F5] border-t border-[#E5E2DB] px-4 py-2.5 flex items-center justify-between text-xs text-[#8C8880]">
+                <div className="flex gap-1">
+                    <button className="px-2 py-1 rounded-md border border-[#E5E2DB] bg-[#ffffff] hover:bg-[#F3F1EC] transition-colors">&lt;</button>
+                    <button className="bg-[#0D9488] text-[#ffffff] px-2 py-1 rounded-md">1</button>
+                    <button className="px-2 py-1 rounded-md border border-[#E5E2DB] bg-[#ffffff] hover:bg-[#F3F1EC] transition-colors">&gt;</button>
                 </div>
-                <div>
-                    10 items per page
-                </div>
-                <div>
-                    1 - {filteredTasks.length} of {filteredTasks.length} items
-                </div>
+                <div>10 items per page</div>
+                <div>1 – {filteredTasks.length} of {filteredTasks.length} items</div>
             </div>
-        </div >
+        </div>
     );
 }

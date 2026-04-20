@@ -594,20 +594,20 @@ export function CaseDetailPage({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex items-center justify-center min-h-[400px] bg-[#F8F7F5]">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0D9488]"></div>
             </div>
         );
     }
 
     if (error || !caseData) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] text-gray-500">
-                <AlertTriangle className="w-12 h-12 mb-4 text-red-500" />
-                <p className="text-lg font-medium">{error || 'Case not found'}</p>
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-[#F8F7F5]">
+                <AlertTriangle className="w-10 h-10 mb-4 text-red-500" />
+                <p className="text-base font-medium text-[#1C1A17]">{error || 'Case not found'}</p>
                 <button
                     onClick={fetchCaseData}
-                    className="mt-4 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="mt-4 px-4 py-2 text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors text-sm"
                 >
                     Try Again
                 </button>
@@ -618,11 +618,11 @@ export function CaseDetailPage({
     // Helper functions
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'REVIEW': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-            case 'ACTIVE': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-            case 'CLOSED': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
-            case 'APPEAL': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+            case 'REVIEW': return 'bg-yellow-100 text-yellow-800';
+            case 'ACTIVE': return 'bg-green-100 text-green-800';
+            case 'CLOSED': return 'bg-[#E5E2DB] text-[#5C5850]';
+            case 'APPEAL': return 'bg-red-100 text-red-800';
+            default: return 'bg-[#0D9488]/15 text-[#0D9488]';
         }
     };
 
@@ -631,32 +631,32 @@ export function CaseDetailPage({
     };
 
     const taskStatusColors = {
-        PENDING: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/10',
-        IN_PROGRESS: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/10',
-        COMPLETED: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/10',
-        CANCELLED: 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-800/50',
+        PENDING: 'text-yellow-700 bg-yellow-50',
+        IN_PROGRESS: 'text-[#0D9488] bg-[#0D9488]/10',
+        COMPLETED: 'text-green-700 bg-green-50',
+        CANCELLED: 'text-[#8C8880] bg-[#F3F1EC]',
     };
 
     const priorityColors = {
-        HIGH: 'text-red-600 bg-red-50 border-red-100 dark:text-red-400 dark:bg-red-900/10 dark:border-red-900/20',
-        MEDIUM: 'text-yellow-600 bg-yellow-50 border-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/10 dark:border-yellow-900/20',
-        LOW: 'text-green-600 bg-green-50 border-green-100 dark:text-green-400 dark:bg-green-900/10 dark:border-green-900/20',
+        HIGH: 'text-red-600 bg-red-50 border-red-100',
+        MEDIUM: 'text-yellow-600 bg-yellow-50 border-yellow-100',
+        LOW: 'text-green-600 bg-green-50 border-green-100',
     };
 
     const documentCategoryColors = {
-        MEDICAL: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        LEGAL: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-        HR: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-        CORRESPONDENCE: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        OTHER: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
+        MEDICAL: 'bg-emerald-100 text-emerald-800',
+        LEGAL: 'bg-purple-100 text-purple-800',
+        HR: 'bg-orange-100 text-orange-800',
+        CORRESPONDENCE: 'bg-[#0D9488]/10 text-[#0D9488]',
+        OTHER: 'bg-[#F3F1EC] text-[#5C5850]',
     };
 
     const contactTypeColors = {
-        CLAIMANT: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-        ATTORNEY: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-        MEDICAL_PROVIDER: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        EMPLOYER: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-        OTHER: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
+        CLAIMANT: 'bg-indigo-100 text-indigo-800',
+        ATTORNEY: 'bg-purple-100 text-purple-800',
+        MEDICAL_PROVIDER: 'bg-emerald-100 text-emerald-800',
+        EMPLOYER: 'bg-orange-100 text-orange-800',
+        OTHER: 'bg-[#F3F1EC] text-[#5C5850]',
     };
 
     const isAdmin = currentUser.role === 'ADMIN';
@@ -709,53 +709,61 @@ export function CaseDetailPage({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            {/* Header / Ribbon */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#1C1A17]">
+            {/* Header / Ribbon — editorial charcoal band */}
+            <div className="sticky top-0 z-30" style={{ background: '#1C1A17' }}>
+                <div
+                    aria-hidden
+                    style={{
+                        position: 'absolute', inset: 0, pointerEvents: 'none',
+                        backgroundImage: 'radial-gradient(ellipse at 8% 50%,rgba(13,148,136,0.12) 0%,transparent 55%)',
+                    }}
+                />
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Top Row: Back, Title, Actions */}
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={onBack}
-                                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#0D9488] hover:text-[#2DD4BF] transition-colors"
                                 aria-label="Go Back"
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                                Cases
                             </button>
+                            <div className="w-px h-5 bg-[#0D9488]/30" />
                             <div>
-                                <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span className="text-gray-400">#</span>
-                                    {caseData.caseNumber}
-                                    <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(caseData.status)}`}>
+                                <h1 className="flex items-center gap-2.5" style={{ fontFamily: 'var(--font-instrument-serif, Georgia, serif)', fontSize: 20, fontWeight: 400, color: '#F0EEE8', margin: 0 }}>
+                                    <span className="font-mono text-[#0D9488] text-base">{caseData.caseNumber}</span>
+                                    <span className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest rounded-full ${getStatusColor(caseData.status)}`}>
                                         {caseData.status}
                                     </span>
                                     {isAdmin && (
                                         <button
                                             onClick={() => setIsTransferModalOpen(true)}
-                                            className="ml-2 text-xs text-blue-600 hover:underline"
+                                            className="text-xs text-[#0D9488] hover:text-[#2DD4BF] transition-colors"
                                         >
-                                            Transfer Case
+                                            Transfer
                                         </button>
                                     )}
                                 </h1>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-[11px]" style={{ color: 'rgba(240,238,232,0.45)' }}>
                                     Created {formatDate(caseData.createdAt)}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsAddNoteModalOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all hover:shadow-md"
+                                className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Note
                             </button>
                             <button
                                 onClick={() => setIsUploadModalOpen(true)}
-                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+                                className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors border border-[#3A3830]"
                                 title="Upload Document"
                                 aria-label="Upload Document"
                             >
@@ -764,7 +772,7 @@ export function CaseDetailPage({
                             <div className="relative">
                                 <button
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                    className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+                                    className="p-2 text-[#8C8880] hover:text-[#F0EEE8] hover:bg-[#2A2825] rounded-lg transition-colors border border-[#3A3830]"
                                     aria-label="More Options"
                                     aria-haspopup="true"
                                     aria-expanded={userMenuOpen}
@@ -778,32 +786,30 @@ export function CaseDetailPage({
                                             className="fixed inset-0 z-40"
                                             onClick={() => setUserMenuOpen(false)}
                                         />
-                                        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 py-1">
+                                        <div className="absolute right-0 mt-2 w-56 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-50 py-1">
                                             <button
                                                 onClick={() => {
                                                     setIsDecisionModalOpen(true);
                                                     setUserMenuOpen(false);
                                                 }}
-                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 Generate Decision
                                             </button>
-
-                                            {/* Edit Case Action */}
                                             <button
                                                 onClick={() => {
                                                     setIsEditModalOpen(true);
                                                     setUserMenuOpen(false);
                                                 }}
-                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                                 Edit Case Details
                                             </button>
 
                                             {(isAdmin || isAuditor) && (
-                                                <div className="border-t border-gray-100 dark:border-gray-700 my-1 pt-1">
+                                                <div className="border-t border-[#E5E2DB] my-1 pt-1">
                                                     <button
                                                         onClick={async () => {
                                                             if (confirm('Are you sure you want to delete this case? This action cannot be undone.')) {
@@ -823,7 +829,7 @@ export function CaseDetailPage({
                                                             }
                                                             setUserMenuOpen(false);
                                                         }}
-                                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                         Delete Case
@@ -838,55 +844,55 @@ export function CaseDetailPage({
                     </div>
 
                     {/* Client Ribbon */}
-                    <div className="py-4 border-t border-gray-100 dark:border-gray-700 grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
+                    <div className="py-4 border-t grid grid-cols-1 md:grid-cols-5 gap-4 text-sm" style={{ borderColor: 'rgba(13,148,136,0.2)' }}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
+                            <div className="w-9 h-9 rounded-full bg-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base">
                                 {caseData.clientName.charAt(0)}
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Client Name</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{caseData.clientName}</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Client</p>
+                                <p className="font-medium text-[#F0EEE8]">{caseData.clientName}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-green-50 dark:bg-green-900/10 rounded-lg text-green-600 dark:text-green-400">
-                                <Phone className="w-5 h-5" />
+                            <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+                                <Phone className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                                <p className="font-medium text-gray-900 dark:text-white font-mono">{caseData.clientPhone || 'N/A'}</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Phone</p>
+                                <p className="font-medium text-[#F0EEE8] font-mono text-sm">{caseData.clientPhone || 'N/A'}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg text-blue-600 dark:text-blue-400">
-                                <Shield className="w-5 h-5" />
+                            <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+                                <Shield className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Examiner</p>
-                                <p className="font-medium text-gray-900 dark:text-white">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Examiner</p>
+                                <p className="font-medium text-[#F0EEE8]">
                                     {(caseData.tasks.find((t: ExtendedTask) => t.status !== 'COMPLETED') || caseData.tasks[0])?.assignee?.name || 'Unassigned'}
                                 </p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-amber-50 dark:bg-amber-900/10 rounded-lg text-amber-600 dark:text-amber-400">
-                                <User className="w-5 h-5" />
+                            <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+                                <User className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Claimant ID</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Claimant ID</p>
                                 <div className="flex items-center gap-2">
                                     {caseData.claimant ? (
-                                        <a href={`/claimants/${caseData.claimant.claimantNumber}`} className="font-medium text-blue-600 dark:text-blue-400 font-mono hover:underline">
+                                        <a href={`/claimants/${caseData.claimant.claimantNumber}`} className="font-medium text-[#0D9488] font-mono hover:underline">
                                             #{caseData.claimant.claimantNumber}
                                         </a>
                                     ) : (
-                                        <span className="font-medium text-gray-500 font-mono italic">Not Linked</span>
+                                        <span className="font-medium font-mono italic" style={{ color: 'rgba(240,238,232,0.35)' }}>Not Linked</span>
                                     )}
                                 </div>
                                 {caseData.claimFamily ? (
                                     <button
                                         onClick={() => setIsLinkClaimsModalOpen(true)}
-                                        className="mt-1 flex items-center gap-1 text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full hover:bg-green-100 transition-colors"
+                                        className="mt-1 flex items-center gap-1 text-[10px] text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded-full hover:bg-green-400/20 transition-colors"
                                     >
                                         <LinkIcon className="w-3 h-3" />
                                         {caseData.claimFamily.name || 'Family Linked'}
@@ -894,7 +900,7 @@ export function CaseDetailPage({
                                 ) : (
                                     <button
                                         onClick={() => setIsLinkClaimsModalOpen(true)}
-                                        className="mt-1 flex items-center gap-1 text-[10px] text-gray-400 hover:text-purple-600 hover:bg-purple-50 px-1.5 py-0.5 rounded-full transition-colors border border-dashed border-gray-300 hover:border-purple-200"
+                                        className="mt-1 flex items-center gap-1 text-[10px] text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 px-1.5 py-0.5 rounded-full transition-colors border border-dashed border-[#3A3830] hover:border-[#0D9488]/40"
                                     >
                                         <Plus className="w-3 h-3" />
                                         Link Claims
@@ -903,12 +909,12 @@ export function CaseDetailPage({
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-purple-50 dark:bg-purple-900/10 rounded-lg text-purple-600 dark:text-purple-400">
-                                <BookUser className="w-5 h-5" />
+                            <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+                                <BookUser className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Program</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{caseData.program || 'N/A'}</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Program</p>
+                                <p className="font-medium text-[#F0EEE8]">{caseData.program || 'N/A'}</p>
                             </div>
                         </div>
                     </div>
@@ -916,13 +922,13 @@ export function CaseDetailPage({
 
                 {/* Navigation Tabs */}
                 <div className={cn(
-                    "mx-auto px-4 sm:px-6 lg:px-8 mt-1 transition-all duration-300",
+                    "relative z-10 mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300",
                     ['decisioning', 'timeline', 'tasks', 'documents'].includes(activeTab) ? "max-w-full" : "max-w-7xl"
                 )}>
                     <div
                         role="tablist"
                         aria-label="Case Sections"
-                        className="flex space-x-8 overflow-x-auto scrollbar-hide"
+                        className="flex space-x-6 overflow-x-auto scrollbar-hide"
                     >
                         {[
                             { id: 'dashboard', label: 'Dashboard', icon: CheckSquare },
@@ -946,17 +952,18 @@ export function CaseDetailPage({
                                 onClick={() => setActiveTab(tab.id)}
                                 onKeyDown={(e) => handleTabKeyDown(e, idx)}
                                 className={`
-                                    flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-t-sm
+                                    flex items-center gap-1.5 py-3.5 px-1 border-b-2 text-[11px] font-semibold uppercase tracking-[0.1em] whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0D9488]
                                     ${activeTab === tab.id
-                                        ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                        ? 'border-[#0D9488] text-[#0D9488]'
+                                        : 'border-transparent hover:border-[#0D9488]/30'
                                     }
                                 `}
+                                style={activeTab === tab.id ? {} : { color: 'rgba(240,238,232,0.45)' }}
                             >
-                                <tab.icon className="w-4 h-4" />
+                                <tab.icon className="w-3.5 h-3.5" />
                                 {tab.label}
                                 {tab.id === 'tasks' && caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length > 0 && (
-                                    <span className="ml-1.5 py-0.5 px-2 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                    <span className="ml-1 py-0.5 px-1.5 bg-[#0D9488]/20 text-[#0D9488] text-[10px] rounded-full">
                                         {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length}
                                     </span>
                                 )}
@@ -964,9 +971,12 @@ export function CaseDetailPage({
                         ))}
                     </div>
                 </div>
+                {/* Hairline divider */}
+                <div aria-hidden style={{ height: 1, background: 'linear-gradient(to right,transparent,rgba(13,148,136,0.4),transparent)' }} />
             </div>
 
             {/* Main Content Area */}
+            <div className="bg-[#F8F7F5] min-h-[calc(100vh-200px)]">
             <main className={cn(
                 "mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300",
                 ['decisioning', 'timeline', 'tasks', 'documents'].includes(activeTab) ? "max-w-full" : "max-w-7xl"
@@ -977,20 +987,20 @@ export function CaseDetailPage({
                         role="tabpanel"
                         id="panel-dashboard"
                         aria-labelledby="tab-dashboard"
-                        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
                     >
                         {/* Left Column: Summary & Quick Actions */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-2 space-y-5">
                             {/* Summary Card */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Case Summary</h2>
-                                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+                                <h2 className="text-base font-semibold text-[#1C1A17] mb-4">Case Summary</h2>
+                                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Claim Number</dt>
-                                        <dd className="mt-1 text-sm text-gray-900 dark:text-white font-mono">{caseData.caseNumber}</dd>
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Claim Number</dt>
+                                        <dd className="mt-1 text-sm text-[#1C1A17] font-mono">{caseData.caseNumber}</dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Status</dt>
                                         <dd className="mt-1">
                                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(caseData.status)}`}>
                                                 {caseData.status}
@@ -1001,8 +1011,8 @@ export function CaseDetailPage({
                                     {/* Medical/Reason */}
                                     {caseData.medicalCondition && (
                                         <div className="sm:col-span-2">
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Medical Condition / Reason</dt>
-                                            <dd className="mt-1 text-sm text-gray-900 dark:text-white bg-red-50 dark:bg-red-900/10 p-2 rounded border border-red-100 dark:border-red-900/20">
+                                            <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Medical Condition / Reason</dt>
+                                            <dd className="mt-1 text-sm text-[#1C1A17] bg-red-50 p-2 rounded border border-red-100">
                                                 {caseData.medicalCondition}
                                             </dd>
                                         </div>
@@ -1011,49 +1021,49 @@ export function CaseDetailPage({
                                     {/* Program & Venue */}
                                     {caseData.program && (
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Program</dt>
-                                            <dd className="mt-1 text-sm text-gray-900 dark:text-white">{caseData.program}</dd>
+                                            <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Program</dt>
+                                            <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.program}</dd>
                                         </div>
                                     )}
                                     {caseData.venue && (
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Venue</dt>
-                                            <dd className="mt-1 text-sm text-gray-900 dark:text-white">{caseData.venue}</dd>
+                                            <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Venue</dt>
+                                            <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.venue}</dd>
                                         </div>
                                     )}
 
                                     {/* Dates */}
                                     {caseData.preferredStartDate && (
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Preferred Start Date</dt>
-                                            <dd className="mt-1 text-sm text-gray-900 dark:text-white">{caseData.preferredStartDate}</dd>
+                                            <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Preferred Start Date</dt>
+                                            <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.preferredStartDate}</dd>
                                         </div>
                                     )}
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Medical Due Date</dt>
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Medical Due Date</dt>
                                         <dd className="mt-1">
                                             <input
                                                 type="date"
                                                 value={medicalDueDate}
                                                 onChange={e => saveMedicalDueDate(e.target.value)}
                                                 disabled={savingMedDue}
-                                                className="text-sm text-gray-900 dark:text-white bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 disabled:opacity-50"
+                                                className="text-sm text-[#1C1A17] bg-transparent border border-[#E5E2DB] rounded px-2 py-0.5 disabled:opacity-50 focus:outline-none focus:border-[#0D9488]"
                                             />
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Projected Return</dt>
-                                        <dd className="mt-1 text-sm text-gray-900 dark:text-white">{formatDate(caseData.closedAt)}</dd>
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Projected Return</dt>
+                                        <dd className="mt-1 text-sm text-[#1C1A17]">{formatDate(caseData.closedAt)}</dd>
                                     </div>
 
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Category</dt>
-                                        <dd className="mt-1 text-sm text-gray-900 dark:text-white">{caseData.category || 'N/A'}</dd>
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Category</dt>
+                                        <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.category || 'N/A'}</dd>
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                                        <dd className="mt-1 text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Description</dt>
+                                        <dd className="mt-1 text-sm text-[#1C1A17] bg-[#F3F1EC] p-3 rounded-lg border border-[#E5E2DB]">
                                             {caseData.description || 'No description provided.'}
                                         </dd>
                                     </div>
@@ -1061,10 +1071,10 @@ export function CaseDetailPage({
                             </div>
 
                             {/* Recent Timeline */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
-                                    <button onClick={() => setActiveTab('notes')} className="text-sm text-blue-600 hover:text-blue-700">
+                                    <h2 className="text-base font-semibold text-[#1C1A17]">Recent Activity</h2>
+                                    <button onClick={() => setActiveTab('notes')} className="text-sm text-[#0D9488] hover:text-[#0F766E]">
                                         View All
                                     </button>
                                 </div>
@@ -1074,24 +1084,24 @@ export function CaseDetailPage({
                                             <li key={note.id}>
                                                 <div className="relative pb-8">
                                                     {idx !== 2 && (
-                                                        <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700" aria-hidden="true" />
+                                                        <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-[#E5E2DB]" aria-hidden="true" />
                                                     )}
                                                     <div className="relative flex space-x-3">
-                                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-900 ${note.noteType === 'AUDIT' ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
+                                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-[#ffffff] ${note.noteType === 'AUDIT' ? 'bg-amber-100' : 'bg-[#0D9488]/10'}`}>
                                                             {note.noteType === 'AUDIT' ? (
-                                                                <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                                                <Shield className="w-4 h-4 text-amber-600" />
                                                             ) : (
-                                                                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                                                <FileText className="w-4 h-4 text-[#0D9488]" />
                                                             )}
                                                         </div>
                                                         <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                                             <div>
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                                    Note added by <span className="font-medium text-gray-900 dark:text-white">{note.author.name}</span>
+                                                                <p className="text-sm text-[#8C8880]">
+                                                                    Note added by <span className="font-medium text-[#1C1A17]">{note.author.name}</span>
                                                                 </p>
-                                                                <p className="mt-1 text-sm text-gray-900 dark:text-white line-clamp-2">{note.content}</p>
+                                                                <p className="mt-1 text-sm text-[#1C1A17] line-clamp-2">{note.content}</p>
                                                             </div>
-                                                            <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                                                            <div className="text-right text-sm whitespace-nowrap text-[#8C8880]">
                                                                 <time dateTime={new Date(note.createdAt).toISOString()}>{formatDate(note.createdAt)}</time>
                                                             </div>
                                                         </div>
@@ -1105,25 +1115,25 @@ export function CaseDetailPage({
                         </div>
 
                         {/* Right Column: Tasks & Reminders */}
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             {/* Urgent Tasks */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                    <AlertTriangle className="w-5 h-5 text-amber-500" />
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+                                <h2 className="text-base font-semibold text-[#1C1A17] mb-4 flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-amber-500" />
                                     Priority Tasks
                                 </h2>
-                                <div className="space-y-3">
+                                <div className="space-y-2.5">
                                     {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED').slice(0, 5).map((task: ExtendedTask) => (
-                                        <div key={task.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-start gap-3">
+                                        <div key={task.id} className="p-3 bg-[#F3F1EC] rounded-lg flex items-start gap-3">
                                             <input
                                                 type="checkbox"
-                                                className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                className="mt-1 rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
                                                 aria-label={`Mark ${task.title} as complete`}
                                                 onChange={() => handleTaskStatusChange(task.id, 'COMPLETED')}
                                             />
                                             <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white">{task.title}</p>
-                                                <p className="text-xs text-gray-500 mt-1">Due {formatDate(task.dueDate)}</p>
+                                                <p className="text-sm font-medium text-[#1C1A17]">{task.title}</p>
+                                                <p className="text-xs text-[#8C8880] mt-0.5">Due {formatDate(task.dueDate)}</p>
                                             </div>
                                             <span className={`px-2 py-0.5 text-xs rounded-full ${(priorityColors as any)[task.priority] || 'bg-gray-100'}`}>
                                                 {task.priority}
@@ -1131,37 +1141,40 @@ export function CaseDetailPage({
                                         </div>
                                     ))}
                                     {caseData.tasks.length === 0 && (
-                                        <p className="text-sm text-gray-500 text-center py-4">No pending tasks</p>
+                                        <p className="text-sm text-[#8C8880] text-center py-4">No pending tasks</p>
                                     )}
                                 </div>
-                                <button className="w-full mt-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors">
+                                <button
+                                    onClick={() => setIsAddTaskModalOpen(true)}
+                                    className="w-full mt-4 py-2 border border-dashed border-[#C8C4BB] rounded-lg text-sm text-[#8C8880] hover:border-[#0D9488] hover:text-[#0D9488] transition-colors"
+                                >
                                     + Add Quick Task
                                 </button>
                             </div>
 
                             {/* Client Contact Card */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
-                                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-4">Contact Client</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <Phone className="w-5 h-5 text-gray-500" />
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+                                <h3 className="font-semibold text-base text-[#1C1A17] mb-4">Contact Client</h3>
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
+                                        <Phone className="w-4 h-4 text-[#8C8880]" />
                                         <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                                            <p className="font-mono text-gray-900 dark:text-white">{caseData.clientPhone || 'No number'}</p>
+                                            <p className="text-[11px] text-[#8C8880]">Phone</p>
+                                            <p className="font-mono text-sm text-[#1C1A17]">{caseData.clientPhone || 'No number'}</p>
                                         </div>
                                         <button
                                             onClick={() => { setNoteModalDefaultType('PHONE_CALL'); setIsAddNoteModalOpen(true); }}
                                             title="Log a call"
-                                            className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors"
+                                            className="ml-auto p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-full transition-colors"
                                         >
                                             <Phone className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <Mail className="w-5 h-5 text-gray-500" />
+                                    <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
+                                        <Mail className="w-4 h-4 text-[#8C8880]" />
                                         <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                                            <p className="truncate max-w-[150px] text-gray-900 dark:text-white">{caseData.clientEmail || 'No email'}</p>
+                                            <p className="text-[11px] text-[#8C8880]">Email</p>
+                                            <p className="truncate max-w-[150px] text-sm text-[#1C1A17]">{caseData.clientEmail || 'No email'}</p>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -1176,7 +1189,7 @@ export function CaseDetailPage({
                                             }}
                                             disabled={!caseData.clientEmail}
                                             title="Send email"
-                                            className="ml-auto p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                            className="ml-auto p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                             <Send className="w-4 h-4" />
                                         </button>
@@ -1190,20 +1203,20 @@ export function CaseDetailPage({
                 {/* NOTES TAB */}
                 {activeTab === 'notes' && (
                     <div className="max-w-4xl mx-auto">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Case Notes</h2>
-                            <div className="flex gap-3">
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-lg font-semibold text-[#1C1A17]">Case Notes</h2>
+                            <div className="flex gap-2.5">
                                 <div className="relative">
                                     <input
                                         type="text"
                                         placeholder="Search notes..."
-                                        className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-blue-500"
+                                        className="pl-9 pr-4 py-2 border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-sm text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488]"
                                     />
-                                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                                    <Search className="w-4 h-4 text-[#8C8880] absolute left-3 top-2.5" />
                                 </div>
                                 <button
                                     onClick={() => setIsAddNoteModalOpen(true)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add Note
@@ -1211,51 +1224,49 @@ export function CaseDetailPage({
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {visibleNotes.length === 0 ? (
-                                <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-                                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FileText className="w-8 h-8 text-gray-400" />
+                                <div className="text-center py-12 bg-[#ffffff] rounded-xl border border-[#E5E2DB]">
+                                    <div className="w-16 h-16 bg-[#F3F1EC] rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <FileText className="w-8 h-8 text-[#C8C4BB]" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">No notes yet</h3>
-                                    <p className="text-gray-500 mt-1">Start by adding a new note to this case.</p>
+                                    <h3 className="text-base font-medium text-[#1C1A17]">No notes yet</h3>
+                                    <p className="text-[#8C8880] mt-1 text-sm">Start by adding a new note to this case.</p>
                                 </div>
                             ) : (
                                 visibleNotes.map((note: ExtendedNote) => {
                                     const isAuditNote = note.noteType === 'AUDIT';
                                     return (
                                         <div key={note.id} className={cn(
-                                            "bg-white dark:bg-gray-900 rounded-xl border p-6 shadow-sm hover:shadow-md transition-shadow",
+                                            "rounded-xl border p-5 shadow-[0_1px_2px_rgba(28,26,23,0.04)]",
                                             isAuditNote
-                                                ? "border-amber-400 dark:border-amber-600 bg-amber-50/50 dark:bg-amber-900/10"
-                                                : "border-gray-200 dark:border-gray-800"
+                                                ? "border-amber-300 bg-amber-50/60"
+                                                : "bg-[#ffffff] border-[#E5E2DB]"
                                         )}>
                                             {isAuditNote && (
-                                                <div className="flex items-center gap-2 mb-3 text-amber-600 dark:text-amber-400">
+                                                <div className="flex items-center gap-2 mb-3 text-amber-600">
                                                     <Shield className="w-4 h-4" />
                                                     <span className="text-xs font-bold uppercase tracking-wide">Audit Note</span>
                                                 </div>
                                             )}
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-3">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2.5">
                                                     <div className={cn(
-                                                        "p-2 rounded-lg",
-                                                        isAuditNote ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                                                            note.noteType === 'PHONE_CALL' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                                        "p-1.5 rounded-lg",
+                                                        isAuditNote ? 'bg-amber-100 text-amber-700' :
+                                                            note.noteType === 'PHONE_CALL' ? 'bg-green-100 text-green-700' : 'bg-[#0D9488]/10 text-[#0D9488]'
                                                     )}>
-                                                        {isAuditNote ? <Shield className="w-4 h-4" /> :
-                                                            note.noteType === 'PHONE_CALL' ? <Phone className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                                                        {isAuditNote ? <Shield className="w-3.5 h-3.5" /> :
+                                                            note.noteType === 'PHONE_CALL' ? <Phone className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
                                                     </div>
-                                                    <div>
-                                                        <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
-                                                            {(note.noteType || 'NOTE').replace('_', ' ').toLowerCase()}
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-sm font-medium text-[#1C1A17] capitalize">
+                                                        {(note.noteType || 'NOTE').replace('_', ' ').toLowerCase()}
+                                                    </span>
                                                 </div>
                                                 <div className="relative">
                                                     <button
                                                         onClick={() => setNoteMenuOpen(noteMenuOpen === note.id ? null : note.id)}
-                                                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                        className="text-[#C8C4BB] hover:text-[#5C5850] p-1 rounded-lg hover:bg-[#F3F1EC] transition-colors"
                                                         aria-label="Note options"
                                                     >
                                                         <MoreHorizontal className="w-5 h-5" />
@@ -1266,10 +1277,10 @@ export function CaseDetailPage({
                                                                 className="fixed inset-0 z-40"
                                                                 onClick={() => setNoteMenuOpen(null)}
                                                             />
-                                                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 py-1">
+                                                            <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-50 py-1">
                                                                 <button
                                                                     onClick={() => handleCopyNote(note.content)}
-                                                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                                    className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                                                 >
                                                                     <Copy className="w-4 h-4" />
                                                                     Copy Note
@@ -1277,7 +1288,7 @@ export function CaseDetailPage({
                                                                 {isNoteEditable(note.createdAt) && (note.authorId === currentUser.id || isAdmin) && (
                                                                     <button
                                                                         onClick={() => handleEditNote(note)}
-                                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                                        className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                                                     >
                                                                         <Edit3 className="w-4 h-4" />
                                                                         Edit Note
@@ -1288,16 +1299,16 @@ export function CaseDetailPage({
                                                     )}
                                                 </div>
                                             </div>
-                                            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{note.content}</p>
+                                            <p className="text-[#5C5850] whitespace-pre-wrap text-sm">{note.content}</p>
                                             {note.attachedDocument && (
-                                                <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center gap-3">
-                                                    <FileText className="w-5 h-5 text-gray-400" />
-                                                    <span className="text-sm text-gray-600 dark:text-gray-400">{note.attachedDocument.fileName}</span>
-                                                    <button className="ml-auto text-blue-600 hover:text-blue-700 text-sm">Download</button>
+                                                <div className="mt-3 p-3 bg-[#F3F1EC] rounded-lg flex items-center gap-3">
+                                                    <FileText className="w-4 h-4 text-[#8C8880]" />
+                                                    <span className="text-sm text-[#5C5850]">{note.attachedDocument.fileName}</span>
+                                                    <button className="ml-auto text-[#0D9488] hover:text-[#0F766E] text-sm">Download</button>
                                                 </div>
                                             )}
-                                            <div className="flex items-center gap-2 mt-4 text-sm text-gray-500">
-                                                <span className="font-medium">{note.author.name}</span>
+                                            <div className="flex items-center gap-2 mt-3 text-xs text-[#8C8880]">
+                                                <span className="font-medium text-[#5C5850]">{note.author.name}</span>
                                                 <span>•</span>
                                                 <span>{formatDateTime(note.createdAt)}</span>
                                             </div>
@@ -1313,12 +1324,12 @@ export function CaseDetailPage({
                 {
                     activeTab === 'timeline' && currentUser.role === 'ADMIN' && (
                         <div className="max-w-3xl mx-auto">
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-8">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-8 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="relative inline-block text-left">
                                         <button
                                             onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                                            className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 flex items-center gap-2"
+                                            className="px-3 py-1.5 text-sm font-semibold text-[#0D9488] bg-[#0D9488]/10 hover:bg-[#0D9488]/20 rounded-lg transition-colors border border-[#0D9488]/20 flex items-center gap-2"
                                         >
                                             <Download className="w-4 h-4" />
                                             Export
@@ -1328,24 +1339,24 @@ export function CaseDetailPage({
                                         {isExportMenuOpen && (
                                             <>
                                                 <div className="fixed inset-0 z-10" onClick={() => setIsExportMenuOpen(false)} />
-                                                <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-20 py-1 origin-top-left">
+                                                <div className="absolute left-0 mt-2 w-48 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-20 py-1 origin-top-left">
                                                     <button
                                                         onClick={() => handleExport('PDF')}
-                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                        className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                                     >
                                                         <File className="w-4 h-4 text-red-500" />
                                                         Export as PDF
                                                     </button>
                                                     <button
                                                         onClick={() => handleExport('WORD')}
-                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                        className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                                     >
-                                                        <FileText className="w-4 h-4 text-blue-600" />
+                                                        <FileText className="w-4 h-4 text-[#0D9488]" />
                                                         Export as Word
                                                     </button>
                                                     <button
                                                         onClick={() => handleExport('EXCEL')}
-                                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                        className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
                                                     >
                                                         <Table className="w-4 h-4 text-green-600" />
                                                         Export as Excel
@@ -1354,9 +1365,7 @@ export function CaseDetailPage({
                                             </>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-1">
-                                        <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center">Case History & Audit Log</h2>
-                                    </div>
+                                    <h2 className="text-lg font-semibold text-[#1C1A17]">Case History & Audit Log</h2>
                                 </div>
                                 <TimelineView caseId={caseData.id} />
                             </div>
@@ -1367,13 +1376,13 @@ export function CaseDetailPage({
                 {/* TASKS TAB */}
                 {
                     activeTab === 'tasks' && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Tasks</h2>
+                                <h2 className="text-lg font-semibold text-[#1C1A17]">Tasks</h2>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setIsAddTaskModalOpen(true)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
                                     >
                                         <Plus className="w-4 h-4" />
                                         Add Task
@@ -1396,20 +1405,20 @@ export function CaseDetailPage({
                 {/* DOCUMENTS TAB */}
                 {
                     activeTab === 'documents' && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Documents</h2>
+                                <h2 className="text-lg font-semibold text-[#1C1A17]">Documents</h2>
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={openEmailUpload}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#ffffff] border border-[#E5E2DB] hover:bg-[#F3F1EC] text-[#5C5850] text-sm font-medium rounded-lg transition-colors"
                                     >
                                         <Mail className="w-4 h-4" />
                                         Upload Email
                                     </button>
                                     <button
                                         onClick={() => { setUploadEmailMode(false); setUploadCategory('OTHER'); setIsUploadModalOpen(true); }}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
                                     >
                                         <Upload className="w-4 h-4" />
                                         Upload Document
@@ -1419,12 +1428,12 @@ export function CaseDetailPage({
 
                             {/* Post-upload DCN banner */}
                             {lastUploadedDCN && (
-                                <div className="flex items-center justify-between gap-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+                                <div className="flex items-center justify-between gap-4 p-4 bg-green-50 border border-green-200 rounded-xl">
                                     <div className="flex items-center gap-3">
-                                        <Mail className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
+                                        <Mail className="w-5 h-5 text-green-600 shrink-0" />
                                         <div>
-                                            <p className="text-sm font-medium text-green-800 dark:text-green-200">Email uploaded successfully</p>
-                                            <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
+                                            <p className="text-sm font-medium text-green-800">Email uploaded successfully</p>
+                                            <p className="text-xs text-green-600 mt-0.5">
                                                 DCN assigned: <code className="font-mono font-semibold">{lastUploadedDCN}</code>
                                             </p>
                                         </div>
@@ -1449,15 +1458,15 @@ export function CaseDetailPage({
                             )}
 
                             {caseData.documents.length === 0 ? (
-                                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-12 text-center">
-                                    <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500">No documents uploaded yet</p>
+                                <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-12 text-center">
+                                    <FolderOpen className="w-12 h-12 text-[#C8C4BB] mx-auto mb-4" />
+                                    <p className="text-[#8C8880] text-sm">No documents uploaded yet</p>
                                 </div>
                             ) : (
-                                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                                <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
                                     <table className="w-full">
-                                        <thead className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
-                                            <tr className="text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
+                                            <tr className="text-left text-[10px] font-semibold text-[#8C8880] uppercase tracking-[0.1em]">
                                                 <th className="px-6 py-3">Document</th>
                                                 <th className="px-6 py-3">DCN</th>
                                                 <th className="px-6 py-3">Category</th>
@@ -1466,17 +1475,17 @@ export function CaseDetailPage({
                                                 <th className="px-6 py-3">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <tbody className="divide-y divide-[#F3F1EC]">
                                             {caseData.documents.map((doc: ExtendedDocument) => (
-                                                <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                                <tr key={doc.id} className="hover:bg-[#F8F7F5] transition-colors">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <FileText className="w-5 h-5 text-gray-400" />
-                                                            <span className="font-medium text-gray-900 dark:text-white">{doc.fileName}</span>
+                                                            <FileText className="w-4 h-4 text-[#C8C4BB]" />
+                                                            <span className="font-medium text-[#1C1A17] text-sm">{doc.fileName}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <code className="text-sm font-mono text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">
+                                                        <code className="text-sm font-mono text-[#0D9488] bg-[#0D9488]/10 px-2 py-1 rounded">
                                                             {doc.documentControlNumber}
                                                         </code>
                                                     </td>
@@ -1485,17 +1494,17 @@ export function CaseDetailPage({
                                                             {doc.category}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                                    <td className="px-6 py-4 text-sm text-[#8C8880]">
                                                         {formatFileSize(doc.fileSize)}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                                    <td className="px-6 py-4 text-sm text-[#8C8880]">
                                                         <div>{formatDate(doc.createdAt)}</div>
                                                         <div className="text-xs">by {doc.uploadedBy.name}</div>
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         {confirmingDeleteId === doc.id ? (
                                                             <div className="flex items-center gap-2">
-                                                                <span className="text-xs text-red-600 dark:text-red-400">
+                                                                <span className="text-xs text-red-600">
                                                                     {doc.annotationCount > 0
                                                                         ? `Has ${doc.annotationCount} annotation(s). Delete permanently?`
                                                                         : 'Delete permanently?'}
@@ -1503,7 +1512,7 @@ export function CaseDetailPage({
                                                                 <button
                                                                     onClick={() => setConfirmingDeleteId(null)}
                                                                     aria-label={`Cancel delete ${doc.fileName}`}
-                                                                    className="px-2 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded transition-colors"
+                                                                    className="px-2 py-1 text-xs text-[#5C5850] hover:text-[#1C1A17] border border-[#E5E2DB] rounded transition-colors"
                                                                 >
                                                                     Cancel
                                                                 </button>
@@ -1511,16 +1520,16 @@ export function CaseDetailPage({
                                                                     onClick={() => handleDeleteDocument(doc.id)}
                                                                     disabled={deletingDocumentId === doc.id}
                                                                     aria-label={`Confirm delete ${doc.fileName}`}
-                                                                    className="px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+                                                                    className="px-2 py-1 text-xs text-[#ffffff] bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
                                                                 >
                                                                     {deletingDocumentId === doc.id ? 'Deleting…' : 'Delete'}
                                                                 </button>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-1">
                                                                 <button
                                                                     onClick={() => setViewingDocument(doc)}
-                                                                    className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                                    className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors"
                                                                     title="View"
                                                                     aria-label={`View ${doc.fileName}`}
                                                                 >
@@ -1528,7 +1537,7 @@ export function CaseDetailPage({
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDownloadDocument(doc.id, doc.fileName, doc.fileType)}
-                                                                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                    className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors"
                                                                     title="Download"
                                                                     aria-label={`Download ${doc.fileName}`}
                                                                 >
@@ -1536,7 +1545,7 @@ export function CaseDetailPage({
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setConfirmingDeleteId(doc.id)}
-                                                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    className="p-2 text-[#8C8880] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                                     title="Delete"
                                                                     aria-label={`Delete ${doc.fileName}`}
                                                                 >
@@ -1558,16 +1567,16 @@ export function CaseDetailPage({
                 {/* ADDRESS BOOK TAB */}
                 {
                     activeTab === 'contacts' && (
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             {/* Claimant Contact Info */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Claimant Contact Info</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+                                <h2 className="text-base font-semibold text-[#1C1A17] mb-4">Claimant Contact Info</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {/* Phone */}
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <Phone className="w-5 h-5 text-gray-400 shrink-0" />
+                                    <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
+                                        <Phone className="w-4 h-4 text-[#8C8880] shrink-0" />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                                            <p className="text-[11px] text-[#8C8880] mb-1">Phone</p>
                                             {editingContactField === 'phone' ? (
                                                 <div className="flex items-center gap-2">
                                                     <input
@@ -1575,17 +1584,17 @@ export function CaseDetailPage({
                                                         value={editContactPhone}
                                                         onChange={e => setEditContactPhone(e.target.value)}
                                                         onKeyDown={e => { if (e.key === 'Enter') saveContactField('phone'); if (e.key === 'Escape') cancelEditContact(); }}
-                                                        className="flex-1 px-2 py-1 text-sm border border-blue-400 rounded bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        className="flex-1 px-2 py-1 text-sm border border-[#0D9488] rounded bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30"
                                                         autoFocus
                                                         disabled={savingContactField}
                                                     />
-                                                    <button onClick={() => saveContactField('phone')} disabled={savingContactField} className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors">Save</button>
-                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 transition-colors">Cancel</button>
+                                                    <button onClick={() => saveContactField('phone')} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E] disabled:opacity-50 transition-colors">Save</button>
+                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#E5E2DB] text-[#5C5850] rounded hover:bg-[#C8C4BB] transition-colors">Cancel</button>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-between">
-                                                    <p className="font-mono text-sm text-gray-900 dark:text-white">{caseData.clientPhone || <span className="text-gray-400 italic text-sm font-normal">Not set</span>}</p>
-                                                    <button onClick={() => startEditContact('phone')} className="ml-2 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors">
+                                                    <p className="font-mono text-sm text-[#1C1A17]">{caseData.clientPhone || <span className="text-[#C8C4BB] italic text-sm font-normal">Not set</span>}</p>
+                                                    <button onClick={() => startEditContact('phone')} className="ml-2 p-1 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded transition-colors">
                                                         <Edit2 className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
@@ -1593,10 +1602,10 @@ export function CaseDetailPage({
                                         </div>
                                     </div>
                                     {/* Email */}
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <Mail className="w-5 h-5 text-gray-400 shrink-0" />
+                                    <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
+                                        <Mail className="w-4 h-4 text-[#8C8880] shrink-0" />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                                            <p className="text-[11px] text-[#8C8880] mb-1">Email</p>
                                             {editingContactField === 'email' ? (
                                                 <div className="flex items-center gap-2">
                                                     <input
@@ -1604,17 +1613,17 @@ export function CaseDetailPage({
                                                         value={editContactEmail}
                                                         onChange={e => setEditContactEmail(e.target.value)}
                                                         onKeyDown={e => { if (e.key === 'Enter') saveContactField('email'); if (e.key === 'Escape') cancelEditContact(); }}
-                                                        className="flex-1 px-2 py-1 text-sm border border-blue-400 rounded bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        className="flex-1 px-2 py-1 text-sm border border-[#0D9488] rounded bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30"
                                                         autoFocus
                                                         disabled={savingContactField}
                                                     />
-                                                    <button onClick={() => saveContactField('email')} disabled={savingContactField} className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors">Save</button>
-                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 transition-colors">Cancel</button>
+                                                    <button onClick={() => saveContactField('email')} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E] disabled:opacity-50 transition-colors">Save</button>
+                                                    <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#E5E2DB] text-[#5C5850] rounded hover:bg-[#C8C4BB] transition-colors">Cancel</button>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-between">
-                                                    <p className="text-sm text-gray-900 dark:text-white truncate">{caseData.clientEmail || <span className="text-gray-400 italic text-sm font-normal">Not set</span>}</p>
-                                                    <button onClick={() => startEditContact('email')} className="ml-2 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors shrink-0">
+                                                    <p className="text-sm text-[#1C1A17] truncate">{caseData.clientEmail || <span className="text-[#C8C4BB] italic text-sm font-normal">Not set</span>}</p>
+                                                    <button onClick={() => startEditContact('email')} className="ml-2 p-1 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded transition-colors shrink-0">
                                                         <Edit2 className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
@@ -1625,10 +1634,10 @@ export function CaseDetailPage({
                             </div>
 
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Address Book</h2>
+                                <h2 className="text-lg font-semibold text-[#1C1A17]">Address Book</h2>
                                 <button
                                     onClick={() => setIsAddContactModalOpen(true)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add Contact
@@ -1636,41 +1645,41 @@ export function CaseDetailPage({
                             </div>
 
                             {caseData.contacts.length === 0 ? (
-                                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-12 text-center">
-                                    <BookUser className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500">No contacts added yet</p>
+                                <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-12 text-center">
+                                    <BookUser className="w-12 h-12 text-[#C8C4BB] mx-auto mb-4" />
+                                    <p className="text-[#8C8880] text-sm">No contacts added yet</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {caseData.contacts.map((contact: Contact) => (
-                                        <div key={contact.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
+                                        <div key={contact.id} className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-5 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
                                             <div className="flex items-start justify-between">
                                                 <div>
                                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${(contactTypeColors as any)[contact.type] || 'bg-gray-100'}`}>
                                                         {contact.type}
                                                     </span>
-                                                    <h3 className="font-semibold text-gray-900 dark:text-white mt-2">{contact.name}</h3>
+                                                    <h3 className="font-semibold text-[#1C1A17] mt-2">{contact.name}</h3>
                                                 </div>
-                                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <button className="p-2 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors">
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
                                             </div>
                                             <div className="space-y-2 mt-4 text-sm">
-                                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                                <div className="flex items-center gap-2 text-[#5C5850]">
                                                     <Phone className="w-4 h-4" />
                                                     <span>{contact.phone}</span>
                                                 </div>
                                                 {contact.email && (
-                                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                                    <div className="flex items-center gap-2 text-[#5C5850]">
                                                         <span className="w-4 h-4 text-center">@</span>
                                                         <span>{contact.email}</span>
                                                     </div>
                                                 )}
                                                 {contact.address && (
-                                                    <p className="text-gray-500 mt-2">{contact.address}</p>
+                                                    <p className="text-[#8C8880] mt-2">{contact.address}</p>
                                                 )}
                                                 {contact.notes && (
-                                                    <p className="text-gray-500 italic mt-2">{contact.notes}</p>
+                                                    <p className="text-[#8C8880] italic mt-2">{contact.notes}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -1695,9 +1704,9 @@ export function CaseDetailPage({
                 {
                     activeTab === 'portal' && (
                         <div className="max-w-4xl mx-auto">
-                            <div className="mb-6">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Portal Messages</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="mb-5">
+                                <h2 className="text-lg font-semibold text-[#1C1A17] mb-1">Portal Messages</h2>
+                                <p className="text-sm text-[#8C8880]">
                                     View and respond to messages from {caseData.clientName} via the claimant portal.
                                 </p>
                             </div>
@@ -1708,7 +1717,8 @@ export function CaseDetailPage({
                         </div>
                     )
                 }
-            </main >
+            </main>
+            </div>{/* /bg-[#F8F7F5] */}
 
             {/* MODALS */}
             < AddNoteModal
@@ -1750,10 +1760,10 @@ export function CaseDetailPage({
             {
                 isUploadModalOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-lg">
+                        <div className="bg-[#ffffff] rounded-xl p-6 w-full max-w-md shadow-lg border border-[#E5E2DB]">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    {uploadEmailMode ? <><Mail className="w-5 h-5 text-blue-500" /> Upload Received Email</> : 'Upload Document'}
+                                <h3 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
+                                    {uploadEmailMode ? <><Mail className="w-4 h-4 text-[#0D9488]" /> Upload Received Email</> : 'Upload Document'}
                                 </h3>
                                 <button
                                     onClick={() => {
@@ -1761,39 +1771,39 @@ export function CaseDetailPage({
                                         setUploadEmailMode(false);
                                         setUploadError(null);
                                     }}
-                                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                                    className="p-2 text-[#8C8880] hover:text-[#1C1A17] rounded-lg transition-colors"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             {uploadEmailMode && (
-                                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                                <p className="mb-4 text-sm text-[#8C8880]">
                                     Upload a received email file (.eml or .msg). A DCN will be assigned automatically and shown after upload.
                                 </p>
                             )}
 
                             {uploadError && (
-                                <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+                                <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100">
                                     {uploadError}
                                 </div>
                             )}
 
                             <div className="space-y-4">
                                 {uploadEmailMode ? (
-                                    <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-[#0D9488]/10 border border-[#0D9488]/20 rounded-lg text-sm text-[#0D9488]">
                                         <Mail className="w-4 h-4 shrink-0" />
                                         Category: <span className="font-medium">Correspondence</span>
                                     </div>
                                 ) : (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] mb-1.5">
                                             Category
                                         </label>
                                         <select
                                             value={uploadCategory}
                                             onChange={(e) => setUploadCategory(e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-3 py-2 border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] text-sm"
                                         >
                                             <option value="MEDICAL">Medical</option>
                                             <option value="LEGAL">Legal</option>
@@ -1805,20 +1815,19 @@ export function CaseDetailPage({
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] mb-1.5">
                                         {uploadEmailMode ? 'Select Email File (.eml or .msg)' : 'Select File'}
                                     </label>
                                     <input
                                         ref={fileInputRef}
                                         type="file"
                                         accept={uploadEmailMode ? '.eml,.msg' : undefined}
-                                        className="w-full text-sm text-gray-500 dark:text-gray-400
+                                        className="w-full text-sm text-[#5C5850]
                                                 file:mr-4 file:py-2 file:px-4
                                                 file:rounded-lg file:border-0
-                                                file:text-sm file:font-medium
-                                                file:bg-blue-50 file:text-blue-700
-                                                hover:file:bg-blue-100
-                                                dark:file:bg-blue-900/30 dark:file:text-blue-400"
+                                                file:text-sm file:font-semibold
+                                                file:bg-[#0D9488]/10 file:text-[#0D9488]
+                                                hover:file:bg-[#0D9488]/20"
                                     />
                                 </div>
                             </div>
@@ -1830,7 +1839,7 @@ export function CaseDetailPage({
                                         setUploadEmailMode(false);
                                         setUploadError(null);
                                     }}
-                                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                    className="flex-1 px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#F3F1EC] hover:bg-[#E5E2DB] rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -1844,7 +1853,7 @@ export function CaseDetailPage({
                                         }
                                     }}
                                     disabled={isUploading}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] disabled:opacity-50 rounded-lg transition-colors"
                                 >
                                     {isUploading ? (
                                         <>
@@ -1872,6 +1881,7 @@ export function CaseDetailPage({
                         fileName={viewingDocument.fileName}
                         fileType={viewingDocument.fileType}
                         currentUserId={currentUser.id}
+                        currentUserName={currentUser.name ?? ''}
                         onClose={() => setViewingDocument(null)}
                     />
                 )

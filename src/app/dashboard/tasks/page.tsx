@@ -542,294 +542,250 @@ export default function TasksDashboardPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+            <div className="min-h-screen flex items-center justify-center bg-[#1C1A17]">
+                <Loader2 className="w-10 h-10 animate-spin text-[#0D9488]" />
             </div>
         );
     }
 
-
-
-    // ... existing code ...
+    const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+    const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
 
     return (
-        <div className="flex min-h-screen app-background">
+        <div className="flex min-h-screen bg-[#1C1A17]">
             {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
 
             <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
 
-                {/* Header */}
-                <header className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-white/20 dark:border-gray-700/30 rounded-2xl mx-6 mt-6 mb-2 shadow-lg transition-all">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between h-16">
-                            <div className="flex items-center gap-4">
-                                {/* Removed Back Button as Sidebar exists */}
-                                <div>
-                                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                                        Task Management
-                                    </h1>
-                                    <p className="text-sm text-gray-500">
-                                        {filteredTasks.length} tasks shown {filteredTasks.length !== stats.total && `(of ${stats.total})`} • {stats.overdue} overdue
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
+                {/* Editorial band */}
+                <div className="relative overflow-hidden" style={{ padding: '28px 48px 20px', background: '#1C1A17' }}>
+                    <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(ellipse at 10% 60%,rgba(13,148,136,0.12) 0%,transparent 55%)' }} />
+                    <div aria-hidden style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(to right,transparent,rgba(13,148,136,0.4),transparent)' }} />
+                    <div className="relative z-10">
+                        <h1 style={{ fontFamily: 'var(--font-instrument-serif, Georgia, serif)', fontSize: 36, fontWeight: 400, lineHeight: 1.1, color: '#F0EEE8', margin: 0 }}>
+                            Task Management
+                        </h1>
+                        <p className="mt-1.5 text-sm" style={{ color: 'rgba(240,238,232,0.45)' }}>
+                            {filteredTasks.length} tasks shown {filteredTasks.length !== stats.total && `(of ${stats.total})`}
+                            {stats.overdue > 0 && <span className="ml-2 text-red-400 font-medium">• {stats.overdue} overdue</span>}
+                        </p>
                     </div>
-                </header>
+                </div>
 
-                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+                {/* Content surface */}
+                <div className="bg-[#F8F7F5] flex-1">
+                    <div className="px-6 py-6">
 
-                    {/* Main Glassmorphic Container for All Content */}
-                    <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden">
+                        {/* Main card */}
+                        <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-[0_1px_3px_rgba(28,26,23,0.06)] overflow-hidden">
 
-                        {/* Collapsible Filter Section */}
-                        <div className="bg-transparent border-b border-white/10 dark:border-gray-700/30 mb-0">
-                            <div
-                                className="bg-white/10 dark:bg-gray-700/20 px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-white/20 dark:hover:bg-gray-700/30 transition-colors"
-                                onClick={() => setShowFilters(!showFilters)}
-                            >
-                                <h2 className="text-gray-700 dark:text-gray-200 text-lg font-medium">Select Colleagues and Date Range</h2>
-                                <ChevronDown className={cn("text-gray-500 w-5 h-5 transition-transform", showFilters ? "rotate-180" : "")} />
-                            </div>
+                            {/* Collapsible Filter Section */}
+                            <div className="border-b border-[#E5E2DB]">
+                                <button
+                                    className="w-full px-5 py-3.5 flex items-center justify-between hover:bg-[#F8F7F5] transition-colors text-left"
+                                    onClick={() => setShowFilters(!showFilters)}
+                                >
+                                    <span className="text-sm font-semibold text-[#1C1A17]">Filters & Date Range</span>
+                                    <ChevronDown className={cn("text-[#8C8880] w-4 h-4 transition-transform", showFilters ? "rotate-180" : "")} />
+                                </button>
 
-                            {/* Selected Chips (Always Visible) */}
-                            <div className="px-6 pt-4 pb-2">
-                                <div className="flex flex-wrap gap-2">
-                                    {activeFilters.map((chip) => (
-                                        <span key={chip} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600/80 text-white text-xs rounded-full backdrop-blur-sm border border-white/10">
-                                            {chip}
-                                            <X
-                                                className="w-3 h-3 cursor-pointer hover:text-blue-200"
-                                                onClick={() => setActiveFilters(prev => prev.filter(f => f !== chip))}
-                                            />
-                                        </span>
-                                    ))}
-                                    {activeFilters.length === 0 && !showFilters && (
-                                        <span className="text-gray-500 text-xs italic p-1">No filters selected</span>
-                                    )}
-                                </div>
-                            </div>
+                                {/* Active filter chips */}
+                                {activeFilters.length > 0 && (
+                                    <div className="px-5 pb-3 flex flex-wrap gap-2">
+                                        {activeFilters.map((chip) => (
+                                            <span key={chip} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#0D9488]/12 text-[#0D9488] text-xs font-medium rounded-full border border-[#0D9488]/20">
+                                                {chip}
+                                                <button
+                                                    onClick={() => setActiveFilters(prev => prev.filter(f => f !== chip))}
+                                                    className="hover:text-[#0F766E] ml-0.5"
+                                                    aria-label={`Remove filter ${chip}`}
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
 
-                            {showFilters && (
-                                <div className="p-6 pt-2 transition-all animate-in fade-in slide-in-from-top-2">
-                                    {/* Filter Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                        <div className="space-y-1 relative">
-                                            <label htmlFor="client-search" className="text-xs font-semibold text-gray-500 uppercase">Clients</label>
+                                {showFilters && (
+                                    <div className="px-5 pb-5 border-t border-[#F3F1EC]">
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                                            {/* Clients */}
                                             <div className="relative">
-                                                <input
-                                                    id="client-search"
-                                                    type="text"
-                                                    value={clientSearch}
-                                                    onChange={(e) => {
-                                                        setClientSearch(e.target.value);
-                                                        setShowClientDropdown(true);
-                                                    }}
-                                                    onFocus={() => setShowClientDropdown(true)}
-                                                    onBlur={() => setTimeout(() => setShowClientDropdown(false), 200)}
-                                                    className="w-full pl-2 pr-8 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-300/50 dark:border-gray-600/50 rounded text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
-                                                    placeholder="Search..."
-                                                    aria-label="Search Clients"
-                                                />
-                                                <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                            </div>
-                                            {showClientDropdown && (
-                                                <div className="absolute top-full left-0 right-0 mt-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
-                                                    {clients
-                                                        .filter(c => {
-                                                            const search = clientSearch.toLowerCase();
-                                                            return (c.name.toLowerCase().includes(search) || c.code?.toLowerCase().includes(search)) && !activeFilters.includes(c.name);
-                                                        })
-                                                        .map(client => (
-                                                            <div
-                                                                key={client.id}
-                                                                className="px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 cursor-pointer"
-                                                                onClick={() => {
-                                                                    setActiveFilters(prev => [...prev, client.name]);
-                                                                    setClientSearch('');
-                                                                    setShowClientDropdown(false);
-                                                                }}
-                                                            >
-                                                                {client.code ? `${client.code} - ${client.name}` : client.name}
-                                                            </div>
-                                                        ))}
-                                                    {clients.filter(c => {
-                                                        const search = clientSearch.toLowerCase();
-                                                        return (c.name.toLowerCase().includes(search) || c.code?.toLowerCase().includes(search)) && !activeFilters.includes(c.name);
-                                                    }).length === 0 && (
-                                                            <div className="px-3 py-2 text-sm text-gray-500">No clients found</div>
+                                                <label htmlFor="client-search" className={labelCls}>Clients</label>
+                                                <div className="relative">
+                                                    <input
+                                                        id="client-search"
+                                                        type="text"
+                                                        value={clientSearch}
+                                                        onChange={(e) => { setClientSearch(e.target.value); setShowClientDropdown(true); }}
+                                                        onFocus={() => setShowClientDropdown(true)}
+                                                        onBlur={() => setTimeout(() => setShowClientDropdown(false), 200)}
+                                                        className={inputCls}
+                                                        placeholder="Search clients..."
+                                                        aria-label="Search Clients"
+                                                    />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880] pointer-events-none" />
+                                                </div>
+                                                {showClientDropdown && (
+                                                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#ffffff] border border-[#E5E2DB] rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+                                                        {clients
+                                                            .filter(c => {
+                                                                const s = clientSearch.toLowerCase();
+                                                                return (c.name.toLowerCase().includes(s) || c.code?.toLowerCase().includes(s)) && !activeFilters.includes(c.name);
+                                                            })
+                                                            .map(client => (
+                                                                <div key={client.id} className="px-3 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] cursor-pointer"
+                                                                    onClick={() => { setActiveFilters(prev => [...prev, client.name]); setClientSearch(''); setShowClientDropdown(false); }}>
+                                                                    {client.code ? `${client.code} — ${client.name}` : client.name}
+                                                                </div>
+                                                            ))}
+                                                        {clients.filter(c => { const s = clientSearch.toLowerCase(); return (c.name.toLowerCase().includes(s) || c.code?.toLowerCase().includes(s)) && !activeFilters.includes(c.name); }).length === 0 && (
+                                                            <div className="px-3 py-2 text-sm text-[#8C8880]">No clients found</div>
                                                         )}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Examiners (Autocomplete) */}
-                                        <div className="space-y-1 relative">
-                                            <label htmlFor="examiner-search" className="text-xs font-semibold text-gray-500 uppercase">Examiners</label>
-                                            <div className="relative">
-                                                <input
-                                                    id="examiner-search"
-                                                    type="text"
-                                                    value={examinerSearch}
-                                                    onChange={(e) => {
-                                                        setExaminerSearch(e.target.value);
-                                                        setShowExaminerDropdown(true);
-                                                    }}
-                                                    onFocus={() => setShowExaminerDropdown(true)}
-                                                    onBlur={() => setTimeout(() => setShowExaminerDropdown(false), 200)}
-                                                    className="w-full pl-2 pr-8 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-300/50 dark:border-gray-600/50 rounded text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
-                                                    placeholder="Search..."
-                                                    aria-label="Search Examiners"
-                                                />
-                                                <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                                    </div>
+                                                )}
                                             </div>
-                                            {showExaminerDropdown && (
-                                                <div className="absolute top-full left-0 right-0 mt-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
-                                                    {users
-                                                        .filter(u => u.name !== 'System')
-                                                        .filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name))
-                                                        .map(user => (
-                                                            <div
-                                                                key={user.id}
-                                                                className="px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 cursor-pointer"
-                                                                onClick={() => {
-                                                                    setActiveFilters(prev => [...prev, user.name]);
-                                                                    setExaminerSearch('');
-                                                                    setShowExaminerDropdown(false);
-                                                                }}
-                                                            >
-                                                                {user.name}
-                                                            </div>
-                                                        ))}
-                                                    {users.filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name)).length === 0 && (
-                                                        <div className="px-3 py-2 text-sm text-gray-500">No users found</div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
 
-                                        <div className="space-y-1">
-                                            <label htmlFor="period-start" className="text-xs font-semibold text-gray-500 uppercase">Period Begin</label>
+                                            {/* Examiners */}
                                             <div className="relative">
+                                                <label htmlFor="examiner-search" className={labelCls}>Examiners</label>
+                                                <div className="relative">
+                                                    <input
+                                                        id="examiner-search"
+                                                        type="text"
+                                                        value={examinerSearch}
+                                                        onChange={(e) => { setExaminerSearch(e.target.value); setShowExaminerDropdown(true); }}
+                                                        onFocus={() => setShowExaminerDropdown(true)}
+                                                        onBlur={() => setTimeout(() => setShowExaminerDropdown(false), 200)}
+                                                        className={inputCls}
+                                                        placeholder="Search examiners..."
+                                                        aria-label="Search Examiners"
+                                                    />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880] pointer-events-none" />
+                                                </div>
+                                                {showExaminerDropdown && (
+                                                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#ffffff] border border-[#E5E2DB] rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+                                                        {users
+                                                            .filter(u => u.name !== 'System')
+                                                            .filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name))
+                                                            .map(user => (
+                                                                <div key={user.id} className="px-3 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] cursor-pointer"
+                                                                    onClick={() => { setActiveFilters(prev => [...prev, user.name]); setExaminerSearch(''); setShowExaminerDropdown(false); }}>
+                                                                    {user.name}
+                                                                </div>
+                                                            ))}
+                                                        {users.filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name)).length === 0 && (
+                                                            <div className="px-3 py-2 text-sm text-[#8C8880]">No users found</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Period Begin */}
+                                            <div>
+                                                <label htmlFor="period-start" className={labelCls}>Period Begin</label>
                                                 <input
                                                     id="period-start"
                                                     type="date"
                                                     value={dateRange.start}
                                                     onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                                                    className="w-full pl-2 pr-2 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-300/50 dark:border-gray-600/50 rounded text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                                    className={inputCls}
                                                     aria-label="Period Begin Date"
                                                 />
                                             </div>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label htmlFor="period-end" className="text-xs font-semibold text-gray-500 uppercase">Period End</label>
-                                            <div className="relative">
+
+                                            {/* Period End */}
+                                            <div>
+                                                <label htmlFor="period-end" className={labelCls}>Period End</label>
                                                 <input
                                                     id="period-end"
                                                     type="date"
                                                     value={dateRange.end}
                                                     onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                                                    className="w-full pl-2 pr-2 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-300/50 dark:border-gray-600/50 rounded text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
+                                                    className={inputCls}
                                                     aria-label="Period End Date"
                                                 />
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Actions Row */}
-                                    <div className="flex items-center justify-end border-t border-white/10 dark:border-gray-700/30 pt-4">
-                                        <div className="flex flex-col items-end gap-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setActiveFilters([]);
-                                                        setDateRange({ start: '', end: '' });
-                                                        setColumnFilters({});
-                                                        setClientSearch('');
-                                                        setExaminerSearch('');
-                                                        setSearchQuery('');
-                                                    }}
-                                                    className="px-6 py-1.5 border border-blue-600/50 text-blue-600 rounded bg-white/50 hover:bg-blue-50 text-sm font-medium transition-colors"
-                                                >
-                                                    Clear
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowFilters(false)}
-                                                    className="px-6 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium shadow-sm transition-colors"
-                                                >
-                                                    Apply
-                                                </button>
-                                            </div>
+                                        <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-[#F3F1EC]">
+                                            <button
+                                                onClick={() => { setActiveFilters([]); setDateRange({ start: '', end: '' }); setColumnFilters({}); setClientSearch(''); setExaminerSearch(''); setSearchQuery(''); }}
+                                                className="px-4 py-1.5 border border-[#E5E2DB] text-[#5C5850] rounded-lg bg-[#ffffff] hover:bg-[#F3F1EC] text-sm font-medium transition-colors"
+                                            >
+                                                Clear
+                                            </button>
+                                            <button
+                                                onClick={() => setShowFilters(false)}
+                                                className="px-4 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold transition-colors"
+                                            >
+                                                Apply
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Reassign Toolbar */}
-                        <div className="bg-transparent border-b border-white/10 dark:border-gray-700/30 p-4 flex flex-wrap items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reassign From:</span>
-                                <div className="bg-white/40 dark:bg-gray-800/50 border border-white/20 dark:border-gray-700/30 rounded px-3 py-1 text-sm min-w-[150px] text-gray-500 cursor-not-allowed backdrop-blur-sm">
-                                    {currentUser?.name || 'Current User'}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reassign to:</span>
-                                <select
-                                    value={reassignTo}
-                                    onChange={(e) => setReassignTo(e.target.value)}
-                                    className="bg-white/50 dark:bg-gray-700/50 border border-white/20 dark:border-gray-600/50 rounded px-3 py-1 text-sm min-w-[150px] focus:bg-white focus:ring-2 focus:ring-blue-500/50 transition-all"
-                                >
-                                    <option value="">Select</option>
-                                    {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                </select>
-                            </div>
-                            <div className="ml-auto relative">
-                                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-8 pr-3 py-1 bg-white/50 dark:bg-gray-700/50 border border-white/20 dark:border-gray-600/50 rounded text-sm w-48 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                                />
-                            </div>
-                            <button
-                                onClick={handleBulkReassign}
-                                className={cn(
-                                    "text-sm font-medium px-4 py-1.5 rounded transition-all",
-                                    reassignTo && selectedTaskIds.size > 0
-                                        ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
-                                        : "text-gray-400 bg-gray-100/50 cursor-not-allowed border border-gray-200/50"
                                 )}
-                                disabled={!reassignTo || selectedTaskIds.size === 0}
-                            >
-                                Reassign
-                            </button>
-                        </div>
-
-                        {/* Controls Bar */}
-                        <div className="bg-transparent border-b border-white/10 dark:border-gray-700/30 p-2 flex items-center justify-between bg-white/5 dark:bg-gray-900/10">
-                            <div className="flex items-center gap-4">
-
                             </div>
-                            <div className="flex gap-2">
+
+                            {/* Reassign Toolbar */}
+                            <div className="border-b border-[#E5E2DB] px-5 py-3 flex flex-wrap items-center gap-4 bg-[#F8F7F5]">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign From:</span>
+                                    <div className="border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#5C5850] bg-[#ffffff] min-w-[140px] cursor-not-allowed">
+                                        {currentUser?.name || 'Current User'}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign To:</span>
+                                    <select
+                                        value={reassignTo}
+                                        onChange={(e) => setReassignTo(e.target.value)}
+                                        className="border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#1C1A17] bg-[#ffffff] min-w-[140px] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+                                    >
+                                        <option value="">Select…</option>
+                                        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="ml-auto relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880]" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search tasks…"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-9 pr-3 py-1.5 border border-[#E5E2DB] rounded-lg text-sm bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] w-52 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleBulkReassign}
+                                    className={cn(
+                                        "text-sm font-semibold px-4 py-1.5 rounded-lg transition-all",
+                                        reassignTo && selectedTaskIds.size > 0
+                                            ? "bg-[#0D9488] text-[#ffffff] hover:bg-[#0F766E]"
+                                            : "text-[#C8C4BB] bg-[#F3F1EC] cursor-not-allowed border border-[#E5E2DB]"
+                                    )}
+                                    disabled={!reassignTo || selectedTaskIds.size === 0}
+                                >
+                                    Reassign
+                                </button>
+                            </div>
+
+                            {/* Controls Bar */}
+                            <div className="border-b border-[#E5E2DB] px-5 py-2.5 flex items-center justify-end gap-2">
                                 <button
                                     onClick={handleExportToExcel}
-                                    className="px-3 py-1 border border-blue-600/50 text-blue-600 text-xs font-medium rounded hover:bg-blue-50/50 bg-white/50 transition-colors"
+                                    className="px-3 py-1.5 border border-[#E5E2DB] text-[#5C5850] text-xs font-medium rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors"
                                 >
-                                    Export to Excel
+                                    Export CSV
                                 </button>
                                 <button
                                     onClick={handleClearTableFilters}
                                     disabled={!hasActiveFilters}
                                     className={cn(
-                                        "px-3 py-1 border text-xs rounded transition-colors bg-white/50",
+                                        "px-3 py-1.5 border text-xs font-medium rounded-lg transition-colors",
                                         hasActiveFilters
-                                            ? "border-blue-600/50 text-blue-600 font-medium hover:bg-blue-50/50"
-                                            : "border-gray-300/50 text-gray-400 cursor-not-allowed bg-gray-50/20"
+                                            ? "border-[#0D9488]/40 text-[#0D9488] bg-[#0D9488]/5 hover:bg-[#0D9488]/10"
+                                            : "border-[#E5E2DB] text-[#C8C4BB] cursor-not-allowed bg-[#ffffff]"
                                     )}
                                 >
                                     Clear Table Filters
@@ -838,215 +794,165 @@ export default function TasksDashboardPage() {
                                     onClick={handleSaveColumnPreferences}
                                     disabled={!hasColumnChanges}
                                     className={cn(
-                                        "px-3 py-1 border text-xs rounded transition-colors bg-white/50",
+                                        "px-3 py-1.5 border text-xs font-medium rounded-lg transition-colors",
                                         hasColumnChanges
-                                            ? "border-blue-600/50 text-blue-600 font-medium hover:bg-blue-50/50"
-                                            : "border-gray-300/50 text-gray-400 cursor-not-allowed bg-gray-50/20"
+                                            ? "border-[#0D9488]/40 text-[#0D9488] bg-[#0D9488]/5 hover:bg-[#0D9488]/10"
+                                            : "border-[#E5E2DB] text-[#C8C4BB] cursor-not-allowed bg-[#ffffff]"
                                     )}
                                 >
-                                    Save Column Preferences
+                                    Save Columns
                                 </button>
                             </div>
-                        </div>
 
-                        {/* Table */}
-                        <div className="bg-transparent overflow-x-auto">
-                            <DndContext
-                                sensors={sensors}
-                                collisionDetection={closestCenter}
-                                onDragEnd={handleDragEnd}
-                            >
-                                <table className="w-full text-sm text-left table-fixed">
-                                    <thead className="bg-white/10 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 font-medium border-b border-white/10 dark:border-gray-700/30">
-                                        <tr>
-                                            <th className="px-4 py-3 w-10">
-                                                <input
-                                                    type="checkbox"
-                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-white/50"
-                                                    checked={filteredTasks.length > 0 && filteredTasks.every(t => selectedTaskIds.has(t.id))}
-                                                    onChange={toggleSelectAll}
-                                                />
-                                            </th>
-                                            <th className="px-4 py-3 w-10"></th>
-                                            <SortableContext items={columns} strategy={horizontalListSortingStrategy}>
-                                                {columns.map(col => (
-                                                    <SortableHeader
-                                                        key={col.id}
-                                                        id={col.id}
-                                                        onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                                                        onFilter={(val) => setColumnFilters(prev => ({ ...prev, [col.id]: val }))}
-                                                        filterValue={columnFilters[col.id]}
-                                                        width={(col as any).width /** keeping as any for now as Column definition is implicit in state */}
-                                                        onResize={(w) => handleResize(col.id, w)}
-                                                    >
-                                                        <div className="flex items-center gap-1">
-                                                            {col.label}
-                                                            {col.sortable && <ArrowUpDown className="w-3 h-3" />}
-                                                        </div>
-                                                    </SortableHeader>
-                                                ))}
-                                            </SortableContext>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/10 dark:divide-gray-700/30">
-                                        {paginatedTasks.length > 0 ? (
-                                            paginatedTasks.map((task, idx) => (
-                                                <tr
-                                                    key={task.id}
-                                                    className={cn("hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors cursor-pointer", idx % 2 === 0 ? "bg-white/5 dark:bg-gray-900/10" : "bg-transparent")}
-                                                    onClick={(e) => {
-                                                        // Prevent navigation if clicking checkbox or action buttons
-                                                        if ((e.target as HTMLElement).closest('input[type="checkbox"], button')) return;
-                                                        if (task.case?.id) {
-                                                            router.push(`/cases/${task.case.id}`);
-                                                        }
-                                                    }}
-                                                >
-                                                    <td className="px-4 py-3">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedTaskIds.has(task.id)}
-                                                            onChange={(e) => {
-                                                                const newSet = new Set(selectedTaskIds);
-                                                                if (e.target.checked) newSet.add(task.id);
-                                                                else newSet.delete(task.id);
-                                                                setSelectedTaskIds(newSet);
-                                                            }}
-                                                            className="rounded border-gray-300 bg-white/50"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <button onClick={() => setSelectedTask(task)} className="text-blue-500 hover:text-blue-700">
-                                                            <Edit2 className="w-4 h-4" />
-                                                        </button>
-                                                    </td>
-
-                                                    {/* Dynamic Columns */}
-                                                    {columns.map(col => {
-                                                        const today = new Date();
-                                                        today.setHours(0, 0, 0, 0);
-                                                        const taskDate = new Date(task.dueDate);
-                                                        taskDate.setHours(0, 0, 0, 0);
-
-                                                        const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
-                                                        const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
-
-                                                        let primaryColor = "text-gray-900 dark:text-gray-100";
-                                                        let secondaryColor = "text-gray-500";
-
-                                                        if (isOverdue) {
-                                                            primaryColor = "text-red-600 dark:text-red-400 font-medium";
-                                                            secondaryColor = "text-red-500 dark:text-red-400";
-                                                        } else if (isDueToday) {
-                                                            primaryColor = "text-blue-600 dark:text-blue-400 font-medium";
-                                                            secondaryColor = "text-blue-500 dark:text-blue-400";
-                                                        }
-
-                                                        switch (col.id) {
-                                                            case 'caseNumber':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 font-medium overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
-                                                                        {task.case?.caseNumber || 'N/A'}
-                                                                    </td>
-                                                                );
-                                                            case 'lob':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
-                                                                        AR
-                                                                    </td>
-                                                                );
-                                                            case 'dueDate':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
-                                                                        {format(new Date(task.dueDate), 'MM/dd/yyyy')}
-                                                                    </td>
-                                                                );
-                                                            case 'description':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>
-                                                                        {task.description || ''}
-                                                                    </td>
-                                                                );
-                                                            case 'category':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
-                                                                        {task.category.replace('_', ' ')}
-                                                                    </td>
-                                                                );
-                                                            case 'assignedTo':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
-                                                                        {task.assignedTo?.name || 'Unassigned'}
-                                                                    </td>
-                                                                );
-                                                            case 'createdBy':
-                                                                return (
-                                                                    <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>
-                                                                        {task.createdBy?.name || 'System'}
-                                                                    </td>
-                                                                );
-                                                            default: return <td key={col.id}></td>;
-                                                        }
-                                                    })}
-                                                </tr>
-                                            ))
-                                        ) : (
+                            {/* Table */}
+                            <div className="overflow-x-auto">
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                    <table className="w-full text-sm text-left table-fixed">
+                                        <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
                                             <tr>
-                                                <td colSpan={9} className="px-4 py-12 text-center text-gray-500">
-                                                    No tasks found
-                                                </td>
+                                                <th className="px-4 py-3 w-10">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
+                                                        checked={filteredTasks.length > 0 && filteredTasks.every(t => selectedTaskIds.has(t.id))}
+                                                        onChange={toggleSelectAll}
+                                                    />
+                                                </th>
+                                                <th className="px-4 py-3 w-10"></th>
+                                                <SortableContext items={columns} strategy={horizontalListSortingStrategy}>
+                                                    {columns.map(col => (
+                                                        <SortableHeader
+                                                            key={col.id}
+                                                            id={col.id}
+                                                            onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                                            onFilter={(val) => setColumnFilters(prev => ({ ...prev, [col.id]: val }))}
+                                                            filterValue={columnFilters[col.id]}
+                                                            width={(col as any).width}
+                                                            onResize={(w) => handleResize(col.id, w)}
+                                                        >
+                                                            <div className="flex items-center gap-1">
+                                                                {col.label}
+                                                                {col.sortable && <ArrowUpDown className="w-3 h-3" />}
+                                                            </div>
+                                                        </SortableHeader>
+                                                    ))}
+                                                </SortableContext>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </DndContext>
-                        </div>
+                                        </thead>
+                                        <tbody className="divide-y divide-[#F3F1EC]">
+                                            {paginatedTasks.length > 0 ? (
+                                                paginatedTasks.map((task) => {
+                                                    const today = new Date(); today.setHours(0, 0, 0, 0);
+                                                    const taskDate = new Date(task.dueDate); taskDate.setHours(0, 0, 0, 0);
+                                                    const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
+                                                    const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
 
-                        {/* Footer / Pagination */}
-                        <div className="bg-white/10 dark:bg-gray-900/20 border-t border-white/10 dark:border-gray-700/30 p-3 flex items-center justify-between text-xs text-gray-500">
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                    className="px-2 py-1 border border-white/20 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-white/20 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                    &lt;
-                                </button>
-                                <span className="flex items-center px-2">Page {currentPage} of {Math.max(totalPages, 1)}</span>
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages || totalPages === 0}
-                                    className="px-2 py-1 border border-white/20 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-white/20 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                    &gt;
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <select
-                                    value={itemsPerPage}
-                                    onChange={(e) => {
-                                        setItemsPerPage(Number(e.target.value));
-                                        setCurrentPage(1);
-                                    }}
-                                    className="bg-white/50 dark:bg-gray-700/50 border border-white/20 dark:border-gray-600 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500/50"
-                                >
-                                    <option value={10}>10</option>
-                                    <option value={25}>25</option>
-                                    <option value={50}>50</option>
-                                    <option value={100}>100</option>
-                                    <option value={200}>200</option>
-                                </select>
-                                <span>items per page</span>
-                            </div>
-                            <div>
-                                {filteredTasks.length > 0 ? (
-                                    <span>{startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredTasks.length)} of {filteredTasks.length} items</span>
-                                ) : (
-                                    <span>0 items</span>
-                                )}
-                            </div>
-                        </div>
+                                                    const primaryColor = isOverdue ? "text-red-600 font-medium" : isDueToday ? "text-[#0D9488] font-medium" : "text-[#1C1A17]";
+                                                    const secondaryColor = isOverdue ? "text-red-500" : isDueToday ? "text-[#0D9488]" : "text-[#8C8880]";
 
+                                                    return (
+                                                        <tr
+                                                            key={task.id}
+                                                            className="bg-[#ffffff] hover:bg-[#F8F7F5] transition-colors cursor-pointer group"
+                                                            onClick={(e) => {
+                                                                if ((e.target as HTMLElement).closest('input[type="checkbox"], button')) return;
+                                                                if (task.case?.id) router.push(`/cases/${task.case.id}`);
+                                                            }}
+                                                        >
+                                                            <td className="px-4 py-3">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={selectedTaskIds.has(task.id)}
+                                                                    onChange={(e) => {
+                                                                        const newSet = new Set(selectedTaskIds);
+                                                                        if (e.target.checked) newSet.add(task.id);
+                                                                        else newSet.delete(task.id);
+                                                                        setSelectedTaskIds(newSet);
+                                                                    }}
+                                                                    className="rounded border-[#C8C4BB]"
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <button onClick={() => setSelectedTask(task)} className="text-[#C8C4BB] hover:text-[#0D9488] transition-colors">
+                                                                    <Edit2 className="w-4 h-4" />
+                                                                </button>
+                                                            </td>
+
+                                                            {columns.map(col => {
+                                                                switch (col.id) {
+                                                                    case 'caseNumber':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 font-mono overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>{task.case?.caseNumber || 'N/A'}</td>;
+                                                                    case 'lob':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>AR</td>;
+                                                                    case 'dueDate':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>{format(new Date(task.dueDate), 'MM/dd/yyyy')}</td>;
+                                                                    case 'description':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", primaryColor)} style={{ width: (col as any).width }}>{task.description || ''}</td>;
+                                                                    case 'category':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>{task.category.replace('_', ' ')}</td>;
+                                                                    case 'assignedTo':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>{task.assignedTo?.name || 'Unassigned'}</td>;
+                                                                    case 'createdBy':
+                                                                        return <td key={col.id} className={cn("px-4 py-3 overflow-hidden text-ellipsis whitespace-nowrap", secondaryColor)} style={{ width: (col as any).width }}>{task.createdBy?.name || 'System'}</td>;
+                                                                    default: return <td key={col.id}></td>;
+                                                                }
+                                                            })}
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={9} className="px-4 py-12 text-center text-[#8C8880] text-sm">
+                                                        No tasks found
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </DndContext>
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="border-t border-[#E5E2DB] bg-[#F8F7F5] px-5 py-3 flex items-center justify-between text-xs text-[#8C8880]">
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                        disabled={currentPage === 1}
+                                        className="px-2.5 py-1 border border-[#E5E2DB] rounded-lg disabled:opacity-40 hover:bg-[#ffffff] transition-colors"
+                                    >
+                                        &lt;
+                                    </button>
+                                    <span className="px-3 text-[#5C5850]">Page {currentPage} of {Math.max(totalPages, 1)}</span>
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                        className="px-2.5 py-1 border border-[#E5E2DB] rounded-lg disabled:opacity-40 hover:bg-[#ffffff] transition-colors"
+                                    >
+                                        &gt;
+                                    </button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <select
+                                        value={itemsPerPage}
+                                        onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                                        className="border border-[#E5E2DB] rounded-lg px-2 py-1 bg-[#ffffff] focus:outline-none focus:ring-1 focus:ring-[#0D9488] text-[#5C5850]"
+                                    >
+                                        <option value={10}>10</option>
+                                        <option value={25}>25</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                        <option value={200}>200</option>
+                                    </select>
+                                    <span>per page</span>
+                                </div>
+                                <div>
+                                    {filteredTasks.length > 0
+                                        ? <span>{startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredTasks.length)} of {filteredTasks.length}</span>
+                                        : <span>0 items</span>}
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 

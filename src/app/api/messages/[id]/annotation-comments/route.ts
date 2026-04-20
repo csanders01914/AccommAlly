@@ -14,11 +14,15 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         const { id: messageId } = await params;
         const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
+        type CommentRow = {
+            id: string; parentId: string | null; deletedAt: Date | null; content: string;
+            createdAt: Date; updatedAt: Date; createdBy: { id: string; name: string };
+        };
         const comments = await tenantPrisma.annotationComment.findMany({
             where: { messageId },
             include: { createdBy: { select: { id: true, name: true } } },
             orderBy: { createdAt: 'asc' },
-        });
+        }) as CommentRow[];
 
         const roots = comments.filter(c => !c.parentId);
         // One level of threading only — replies-to-replies are not supported and will not appear.
@@ -54,12 +58,12 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
             return NextResponse.json({ error: 'type and content are required' }, { status: 400 });
         }
 
-        const VALID_TYPES = ['HIGHLIGHT_PDF', 'HIGHLIGHT_EMAIL', 'DOCUMENT_NOTE', 'EMAIL_NOTE'] as const;
+        const VALID_TYPES = ['HIGHLIGHT_EMAIL', 'EMAIL_NOTE'] as const;
         if (!VALID_TYPES.includes(type)) {
-            return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 });
+            return NextResponse.json({ error: `Invalid type for messages. Must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 });
         }
 
-        const isNote = type === 'DOCUMENT_NOTE' || type === 'EMAIL_NOTE';
+        const isNote = type === 'EMAIL_NOTE';
         if (isNote && (!content || !String(content).trim())) {
             return NextResponse.json({ error: 'content is required for note types' }, { status: 400 });
         }
