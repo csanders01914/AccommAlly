@@ -42,6 +42,11 @@ export class NextResponse {
         return res;
     }
 
+    async json() {
+        if (!this.body) return null;
+        return JSON.parse(this.body);
+    }
+
     static redirect(url: URL | string) {
         return new NextResponse(null, { status: 302 });
     }

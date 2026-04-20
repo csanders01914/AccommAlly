@@ -1,0 +1,191 @@
+/**
+ * Tests for /api/documents/[id]/annotation-comments and
+ * /api/messages/[id]/annotation-comments routes.
+ */
+import { NextRequest } from 'next/server';
+
+const prismaMock = {
+    annotationComment: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+    },
+    document: {
+        findUnique: jest.fn(),
+    },
+    message: {
+        findUnique: jest.fn(),
+    },
+    auditLog: {
+        create: jest.fn().mockResolvedValue({}),
+    },
+    // Support withTenantScope — returns the same mock so tenant-scoped operations
+    // resolve against the same jest.fn() instances we seed in beforeEach.
+    $extends: jest.fn().mockReturnThis(),
+};
+
+jest.mock('@/lib/prisma', () => ({
+    __esModule: true,
+    default: prismaMock,
+    prisma: prismaMock,
+}));
+
+jest.mock('@/lib/csrf', () => ({
+    validateCsrf: jest.fn().mockReturnValue({ valid: true }),
+}));
+
+const mockSession = {
+    id: 'user-1',
+    email: 'test@example.com',
+    role: 'COORDINATOR',
+    tenantId: 'tenant-1',
+    name: 'Test User',
+};
+
+jest.mock('@/lib/auth', () => ({
+    ...jest.requireActual('@/lib/auth'),
+    getSession: jest.fn(),
+}));
+
+function makeRequest(url: string, method = 'GET', body?: object) {
+    return new NextRequest(url, {
+        method,
+        ...(body ? { body: JSON.stringify(body), headers: { 'content-type': 'application/json', 'x-csrf-token': 'test' } } : {}),
+    });
+}
+
+// -------------------------------------------------------
+// GET /api/documents/[id]/annotation-comments
+// -------------------------------------------------------
+describe('GET /api/documents/[id]/annotation-comments', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        prismaMock.auditLog.create.mockResolvedValue({});
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(mockSession);
+    });
+
+    it('returns 401 when unauthenticated', async () => {
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(null);
+
+        const { GET } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest('http://localhost/api/documents/doc-1/annotation-comments');
+        const res = await GET(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(401);
+    });
+
+    it('returns nested tree of annotation comments', async () => {
+        const root = {
+            id: 'cmt-1', parentId: null, tenantId: 'tenant-1', documentId: 'doc-1',
+            type: 'HIGHLIGHT_PDF', content: 'Root comment', deletedAt: null,
+            color: '#FFFF00', pageNumber: 1, x: 10, y: 20, width: 30, height: 5,
+            selectedText: null, selectionStart: null, selectionEnd: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-1', name: 'Test User' },
+        };
+        const reply = {
+            id: 'cmt-2', parentId: 'cmt-1', tenantId: 'tenant-1', documentId: 'doc-1',
+            type: 'HIGHLIGHT_PDF', content: 'A reply', deletedAt: null,
+            color: null, pageNumber: null, x: null, y: null, width: null, height: null,
+            selectedText: null, selectionStart: null, selectionEnd: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-2', name: 'Other User' },
+        };
+        prismaMock.annotationComment.findMany.mockResolvedValue([root, reply]);
+
+        const { GET } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest('http://localhost/api/documents/doc-1/annotation-comments');
+        const res = await GET(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(200);
+        const data = await res.json();
+        expect(data).toHaveLength(1);
+        expect(data[0].id).toBe('cmt-1');
+        expect(data[0].replies).toHaveLength(1);
+        expect(data[0].replies[0].id).toBe('cmt-2');
+    });
+});
+
+// -------------------------------------------------------
+// POST /api/documents/[id]/annotation-comments
+// -------------------------------------------------------
+describe('POST /api/documents/[id]/annotation-comments', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        prismaMock.auditLog.create.mockResolvedValue({});
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(mockSession);
+        prismaMock.document.findUnique.mockResolvedValue({ id: 'doc-1', tenantId: 'tenant-1' });
+    });
+
+    it('returns 401 when unauthenticated', async () => {
+        const auth = jest.requireMock('@/lib/auth');
+        (auth.getSession as jest.Mock).mockResolvedValue(null);
+
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'DOCUMENT_NOTE', content: 'A note' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 400 when content is missing', async () => {
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'DOCUMENT_NOTE' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(400);
+    });
+
+    it('creates a DOCUMENT_NOTE and returns 201', async () => {
+        const created = {
+            id: 'cmt-new', parentId: null, tenantId: 'tenant-1', documentId: 'doc-1',
+            type: 'DOCUMENT_NOTE', content: 'A note', deletedAt: null,
+            color: null, pageNumber: null, x: null, y: null, width: null, height: null,
+            selectedText: null, selectionStart: null, selectionEnd: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-1', name: 'Test User' },
+        };
+        prismaMock.annotationComment.create.mockResolvedValue(created);
+
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'DOCUMENT_NOTE', content: 'A note' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(201);
+        const data = await res.json();
+        expect(data.id).toBe('cmt-new');
+        expect(prismaMock.auditLog.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('creates a HIGHLIGHT_PDF and returns 201', async () => {
+        const created = {
+            id: 'cmt-pdf', parentId: null, tenantId: 'tenant-1', documentId: 'doc-1',
+            type: 'HIGHLIGHT_PDF', content: '', deletedAt: null,
+            color: '#00FF00', pageNumber: 2, x: 5, y: 10, width: 50, height: 3,
+            selectedText: null, selectionStart: null, selectionEnd: null,
+            createdAt: new Date(), updatedAt: new Date(),
+            createdBy: { id: 'user-1', name: 'Test User' },
+        };
+        prismaMock.annotationComment.create.mockResolvedValue(created);
+
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'HIGHLIGHT_PDF', content: '', color: '#00FF00', pageNumber: 2, x: 5, y: 10, width: 50, height: 3 }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(201);
+    });
+});
