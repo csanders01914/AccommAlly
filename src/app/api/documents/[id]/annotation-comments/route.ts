@@ -21,13 +21,17 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         });
 
         const roots = comments.filter(c => !c.parentId);
+        // One level of threading only — replies-to-replies are not supported and will not appear.
         const replies = comments.filter(c => c.parentId);
+
+        function formatComment<T extends { deletedAt: Date | null; content: string; [key: string]: unknown }>(c: T) {
+            const { deletedAt, ...rest } = c;
+            return { ...rest, content: deletedAt ? '[deleted]' : c.content, deleted: !!deletedAt };
+        }
+
         const tree = roots.map(root => ({
-            ...root,
-            content: root.deletedAt ? '[deleted]' : root.content,
-            replies: replies
-                .filter(r => r.parentId === root.id)
-                .map(r => ({ ...r, content: r.deletedAt ? '[deleted]' : r.content })),
+            ...formatComment(root),
+            replies: replies.filter(r => r.parentId === root.id).map(formatComment),
         }));
 
         return NextResponse.json(tree);
@@ -48,6 +52,20 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
 
         if (!type || content === undefined || content === null) {
             return NextResponse.json({ error: 'type and content are required' }, { status: 400 });
+        }
+
+        const VALID_TYPES = ['HIGHLIGHT_PDF', 'HIGHLIGHT_EMAIL', 'DOCUMENT_NOTE', 'EMAIL_NOTE'] as const;
+        if (!VALID_TYPES.includes(type)) {
+            return NextResponse.json({ error: `Invalid type. Must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 });
+        }
+
+        const isNote = type === 'DOCUMENT_NOTE' || type === 'EMAIL_NOTE';
+        if (isNote && (!content || !String(content).trim())) {
+            return NextResponse.json({ error: 'content is required for note types' }, { status: 400 });
+        }
+
+        if (body.parentId) {
+            return NextResponse.json({ error: 'Use the /replies endpoint to add a threaded reply' }, { status: 400 });
         }
 
         const tenantPrisma = withTenantScope(prisma, session.tenantId);

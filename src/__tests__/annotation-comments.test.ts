@@ -106,7 +106,7 @@ describe('GET /api/documents/[id]/annotation-comments', () => {
         expect(data[0].replies[0].id).toBe('cmt-2');
     });
 
-    it('replaces content with [deleted] for soft-deleted comments', async () => {
+    it('replaces content with [deleted] for soft-deleted comments and exposes deleted:true without deletedAt', async () => {
         const deletedRoot = {
             id: 'cmt-deleted', parentId: null, tenantId: 'tenant-1', documentId: 'doc-1',
             type: 'DOCUMENT_NOTE', content: 'original content', deletedAt: new Date(),
@@ -123,6 +123,8 @@ describe('GET /api/documents/[id]/annotation-comments', () => {
         expect(res.status).toBe(200);
         const data = await res.json();
         expect(data[0].content).toBe('[deleted]');
+        expect(data[0].deleted).toBe(true);
+        expect(data[0]).not.toHaveProperty('deletedAt');
         expect(data[0].replies).toHaveLength(0);
     });
 });
@@ -162,6 +164,32 @@ describe('POST /api/documents/[id]/annotation-comments', () => {
         );
         const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
         expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for an invalid type', async () => {
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'INVALID_TYPE', content: 'some content' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(400);
+        const data = await res.json();
+        expect(data.error).toMatch(/Invalid type/);
+    });
+
+    it('returns 400 for a NOTE type with empty content', async () => {
+        const { POST } = await import('@/app/api/documents/[id]/annotation-comments/route');
+        const req = makeRequest(
+            'http://localhost/api/documents/doc-1/annotation-comments',
+            'POST',
+            { type: 'DOCUMENT_NOTE', content: '   ' }
+        );
+        const res = await POST(req, { params: Promise.resolve({ id: 'doc-1' }) });
+        expect(res.status).toBe(400);
+        const data = await res.json();
+        expect(data.error).toMatch(/content is required for note types/);
     });
 
     it('creates a DOCUMENT_NOTE and returns 201', async () => {
