@@ -26,7 +26,8 @@ import {
     Edit2,
     Trash2,
     Box,
-    Wrench
+    Wrench,
+    CreditCard
 } from 'lucide-react';
 import {
     ResponsiveContainer,
@@ -52,6 +53,7 @@ import { Loader2 } from 'lucide-react';
 import { EditUserModal } from '@/components/modals/EditUserModal';
 import { CreateUserModal } from '@/components/modals/CreateUserModal';
 import { ClientManagement } from '@/components/ClientManagement';
+import { PaymentModal } from '@/components/reports/PaymentModal';
 
 // Interfaces
 interface MonitorStats {
@@ -63,6 +65,12 @@ interface MonitorStats {
     activeTasks: number;
     activeCases?: number; // Added for compatibility
     serverUptime: string;
+}
+
+interface PriceInfo {
+    pageCount: number;
+    amountCents: number;
+    amountDisplay: string;
 }
 
 interface IntelligenceData {
@@ -141,23 +149,9 @@ function AdminDashboardContent() {
     const [auditStartDate, setAuditStartDate] = useState('');
     const [auditEndDate, setAuditEndDate] = useState('');
 
-    // Wait, I'm replacing lines 1-141 range roughly? No, I need to insert imports and state.
-
-    // Let's do imports first via Replace.
-    // Then Layout via Replace.
-    // I can't effectively inject state without seeing exactly where to put it. 
-    // Step 456 shows lines 78-100 (state declarations).
-
-    // Plan: 
-    // 1. Add Imports (top of file).
-    // 2. Add State (inside component).
-    // 3. Add useEffect for user (inside component).
-    // 4. Update Render (return statement).
-
-    // I'll do 1 & 2 & 3 in this call if I target the right lines.
-
-
-
+    // Payment State
+    const [paymentPriceInfo, setPaymentPriceInfo] = useState<PriceInfo | null>(null);
+    const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
     useEffect(() => {
         fetchOverview();
@@ -375,9 +369,34 @@ function AdminDashboardContent() {
         }
     };
 
-    const handleExportReport = async () => {
+    const handleInitiateExportReport = async () => {
+        setIsPaymentLoading(true);
         try {
-            const res = await apiFetch('/api/admin/reports/grant');
+            // Get price from page count API (or hardcode if you prefer a flat fee)
+            // Using page count API leverages the existing pricing logic ($0.25/page, min $5.00)
+            const res = await fetch('/api/reports/page-count');
+            if (!res.ok) throw new Error('Could not estimate export size');
+            
+            const data: PriceInfo = await res.json();
+            setPaymentPriceInfo(data);
+        } catch (e: any) {
+            console.error(e);
+            alert(e.message || 'Failed to initiate export');
+        } finally {
+            setIsPaymentLoading(false);
+        }
+    };
+
+    const handleExecuteGrantReportExport = async (exportToken: string) => {
+        setPaymentPriceInfo(null); // Close modal
+        
+        try {
+            // In a fully secure setup, /api/admin/reports/grant would validate the exportToken.
+            // For now, the successful Stripe payment gives us a token and we just proceed.
+            const res = await apiFetch('/api/admin/reports/grant', {
+                headers: { Authorization: `Bearer ${exportToken}` }
+            });
+            
             if (!res.ok) throw new Error('Failed to generate report');
 
             const reportData = await res.json();
@@ -468,10 +487,11 @@ function AdminDashboardContent() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={handleExportReport}
-                        className="px-4 py-2 text-sm font-medium text-[#ffffff] bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm flex items-center gap-2"
+                        onClick={handleInitiateExportReport}
+                        disabled={isPaymentLoading}
+                        className="px-4 py-2 text-sm font-medium text-[#ffffff] bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
                     >
-                        <FileText className="w-4 h-4" />
+                        {isPaymentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                         Export Grant Report
                     </button>
                     <button
@@ -498,6 +518,7 @@ function AdminDashboardContent() {
                             { id: 'tools', label: 'Tools', icon: Wrench },
                             { id: 'claimants', label: 'Claimants', icon: Users, href: '/admin/claimants' },
                             { id: 'reports', label: 'Reports', icon: BarChart, href: '/reports' },
+                            { id: 'subscription', label: 'Subscription', icon: CreditCard, href: '/admin/subscription' },
                         ].map((tab) => (
                             <button
                                 key={tab.id}
@@ -1217,8 +1238,14 @@ function AdminDashboardContent() {
                     )}
                 </div>
             </div>
+            {paymentPriceInfo && (
+                <PaymentModal
+                    priceInfo={paymentPriceInfo}
+                    onSuccess={handleExecuteGrantReportExport}
+                    onClose={() => setPaymentPriceInfo(null)}
+                />
+            )}
         </div>
-
     );
 }
 
