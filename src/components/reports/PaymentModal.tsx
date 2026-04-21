@@ -238,6 +238,24 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
                             No card data stored by AccommAlly
                         </span>
                     </div>
+
+                    {/* Subscription upsell */}
+                    <div className="rounded-xl border border-[#0D9488]/25 bg-[#0D9488]/5 px-4 py-3 flex items-center justify-between gap-3">
+                        <div>
+                            <p className="text-xs text-[#0D9488] font-medium">
+                                💡 Avoid per-export charges
+                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                                Subscribe to a monthly plan and export unlimited reports with no per-use fees.
+                            </p>
+                        </div>
+                        <a
+                            href="/settings/subscription"
+                            className="flex-shrink-0 text-xs font-semibold text-white bg-[#0D9488] hover:bg-[#0F766E] px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                        >
+                            View Plans
+                        </a>
+                    </div>
                 </form>
             )}
         </div>

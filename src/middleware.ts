@@ -22,11 +22,12 @@ function generateCsrfToken(): string {
 function buildCspHeader(nonce: string): string {
     return [
         `default-src 'self'`,
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com`,
         `style-src 'self' 'unsafe-inline'`, // required for Tailwind CSS v4 dynamic styles
-        `img-src 'self' data: blob:`,
+        `img-src 'self' data: blob: https://*.stripe.com`,
         `font-src 'self' data:`,
-        `connect-src 'self'`,
+        `connect-src 'self' https://api.stripe.com`,
+        `frame-src https://js.stripe.com https://hooks.stripe.com`,
         `frame-ancestors 'self'`,
         `base-uri 'self'`,
         `form-action 'self'`,
