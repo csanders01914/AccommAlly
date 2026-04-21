@@ -58,7 +58,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
     useEffect(() => {
         if (isOpen) {
             setStep(1); setRule(INITIAL_RULE); setError('');
-            apiFetch('/api/messages/folders').then(r => r.ok && r.json().then(setFolders)).catch(console.error);
+            apiFetch('/api/messages/folders').then(r => { if (r.ok) r.json().then(setFolders); }).catch(console.error);
         }
     }, [isOpen]);
 
