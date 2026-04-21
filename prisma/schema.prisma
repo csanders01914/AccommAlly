@@ -17,6 +17,11 @@ model Tenant {
   planId                String?
   subscriptionPlan      SubscriptionPlan?      @relation(fields: [planId], references: [id])
   plan                  String                 @default("FREE")
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  subscriptionStatus    String?                // active | past_due | canceled | trialing
+  currentPeriodEnd      DateTime?
+  billingInterval       String?                // monthly | yearly
   settings              Json?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
@@ -52,12 +57,14 @@ model Tenant {
 }
 
 model SubscriptionPlan {
-  id              String   @id @default(cuid())
-  code            String   @unique // FREE, STARTER, PRO, ENTERPRISE
-  name            String
-  maxUsers        Int      @default(5) // -1 for unlimited
-  maxActiveClaims Int      @default(10) // -1 for unlimited
-  tenants         Tenant[]
+  id                   String   @id @default(cuid())
+  code                 String   @unique // FREE, STARTER, PRO, ENTERPRISE
+  name                 String
+  maxUsers             Int      @default(5) // -1 for unlimited
+  maxActiveClaims      Int      @default(10) // -1 for unlimited
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+  tenants              Tenant[]
 }
 
 /// Super-Admin accounts for platform-level management (separate from tenant users)
