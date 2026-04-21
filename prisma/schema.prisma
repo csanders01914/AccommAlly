@@ -17,8 +17,8 @@ model Tenant {
   planId                String?
   subscriptionPlan      SubscriptionPlan?      @relation(fields: [planId], references: [id])
   plan                  String                 @default("FREE")
-  stripeCustomerId      String?
-  stripeSubscriptionId  String?
+  stripeCustomerId      String?  @unique
+  stripeSubscriptionId  String?  @unique
   subscriptionStatus    String?                // active | past_due | canceled | trialing
   currentPeriodEnd      DateTime?
   billingInterval       String?                // monthly | yearly
