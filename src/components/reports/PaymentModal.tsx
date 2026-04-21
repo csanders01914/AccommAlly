@@ -14,13 +14,13 @@ const stripePromise = loadStripe(
 const CARD_ELEMENT_OPTIONS: StripeCardElementOptions = {
     style: {
         base: {
-            color: '#1C1A17',
-            fontFamily: '"Inter", system-ui, sans-serif',
+            color: '#F0EEE8',
+            fontFamily: 'Georgia, serif',
             fontSize: '15px',
             fontSmoothing: 'antialiased',
-            '::placeholder': { color: '#8C8880' },
+            '::placeholder': { color: 'rgba(240,238,232,0.35)' },
         },
-        invalid: { color: '#dc2626', iconColor: '#dc2626' },
+        invalid: { color: '#F87171', iconColor: '#F87171' },
     },
 };
 
@@ -49,15 +49,24 @@ export function PaymentModal({ priceInfo, onSuccess, onClose }: PaymentModalProp
             aria-modal="true"
             aria-labelledby="payment-modal-title"
         >
-            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-                {/* Gradient banner */}
-                <div className="h-1.5 w-full bg-gradient-to-r from-[#0D9488] via-[#6366f1] to-[#8b5cf6]" />
+            <div className="relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden" style={{ backgroundColor: '#1C1A17' }}>
+                {/* Teal accent line */}
+                <div className="h-[3px] w-full" style={{ background: 'linear-gradient(to right, #0D9488, rgba(13,148,136,0.3))' }} />
+
+                {/* Subtle radial glow */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ backgroundImage: 'radial-gradient(ellipse at 30% 0%, rgba(13,148,136,0.10) 0%, transparent 60%)' }}
+                />
 
                 {/* Close */}
                 <button
                     id="payment-modal-close"
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                    className="absolute top-4 right-4 p-1.5 rounded-full transition-colors"
+                    style={{ color: 'rgba(240,238,232,0.4)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0EEE8'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(240,238,232,0.08)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(240,238,232,0.4)'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'; }}
                     aria-label="Close"
                 >
                     <X className="w-4 h-4" />
@@ -140,57 +149,62 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
     const dollars = (priceInfo.amountCents / 100).toFixed(2);
 
     return (
-        <div className="px-8 pt-7 pb-8 space-y-5">
+        <div className="relative z-10 px-8 pt-7 pb-8 space-y-5">
             {/* Header */}
             <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D9488]/10 to-[#6366f1]/10 flex items-center justify-center flex-shrink-0">
-                    <CreditCard className="w-5 h-5 text-[#0D9488]" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(13,148,136,0.15)', border: '1px solid rgba(13,148,136,0.25)' }}>
+                    <CreditCard className="w-5 h-5" style={{ color: '#0D9488' }} />
                 </div>
                 <div>
-                    <h2 id="payment-modal-title" className="text-lg font-bold text-gray-900">
+                    <h2 id="payment-modal-title" className="text-lg font-bold" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}>
                         Export Reports
                     </h2>
-                    <p className="text-sm text-gray-500 mt-0.5">
+                    <p className="text-sm mt-0.5" style={{ color: 'rgba(240,238,232,0.45)' }}>
                         One-time charge · download starts immediately
                     </p>
                 </div>
             </div>
 
             {/* Price summary */}
-            <div className="rounded-xl bg-gradient-to-r from-[#0D9488]/5 to-[#6366f1]/5 border border-[#0D9488]/20 px-4 py-3.5">
+            <div className="rounded-xl px-4 py-3.5" style={{ backgroundColor: 'rgba(13,148,136,0.08)', border: '1px solid rgba(13,148,136,0.2)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        <p className="text-xs uppercase tracking-wide font-medium" style={{ color: '#0D9488' }}>
                             Estimated pages
                         </p>
-                        <p className="text-sm text-gray-700 font-medium">
+                        <p className="text-sm font-medium mt-0.5" style={{ color: '#F0EEE8' }}>
                             {priceInfo.pageCount} page{priceInfo.pageCount !== 1 ? 's' : ''} × $0.25
-                            <span className="text-gray-400 font-normal"> (min $5.00)</span>
+                            <span className="font-normal" style={{ color: 'rgba(240,238,232,0.35)' }}> (min $5.00)</span>
                         </p>
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">${dollars}</p>
+                    <p className="text-2xl font-bold" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}>${dollars}</p>
                 </div>
             </div>
 
             {/* Card form / states */}
             {status === 'success' ? (
                 <div className="flex flex-col items-center gap-2 py-6 text-center">
-                    <CheckCircle2 className="w-12 h-12 text-[#0D9488]" />
-                    <p className="font-semibold text-gray-900">Payment successful!</p>
-                    <p className="text-sm text-gray-500">Preparing your download…</p>
+                    <CheckCircle2 className="w-12 h-12" style={{ color: '#0D9488' }} />
+                    <p className="font-semibold" style={{ color: '#F0EEE8' }}>Payment successful!</p>
+                    <p className="text-sm" style={{ color: 'rgba(240,238,232,0.45)' }}>Preparing your download…</p>
                 </div>
             ) : (
                 <form onSubmit={handlePay} className="space-y-4">
                     {/* Card input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(240,238,232,0.7)' }}>
                             Card details
                         </label>
-                        <div className={`rounded-xl border px-3.5 py-3 transition-colors ${
-                            status === 'error' && errorMsg ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
-                        }`}>
+                        <div
+                            className="rounded-xl px-3.5 py-3 transition-colors"
+                            style={
+                                status === 'error' && errorMsg
+                                    ? { backgroundColor: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)' }
+                                    : { backgroundColor: 'rgba(240,238,232,0.05)', border: '1px solid rgba(240,238,232,0.12)' }
+                            }
+                        >
                             {status === 'loading-intent' ? (
-                                <div className="flex items-center gap-2 text-gray-400 py-0.5">
+                                <div className="flex items-center gap-2 py-0.5" style={{ color: 'rgba(240,238,232,0.35)' }}>
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                     <span className="text-sm">Preparing payment…</span>
                                 </div>
@@ -202,7 +216,7 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
 
                     {/* Error */}
                     {errorMsg && (
-                        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-sm rounded-lg px-3 py-2" style={{ color: '#F87171', backgroundColor: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)' }}>
                             {errorMsg}
                         </p>
                     )}
@@ -212,7 +226,10 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
                         id="payment-modal-pay-btn"
                         type="submit"
                         disabled={!stripe || status === 'loading-intent' || status === 'processing'}
-                        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#0D9488] to-[#6366f1] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full py-3 px-4 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        style={{ backgroundColor: '#0D9488', color: '#F0EEE8' }}
+                        onMouseEnter={e => { if (!(e.currentTarget as HTMLButtonElement).disabled) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0F766E'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0D9488'; }}
                     >
                         {status === 'processing' ? (
                             <>
@@ -229,29 +246,32 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
 
                     {/* Security note */}
                     <div className="flex items-center justify-center gap-4 pt-1">
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <span className="flex items-center gap-1 text-xs" style={{ color: 'rgba(240,238,232,0.3)' }}>
                             <ShieldCheck className="w-3.5 h-3.5" />
                             Secured by Stripe
                         </span>
-                        <span className="text-gray-200">|</span>
-                        <span className="text-xs text-gray-400">
+                        <span style={{ color: 'rgba(240,238,232,0.12)' }}>|</span>
+                        <span className="text-xs" style={{ color: 'rgba(240,238,232,0.3)' }}>
                             No card data stored by AccommAlly
                         </span>
                     </div>
 
                     {/* Subscription upsell */}
-                    <div className="rounded-xl border border-[#0D9488]/25 bg-[#0D9488]/5 px-4 py-3 flex items-center justify-between gap-3">
+                    <div className="rounded-xl px-4 py-3 flex items-center justify-between gap-3" style={{ backgroundColor: 'rgba(13,148,136,0.08)', border: '1px solid rgba(13,148,136,0.2)' }}>
                         <div>
-                            <p className="text-xs text-[#0D9488] font-medium">
-                                💡 Avoid per-export charges
+                            <p className="text-xs font-medium" style={{ color: '#0D9488' }}>
+                                Avoid per-export charges
                             </p>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className="text-xs mt-0.5" style={{ color: 'rgba(240,238,232,0.4)' }}>
                                 Subscribe to a monthly plan and export unlimited reports with no per-use fees.
                             </p>
                         </div>
                         <a
                             href="/settings/subscription"
-                            className="flex-shrink-0 text-xs font-semibold text-white bg-[#0D9488] hover:bg-[#0F766E] px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                            className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                            style={{ backgroundColor: '#0D9488', color: '#F0EEE8' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0F766E'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0D9488'; }}
                         >
                             View Plans
                         </a>
