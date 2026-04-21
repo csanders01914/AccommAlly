@@ -267,7 +267,7 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
                             </p>
                         </div>
                         <a
-                            href="/settings/subscription"
+                            href="/admin/subscription"
                             className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
                             style={{ backgroundColor: '#0D9488', color: '#F0EEE8' }}
                             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = '#0F766E'; }}

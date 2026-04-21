@@ -24,6 +24,10 @@ export class NextRequest {
         if (!this._body) return {};
         return JSON.parse(this._body);
     }
+
+    async text() {
+        return this._body ?? '';
+    }
 }
 
 export class NextResponse {
