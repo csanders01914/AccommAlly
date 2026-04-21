@@ -6,10 +6,10 @@ async function main() {
     console.log('Seeding subscription plans...');
 
     const plans = [
-        { code: 'FREE', name: 'Free', maxUsers: 5, maxActiveClaims: 10 },
-        { code: 'STARTER', name: 'Starter', maxUsers: 10, maxActiveClaims: 50 },
-        { code: 'PRO', name: 'Professional', maxUsers: 50, maxActiveClaims: 500 },
-        { code: 'ENTERPRISE', name: 'Enterprise', maxUsers: -1, maxActiveClaims: -1 },
+        { code: 'FREE',       name: 'Free',         maxUsers: 1,  maxActiveClaims: 10  },
+        { code: 'STARTER',    name: 'Starter',      maxUsers: 3,  maxActiveClaims: 25  },
+        { code: 'PRO',        name: 'Professional', maxUsers: 10, maxActiveClaims: 100 },
+        { code: 'ENTERPRISE', name: 'Enterprise',   maxUsers: 25, maxActiveClaims: 500 },
     ];
 
     for (const plan of plans) {
