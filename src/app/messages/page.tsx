@@ -531,24 +531,21 @@ function MessagesContent() {
             {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
             <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
                 {/* Header */}
-                <div className="bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/20 dark:border-gray-800/30 p-4 rounded-2xl mx-6 mt-6 mb-2 shadow-lg flex items-center justify-between transition-all">
-                    <div className="flex items-center gap-3">
-
-                        <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <Mail className="w-5 h-5" />
-                            Secure Messages
-                        </h1>
-                    </div>
+                <div className="bg-[#ffffff] border border-[#E5E2DB] p-4 rounded-xl mx-6 mt-6 mb-2 shadow-sm flex items-center justify-between">
+                    <h1 className="text-lg font-semibold text-[#1C1A17] flex items-center gap-2">
+                        <Mail className="w-5 h-5 text-[#0D9488]" />
+                        Secure Messages
+                    </h1>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setShowSettingsModal(true)}
-                            className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm"
+                            className="px-3 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors"
                         >
                             Settings
                         </button>
                         <button
                             onClick={handleNewMessage}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium flex items-center gap-2"
+                            className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
                             New Message
@@ -556,10 +553,10 @@ function MessagesContent() {
                     </div>
                 </div>
 
-                {/* Main Content Area - Unified Glassmorphic Container */}
-                <div className="flex flex-1 overflow-hidden mx-6 mb-6 bg-white/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm">
+                {/* Main Content Area */}
+                <div className="flex flex-1 overflow-hidden mx-6 mb-6 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm">
                     {/* Sidebar (Folders) */}
-                    <div className="w-56 bg-transparent border-r border-white/10 dark:border-gray-700/30 flex flex-col">
+                    <div className="w-56 bg-[#F8F7F5] border-r border-[#E5E2DB] flex flex-col">
                         <div className="p-3 space-y-1">
                             <SidebarButton
                                 icon={Inbox}
@@ -642,12 +639,12 @@ function MessagesContent() {
                         </div>
 
                         {/* Custom Folders Section */}
-                        <div className="flex-1 border-t border-white/10 dark:border-gray-700/30">
+                        <div className="flex-1 border-t border-[#E5E2DB]">
                             <div className="p-3 pb-1 flex items-center justify-between">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Folders</span>
+                                <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Folders</span>
                                 <button
                                     onClick={() => setShowCreateFolderModal(true)}
-                                    className="p-1 hover:bg-white/20 dark:hover:bg-gray-700/50 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                                    className="p-1 hover:bg-[#F3F1EC] rounded text-[#8C8880] hover:text-[#5C5850] transition-colors"
                                     title="Create folder"
                                 >
                                     <FolderPlus className="w-4 h-4" />
@@ -655,7 +652,7 @@ function MessagesContent() {
                             </div>
                             <div className="px-3 space-y-1 pb-3">
                                 {folders.length === 0 ? (
-                                    <p className="text-xs text-gray-400 py-2 text-center">No custom folders</p>
+                                    <p className="text-xs text-[#8C8880] py-2 text-center">No custom folders</p>
                                 ) : (
                                     folders.map(folder => (
                                         <button
@@ -679,15 +676,15 @@ function MessagesContent() {
                                             className={cn(
                                                 "w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm border border-transparent",
                                                 activeBox === 'folder' && activeFolderId === folder.id
-                                                    ? "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/30"
-                                                    : "text-gray-600 hover:bg-white/10 dark:text-gray-400 dark:hover:bg-gray-700/50",
-                                                dragOverFolderId === folder.id && "bg-blue-500/20 border-blue-500/30"
+                                                    ? "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20"
+                                                    : "text-[#5C5850] hover:bg-[#F3F1EC]",
+                                                dragOverFolderId === folder.id && "bg-[#0D9488]/5 border-[#0D9488]/20"
                                             )}
                                         >
                                             <Folder className="w-4 h-4" style={{ color: folder.color }} />
                                             <span className="truncate flex-1">{folder.name}</span>
                                             {(folder._count?.messages ?? 0) > 0 && (
-                                                <span className="text-xs bg-white/20 dark:bg-gray-700/50 text-gray-500 px-1.5 py-0.5 rounded-full">
+                                                <span className="text-xs bg-[#E5E2DB] text-[#5C5850] px-1.5 py-0.5 rounded-full">
                                                     {folder._count?.messages}
                                                 </span>
                                             )}
@@ -699,17 +696,17 @@ function MessagesContent() {
                     </div>
 
                     {/* Message List */}
-                    <div className="w-80 border-r border-white/10 dark:border-gray-700/30 bg-transparent flex flex-col">
+                    <div className="w-80 border-r border-[#E5E2DB] bg-[#ffffff] flex flex-col">
                         {/* Search */}
-                        <div className="p-3 border-b border-white/10 dark:border-gray-700/30">
+                        <div className="p-3 border-b border-[#E5E2DB]">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
                                 <input
                                     type="text"
-                                    placeholder="Search messages..."
+                                    placeholder="Search messages…"
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-white/40 dark:bg-gray-900/40 border border-white/20 dark:border-gray-700/30 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none placeholder-gray-500"
+                                    className="w-full pl-10 pr-4 py-2 bg-[#F8F7F5] border border-[#E5E2DB] rounded-lg text-sm text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                 />
                             </div>
                         </div>
@@ -717,11 +714,11 @@ function MessagesContent() {
                         {/* Messages */}
                         <div className="flex-1 overflow-y-auto">
                             {isLoading ? (
-                                <div className="p-8 text-center text-gray-400">Loading...</div>
+                                <div className="p-8 text-center text-[#8C8880]">Loading…</div>
                             ) : filteredMessages.length === 0 ? (
-                                <div className="p-8 text-center text-gray-600 dark:text-gray-400 font-medium">No messages</div>
+                                <div className="p-8 text-center text-[#8C8880] font-medium">No messages</div>
                             ) : (
-                                <ul className="divide-y divide-white/10 dark:divide-gray-700/30">
+                                <ul className="divide-y divide-[#F3F1EC]">
                                     {filteredMessages.map(msg => (
                                         <MessageListItem
                                             key={msg.id}
@@ -738,7 +735,7 @@ function MessagesContent() {
                     </div>
 
                     {/* Reading Pane */}
-                    <div className="flex-1 bg-white/5 dark:bg-gray-900/20 overflow-y-auto">
+                    <div className="flex-1 bg-[#F8F7F5] overflow-y-auto">
                         {isComposeOpen ? (
                             <ComposeView
                                 mode={composeMode}
@@ -767,11 +764,11 @@ function MessagesContent() {
                                 currentUserName={currentUser?.name ?? ''}
                             />
                         ) : (
-                            <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-                                <div className="text-center p-8 bg-white/20 dark:bg-black/20 rounded-2xl backdrop-blur-sm border border-white/10 shadow-sm">
-                                    <Mail className="w-12 h-12 mx-auto mb-3 opacity-80" />
-                                    <p className="text-lg font-medium text-gray-700 dark:text-gray-200">Select a message to read</p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Click on a message from the list to view details</p>
+                            <div className="h-full flex items-center justify-center">
+                                <div className="text-center p-8 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm">
+                                    <Mail className="w-12 h-12 mx-auto mb-3 text-[#C8C4BB]" />
+                                    <p className="text-base font-semibold text-[#1C1A17]">Select a message to read</p>
+                                    <p className="text-sm text-[#8C8880] mt-1">Click on a message from the list to view details</p>
                                 </div>
                             </div>
                         )}
@@ -1045,7 +1042,7 @@ function MessageDetail({
         <div className="relative min-h-full flex">
         <div className="flex-1 p-6">
         <div className="max-w-4xl mx-auto">
-            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden">
+            <div className="bg-[#ffffff] rounded-xl shadow-sm border border-[#E5E2DB] overflow-hidden">
                 {/* External Email Warning Banner */}
                 {isExternalInbound && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
@@ -1068,24 +1065,24 @@ function MessageDetail({
                 )}
 
                 {/* Toolbar */}
-                <div className="p-3 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2 bg-gray-50 dark:bg-gray-800/50">
-                    <button onClick={onReply} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors" title="Reply">
+                <div className="p-3 border-b border-[#E5E2DB] flex items-center gap-2 bg-[#F8F7F5]">
+                    <button onClick={onReply} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Reply">
                         <Reply className="w-4 h-4" />
                     </button>
-                    <button onClick={onForward} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors" title="Forward">
+                    <button onClick={onForward} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Forward">
                         <Forward className="w-4 h-4" />
                     </button>
-                    <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1" />
-                    <button onClick={onStar} className={cn("p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors", message.starred && "text-yellow-500")} title="Star">
+                    <div className="w-px h-5 bg-[#E5E2DB] mx-1" />
+                    <button onClick={onStar} className={cn("p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors", message.starred ? "text-amber-500" : "text-[#8C8880]")} title="Star">
                         <Star className={cn("w-4 h-4", message.starred && "fill-current")} />
                     </button>
-                    <button onClick={onArchive} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors" title={message.archived ? "Unarchive" : "Archive"}>
+                    <button onClick={onArchive} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title={message.archived ? "Unarchive" : "Archive"}>
                         <Archive className="w-4 h-4" />
                     </button>
-                    <button onClick={onAddToCalendar} className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-colors" title="Add to Calendar">
+                    <button onClick={onAddToCalendar} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Add to Calendar">
                         <Calendar className="w-4 h-4" />
                     </button>
-                    <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1" />
+                    <div className="w-px h-5 bg-[#E5E2DB] mx-1" />
                     <button
                         onClick={handleSaveToCase}
                         disabled={!message.case?.id || savingToCase}
@@ -1093,19 +1090,19 @@ function MessageDetail({
                         className={cn(
                             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
                             message.case?.id
-                                ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40"
-                                : "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                                ? "bg-[#0D9488]/10 text-[#0D9488] hover:bg-[#0D9488]/20"
+                                : "text-[#C8C4BB] cursor-not-allowed"
                         )}
                     >
                         {savingToCase ? (
-                            <div className="w-3.5 h-3.5 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
+                            <div className="w-3.5 h-3.5 border-2 border-[#0D9488]/30 border-t-[#0D9488] rounded-full animate-spin" />
                         ) : (
                             <FolderDown className="w-3.5 h-3.5" />
                         )}
                         Save to Case
                     </button>
                     <div className="flex-1" />
-                    <button onClick={onDelete} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors" title="Delete">
+                    <button onClick={onDelete} className="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-lg transition-colors" title="Delete">
                         <Trash2 className="w-4 h-4" />
                     </button>
                 </div>
@@ -1141,34 +1138,32 @@ function MessageDetail({
                 )}
 
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100 dark:border-gray-800">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                <div className="p-6 border-b border-[#E5E2DB]">
+                    <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">
                         {message.subject || '(No Subject)'}
                     </h2>
                     <div className="flex items-start gap-4">
                         <div className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0",
+                            "w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm",
                             message.isExternal
-                                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600"
-                                : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600"
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-[#F3F1EC] text-[#5C5850]"
                         )}>
                             {message.isExternal ? <Globe className="w-5 h-5" /> : displayInitial}
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            <p className="text-sm font-medium text-[#1C1A17] flex items-center gap-2">
                                 {activeBox === 'sent' ? `To: ${getRecipientDisplayName()}` : `From: ${getSenderDisplayName()}`}
                                 {message.isExternal && (
-                                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded font-medium">
+                                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-semibold">
                                         EXTERNAL
                                     </span>
                                 )}
                             </p>
                             {message.isExternal && message.externalEmail && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {message.externalEmail}
-                                </p>
+                                <p className="text-xs text-[#8C8880]">{message.externalEmail}</p>
                             )}
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-[#8C8880]">
                                 {format(new Date(message.createdAt), 'PPPP \'at\' p')}
                             </p>
                             {message.case && (
@@ -1176,14 +1171,14 @@ function MessageDetail({
                                     href={`/cases/${message.case.id}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-xs text-indigo-600 mt-1 font-medium hover:underline block"
+                                    className="text-xs text-[#0D9488] mt-1 font-medium hover:underline block"
                                 >
-                                    📁 Case: {message.case.caseNumber} - {message.case.clientName}
+                                    Case: {message.case.caseNumber} — {message.case.clientName}
                                 </Link>
                             )}
                             <button
                                 onClick={() => { setShowEmailNotePanel(true); setOpenEmailThreadId(null); }}
-                                className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 mt-1 font-medium"
+                                className="flex items-center gap-1 text-xs text-[#0D9488] hover:text-[#0F766E] mt-1 font-medium transition-colors"
                             >
                                 <StickyNote className="w-3.5 h-3.5" /> Add Note
                             </button>
@@ -1196,7 +1191,7 @@ function MessageDetail({
                     <div className="relative">
                         {selectionToolbar && (
                             <div
-                                className="absolute z-20 flex items-center gap-1 bg-gray-900 rounded-lg px-2 py-1 shadow-lg"
+                                className="absolute z-20 flex items-center gap-1 bg-[#1C1A17] rounded-lg px-2 py-1 shadow-lg"
                                 style={{ top: selectionToolbar.top, left: selectionToolbar.left }}
                             >
                                 {['#FFFF00', '#00FF00', '#0096FF', '#FF6496', '#FFA500'].map(hex => (
@@ -1209,18 +1204,18 @@ function MessageDetail({
                                 ))}
                                 <button
                                     onClick={saveEmailHighlight}
-                                    className="ml-1 text-xs px-2 py-0.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                                    className="ml-1 text-xs px-2 py-0.5 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E]"
                                 >
                                     Highlight
                                 </button>
-                                <button onClick={() => setSelectionToolbar(null)} className="text-gray-400 hover:text-white ml-1">
+                                <button onClick={() => setSelectionToolbar(null)} className="text-[#8C8880] hover:text-[#ffffff] ml-1">
                                     <X className="w-3 h-3" />
                                 </button>
                             </div>
                         )}
                         <div
                             ref={emailBodyRef}
-                            className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed"
+                            className="prose max-w-none text-[#5C5850] text-sm leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.body) }}
                             onMouseUp={handleEmailMouseUp}
                         />
@@ -1230,20 +1225,18 @@ function MessageDetail({
                 {/* Attachments */}
                 {message.attachments && message.attachments.length > 0 && (
                     <div className="px-6 pb-4">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                            Attachments
-                        </p>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-2">Attachments</p>
                         <div className="space-y-1">
                             {message.attachments.map(att => (
                                 <a
                                     key={att.id}
                                     href={`/api/messages/${message.id}/attachments/${att.id}`}
                                     download={att.filename}
-                                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm"
+                                    className="flex items-center gap-2 px-3 py-2 bg-[#F8F7F5] border border-[#E5E2DB] rounded-lg hover:bg-[#F3F1EC] transition-colors text-sm"
                                 >
-                                    <Paperclip className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                                    <span className="text-gray-700 dark:text-gray-300 truncate">{att.filename}</span>
-                                    <span className="text-gray-400 text-xs ml-auto flex-shrink-0">
+                                    <Paperclip className="w-4 h-4 text-[#8C8880] flex-shrink-0" />
+                                    <span className="text-[#5C5850] truncate">{att.filename}</span>
+                                    <span className="text-[#8C8880] text-xs ml-auto flex-shrink-0">
                                         {att.size < 1024 * 1024
                                             ? `${(att.size / 1024).toFixed(0)} KB`
                                             : `${(att.size / (1024 * 1024)).toFixed(1)} MB`}
@@ -1255,10 +1248,10 @@ function MessageDetail({
                 )}
 
                 {/* Quick Reply */}
-                <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                <div className="p-4 border-t border-[#E5E2DB] bg-[#F8F7F5]">
                     <button
                         onClick={onReply}
-                        className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-400 hover:border-indigo-300 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                        className="w-full text-left p-3 border border-[#E5E2DB] rounded-lg text-[#8C8880] hover:border-[#0D9488]/40 hover:bg-[#ffffff] transition-colors text-sm"
                     >
                         {message.isExternal ? 'Click to reply (will send external email)...' : 'Click to reply...'}
                     </button>
@@ -1330,43 +1323,43 @@ function ComposeView({
     }
 
     return (
-        <div className="h-full flex flex-col bg-transparent border-l border-white/10 dark:border-gray-700/30">
-            <div className="p-4 border-b border-white/10 dark:border-gray-700/30 flex justify-between items-center bg-white/10 dark:bg-gray-800/30">
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                    {mode === 'reply' && <Reply className="w-4 h-4" />}
-                    {mode === 'forward' && <Forward className="w-4 h-4" />}
-                    {mode === 'new' && <Mail className="w-4 h-4" />}
+        <div className="h-full flex flex-col bg-[#ffffff]">
+            <div className="p-4 border-b border-[#E5E2DB] flex justify-between items-center bg-[#F8F7F5]">
+                <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
+                    {mode === 'reply' && <Reply className="w-4 h-4 text-[#0D9488]" />}
+                    {mode === 'forward' && <Forward className="w-4 h-4 text-[#0D9488]" />}
+                    {mode === 'new' && <Mail className="w-4 h-4 text-[#0D9488]" />}
                     {modalTitle}
                 </h2>
-                <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
-                    <X className="w-5 h-5" />
+                <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
+                    <X className="w-4 h-4 text-[#8C8880]" />
                 </button>
             </div>
 
             <div className="p-4 space-y-3 overflow-y-auto flex-1">
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-medium text-gray-500">To</label>
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">To</label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <span className="text-xs text-gray-500">External Email</span>
+                            <span className="text-xs text-[#8C8880]">External Email</span>
                             <input
                                 type="checkbox"
                                 checked={data.isExternal || false}
                                 onChange={e => onChange({ ...data, isExternal: e.target.checked, recipientId: '' })}
-                                className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                className="w-4 h-4 rounded accent-[#0D9488]"
                                 disabled={mode === 'reply'}
                             />
                         </label>
                     </div>
 
                     {data.isExternal ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             <input
                                 type="email"
                                 placeholder="Recipient Email"
                                 value={data.externalEmail || ''}
                                 onChange={e => onChange({ ...data, externalEmail: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-sm"
+                                className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
                                 disabled={mode === 'reply'}
                             />
                             <input
@@ -1374,7 +1367,7 @@ function ComposeView({
                                 placeholder="Recipient Name"
                                 value={data.externalName || ''}
                                 onChange={e => onChange({ ...data, externalName: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-sm"
+                                className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
                                 disabled={mode === 'reply'}
                             />
                         </div>
@@ -1382,7 +1375,7 @@ function ComposeView({
                         <select
                             value={data.recipientId}
                             onChange={e => onChange({ ...data, recipientId: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-sm"
+                            className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
                             disabled={mode === 'reply'}
                         >
                             <option value="">Select Recipient</option>
@@ -1394,37 +1387,37 @@ function ComposeView({
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium mb-1 text-gray-500">Subject</label>
+                    <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Subject</label>
                     <input
                         type="text"
                         value={data.subject}
                         onChange={e => onChange({ ...data, subject: e.target.value })}
-                        placeholder="Enter subject..."
-                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-sm"
+                        placeholder="Enter subject…"
+                        className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-medium mb-1 text-gray-500">Related Case (Optional)</label>
+                    <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Related Case <span className="normal-case font-normal">(Optional)</span></label>
                     <select
                         value={data.caseId}
                         onChange={e => onChange({ ...data, caseId: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800 text-sm"
+                        className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                     >
                         <option value="">None</option>
                         {cases.map((c) => (
-                            <option key={c.id} value={c.id}>{c.caseNumber} - {c.clientName}</option>
+                            <option key={c.id} value={c.id}>{c.caseNumber} — {c.clientName}</option>
                         ))}
                     </select>
                 </div>
 
                 <div>
-                    <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-medium text-gray-500">Message</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Message</label>
                         <button
                             type="button"
                             onClick={() => setShowTemplateModal(true)}
-                            className="text-xs text-indigo-500 hover:text-indigo-400 flex items-center gap-1"
+                            className="text-xs text-[#0D9488] hover:text-[#0F766E] flex items-center gap-1 transition-colors"
                         >
                             <FileText className="w-3 h-3" /> Load Template
                         </button>
@@ -1441,7 +1434,7 @@ function ComposeView({
                             {pendingAttachments.map(file => (
                                 <div
                                     key={file.name}
-                                    className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-700 dark:text-gray-300"
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-[#F3F1EC] rounded-full text-xs text-[#5C5850]"
                                 >
                                     <Paperclip className="w-3 h-3 flex-shrink-0" />
                                     <span className="max-w-[140px] truncate">{file.name}</span>
@@ -1469,14 +1462,14 @@ function ComposeView({
                 </div>
             </div>
 
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
-                <button onClick={onClose} className="px-4 py-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm">
+            <div className="p-4 border-t border-[#E5E2DB] bg-[#F8F7F5] flex justify-end gap-3">
+                <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
                     Cancel
                 </button>
                 <button
                     onClick={onSend}
                     disabled={(!data.recipientId && !data.isExternal) || (data.isExternal && (!data.externalEmail || !data.externalName)) || !data.body}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     <Send className="w-4 h-4" />
                     Send
@@ -1488,7 +1481,7 @@ function ComposeView({
 
 export default function MessagesPage() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>}>
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#F8F7F5]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D9488]"></div></div>}>
             <MessagesContent />
         </Suspense>
     );
@@ -1523,14 +1516,14 @@ function SidebarButton({ icon: Icon, label, count, active, onClick, onDrop, onDr
             className={cn(
                 "w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm",
                 active
-                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-sm border border-indigo-500/20"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-gray-700/50"
+                    ? "bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20"
+                    : "text-[#5C5850] hover:bg-[#F3F1EC] border border-transparent"
             )}
         >
             <Icon className="w-4 h-4" />
             {label}
             {count !== undefined && count > 0 && (
-                <span className="ml-auto text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 px-1.5 py-0.5 rounded-full">
+                <span className="ml-auto text-xs bg-[#0D9488]/10 text-[#0D9488] px-1.5 py-0.5 rounded-full font-semibold">
                     {count}
                 </span>
             )}
@@ -1577,8 +1570,8 @@ function MessageListItem({
             onDragStart={handleDragStart}
             className={cn(
                 "p-3 cursor-pointer transition-colors relative group cursor-grab active:cursor-grabbing",
-                isSelected ? "bg-indigo-500/10 dark:bg-indigo-500/20 backdrop-blur-sm border-l-2 border-indigo-500" : "hover:bg-white/10 dark:hover:bg-gray-800/30",
-                !message.isRead && activeBox !== 'sent' ? "bg-indigo-500/5 dark:bg-indigo-900/20" : ""
+                isSelected ? "bg-[#0D9488]/8 border-l-2 border-[#0D9488]" : "hover:bg-[#F8F7F5] border-l-2 border-transparent",
+                !message.isRead && activeBox !== 'sent' ? "bg-[#0D9488]/5" : ""
             )}
         >
             <div className="flex items-start gap-2">
@@ -1586,7 +1579,7 @@ function MessageListItem({
                     onClick={e => { e.stopPropagation(); onStar(); }}
                     className={cn(
                         "mt-0.5 flex-shrink-0 transition-colors",
-                        message.starred ? "text-yellow-500" : "text-gray-300 hover:text-yellow-400"
+                        message.starred ? "text-amber-400" : "text-[#C8C4BB] hover:text-amber-400"
                     )}
                 >
                     <Star className={cn("w-4 h-4", message.starred && "fill-current")} />
@@ -1595,21 +1588,21 @@ function MessageListItem({
                     <div className="flex justify-between items-center mb-0.5">
                         <span className={cn(
                             "text-sm truncate",
-                            !message.isRead && activeBox !== 'sent' ? "font-bold text-gray-900 dark:text-white" : "font-medium text-gray-700 dark:text-gray-300"
+                            !message.isRead && activeBox !== 'sent' ? "font-bold text-[#1C1A17]" : "font-medium text-[#5C5850]"
                         )}>
                             {displayName}
                         </span>
-                        <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">
+                        <span className="text-[10px] text-[#8C8880] flex-shrink-0 ml-2">
                             {format(new Date(message.createdAt), 'MMM d')}
                         </span>
                     </div>
                     <h4 className={cn(
                         "text-xs mb-0.5 truncate",
-                        !message.isRead && activeBox !== 'sent' ? "font-semibold text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
+                        !message.isRead && activeBox !== 'sent' ? "font-semibold text-[#1C1A17]" : "text-[#5C5850]"
                     )}>
                         {message.subject || '(No Subject)'}
                     </h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">{message.body}</p>
+                    <p className="text-xs text-[#8C8880] line-clamp-1">{message.body}</p>
                 </div>
             </div>
         </li>

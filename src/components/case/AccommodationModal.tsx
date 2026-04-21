@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, FileText, Check, AlertTriangle } from 'lucide-react';
-import { AccommodationType, AccommodationStatus, LifecycleStatus, LifecycleSubstatus } from '@prisma/client';
+import { X, Calendar } from 'lucide-react';
+import { AccommodationType, AccommodationStatus, LifecycleSubstatus } from '@prisma/client';
 
 interface AccommodationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (data: any) => Promise<void>;
-    initialData?: any; // If editing
+    initialData?: any;
     caseId: string;
 }
 
@@ -20,18 +20,17 @@ const ACCOMMODATION_TYPES = [
     { value: 'SCHEDULE_MODIFICATION', label: 'Schedule Modification' },
 ];
 
+const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
+const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+
 export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseId }: AccommodationModalProps) {
     const [isLoading, setIsLoading] = useState(false);
-
-    // Form State
     const [type, setType] = useState<AccommodationType | ''>('');
     const [subtype, setSubtype] = useState('');
     const [description, setDescription] = useState('');
     const [isLongTerm, setIsLongTerm] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-
-    // Edit State
     const [status, setStatus] = useState<AccommodationStatus>('PENDING');
     const [lifecycleSubstatus, setLifecycleSubstatus] = useState<LifecycleSubstatus>('PENDING');
     const [decisionDate, setDecisionDate] = useState('');
@@ -49,16 +48,8 @@ export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseI
                 setLifecycleSubstatus(initialData.lifecycleSubstatus);
                 setDecisionDate(initialData.decisionDate ? new Date(initialData.decisionDate).toISOString().split('T')[0] : '');
             } else {
-                // Reset for new
-                setType('');
-                setSubtype('');
-                setDescription('');
-                setIsLongTerm(false);
-                setStartDate('');
-                setEndDate('');
-                setStatus('PENDING');
-                setLifecycleSubstatus('PENDING');
-                setDecisionDate('');
+                setType(''); setSubtype(''); setDescription(''); setIsLongTerm(false);
+                setStartDate(''); setEndDate(''); setStatus('PENDING'); setLifecycleSubstatus('PENDING'); setDecisionDate('');
             }
         }
     }, [isOpen, initialData]);
@@ -67,17 +58,7 @@ export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseI
         e.preventDefault();
         setIsLoading(true);
         try {
-            await onSave({
-                type,
-                subtype,
-                description,
-                isLongTerm,
-                startDate,
-                endDate: isLongTerm ? null : endDate,
-                status,
-                lifecycleSubstatus,
-                decisionDate: decisionDate || null
-            });
+            await onSave({ type, subtype, description, isLongTerm, startDate, endDate: isLongTerm ? null : endDate, status, lifecycleSubstatus, decisionDate: decisionDate || null });
             onClose();
         } catch (error) {
             console.error(error);
@@ -90,113 +71,67 @@ export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseI
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
+                    <h2 className="text-base font-semibold text-[#1C1A17]">
                         {initialData ? `Edit Accommodation #${initialData.accommodationNumber}` : 'New Accommodation Request'}
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-                        <X className="w-5 h-5" />
+                    <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
+                        <X className="w-4 h-4 text-[#8C8880]" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {/* Basic Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
-                            <select
-                                required
-                                value={type}
-                                onChange={(e) => setType(e.target.value as AccommodationType)}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                            >
-                                <option value="">Select Type...</option>
-                                {ACCOMMODATION_TYPES.map(t => (
-                                    <option key={t.value} value={t.value}>{t.label}</option>
-                                ))}
+                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label className={labelCls}>Type</label>
+                            <select required value={type} onChange={e => setType(e.target.value as AccommodationType)} className={inputCls}>
+                                <option value="">Select Type…</option>
+                                {ACCOMMODATION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                             </select>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Subtype</label>
-                            <input
-                                type="text"
-                                value={subtype}
-                                onChange={(e) => setSubtype(e.target.value)}
-                                placeholder="E.g. Ergonomic Chair"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                        <div>
+                            <label className={labelCls}>Subtype</label>
+                            <input type="text" value={subtype} onChange={e => setSubtype(e.target.value)} placeholder="E.g. Ergonomic Chair" className={inputCls} />
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <textarea
-                            required
-                            rows={3}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                            placeholder="Describe the requested accommodation..."
-                        />
+                    <div>
+                        <label className={labelCls}>Description</label>
+                        <textarea required rows={3} value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the requested accommodation…" className={`${inputCls} resize-none`} />
                     </div>
 
-                    {/* Timeline */}
-                    <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg space-y-4">
+                    <div className="p-4 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB] space-y-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
+                            <h3 className="text-sm font-semibold text-[#1C1A17] flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-[#0D9488]" />
                                 Timeline
                             </h3>
-                            <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={isLongTerm}
-                                    onChange={(e) => setIsLongTerm(e.target.checked)}
-                                    className="rounded text-blue-600 focus:ring-blue-500"
-                                />
+                            <label className="flex items-center gap-2 text-sm text-[#5C5850] cursor-pointer">
+                                <input type="checkbox" checked={isLongTerm} onChange={e => setIsLongTerm(e.target.checked)} className="rounded accent-[#0D9488]" />
                                 Long-Term / Indefinite
                             </label>
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs text-gray-500 mb-1 block">Start Date</label>
-                                <input
-                                    type="date"
-                                    required
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                                />
+                                <label className={labelCls}>Start Date</label>
+                                <input type="date" required value={startDate} onChange={e => setStartDate(e.target.value)} className={inputCls} />
                             </div>
                             <div>
-                                <label className="text-xs text-gray-500 mb-1 block">End Date</label>
-                                <input
-                                    type="date"
-                                    disabled={isLongTerm}
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    className={`w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none transition-opacity ${isLongTerm ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                />
+                                <label className={labelCls}>End Date</label>
+                                <input type="date" disabled={isLongTerm} value={endDate} onChange={e => setEndDate(e.target.value)} className={`${inputCls} ${isLongTerm ? 'opacity-40 cursor-not-allowed' : ''}`} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Status & Decision (Only visible if editing existing) */}
                     {initialData && (
-                        <div className="space-y-4 border-t border-gray-100 dark:border-gray-700 pt-4">
-                            <h3 className="font-medium text-gray-900 dark:text-white">Request Status</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Decision</label>
-                                    <select
-                                        value={status}
-                                        onChange={(e) => setStatus(e.target.value as AccommodationStatus)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    >
+                        <div className="space-y-4 pt-2 border-t border-[#E5E2DB]">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Request Status</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label className={labelCls}>Decision</label>
+                                    <select value={status} onChange={e => setStatus(e.target.value as AccommodationStatus)} className={inputCls}>
                                         <option value="PENDING">Pending</option>
                                         <option value="APPROVED">Approved</option>
                                         <option value="REJECTED">Rejected</option>
@@ -204,24 +139,14 @@ export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseI
                                         <option value="RESCINDED">Rescinded</option>
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Date of Decision</label>
-                                    <input
-                                        type="date"
-                                        value={decisionDate}
-                                        onChange={(e) => setDecisionDate(e.target.value)}
-                                        className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
+                                <div>
+                                    <label className={labelCls}>Date of Decision</label>
+                                    <input type="date" value={decisionDate} onChange={e => setDecisionDate(e.target.value)} className={inputCls} />
                                 </div>
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Lifecycle Substatus</label>
-                                <select
-                                    value={lifecycleSubstatus}
-                                    onChange={(e) => setLifecycleSubstatus(e.target.value as LifecycleSubstatus)}
-                                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
-                                >
+                            <div>
+                                <label className={labelCls}>Lifecycle Substatus</label>
+                                <select value={lifecycleSubstatus} onChange={e => setLifecycleSubstatus(e.target.value as LifecycleSubstatus)} className={inputCls}>
                                     <option value="PENDING">Pending</option>
                                     <option value="APPROVED">Approved</option>
                                     <option value="MEDICAL_NOT_SUBMITTED">Medical Not Submitted</option>
@@ -234,20 +159,12 @@ export function AccommodationModal({ isOpen, onClose, onSave, initialData, caseI
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-3 pt-6">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
-                        >
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
                             Cancel
                         </button>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-all hover:shadow-md font-medium disabled:opacity-50"
-                        >
-                            {isLoading ? 'Saving...' : initialData ? 'Update Accommodation' : 'Create Request'}
+                        <button type="submit" disabled={isLoading} className="px-5 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 transition-colors">
+                            {isLoading ? 'Saving…' : initialData ? 'Update Accommodation' : 'Create Request'}
                         </button>
                     </div>
                 </form>

@@ -201,7 +201,7 @@ export default function AuditLogPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans p-8">
+        <div className="font-sans p-8">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Header */}
@@ -209,13 +209,13 @@ export default function AuditLogPage() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => router.back()}
-                            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                            className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-500" />
+                            <ArrowLeft className="w-5 h-5 text-[#5C5850]" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Audit Logs</h1>
-                            <p className="text-gray-500 dark:text-gray-400">Track all system activities and changes</p>
+                            <h1 className="text-2xl font-bold text-[#1C1A17]">System Audit Logs</h1>
+                            <p className="text-[#8C8880]">Track all system activities and changes</p>
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -228,7 +228,7 @@ export default function AuditLogPage() {
                         </button>
                         <button
                             onClick={handleExportPDF}
-                            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg shadow-sm transition-colors font-medium text-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-[#ffffff] border border-[#E5E2DB] text-[#5C5850] hover:bg-[#F8F7F5] rounded-lg shadow-sm transition-colors font-medium text-sm"
                         >
                             <Download className="w-4 h-4" />
                             Export PDF
@@ -237,14 +237,14 @@ export default function AuditLogPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="relative">
-                            <label className="block text-xs font-medium text-gray-500 mb-1">User</label>
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">User</label>
                             <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
                                 <select
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors appearance-none"
                                     value={selectedUser}
                                     onChange={(e) => setSelectedUser(e.target.value)}
                                 >
@@ -257,12 +257,12 @@ export default function AuditLogPage() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Start Date</label>
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Start Date</label>
                             <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
                                 <input
                                     type="date"
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
@@ -270,12 +270,12 @@ export default function AuditLogPage() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">End Date</label>
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">End Date</label>
                             <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
                                 <input
                                     type="date"
-                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />
@@ -289,7 +289,7 @@ export default function AuditLogPage() {
                                     setStartDate('');
                                     setEndDate('');
                                 }}
-                                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors w-full"
+                                className="px-4 py-2 text-sm text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC] rounded-lg transition-colors w-full"
                             >
                                 Clear Filters
                             </button>
@@ -298,53 +298,53 @@ export default function AuditLogPage() {
                 </div>
 
                 {/* Logs List */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
                     {isLoading ? (
                         <div className="flex justify-center py-12">
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                            <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
                         </div>
                     ) : logs.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                                <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
                                     <tr>
-                                        <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Timestamp</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">User</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Action</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Entity</th>
-                                        <th className="px-6 py-4 font-semibold text-gray-700 dark:text-gray-300">Details</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Timestamp</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Entity</th>
+                                        <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                <tbody className="divide-y divide-[#F3F1EC]">
                                     {logs.map((log) => (
-                                        <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                        <tr key={log.id} className="hover:bg-[#F8F7F5] transition-colors">
+                                            <td className="px-6 py-4 text-[#8C8880] whitespace-nowrap">
                                                 {new Date(log.timestamp).toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                                    <div className="w-6 h-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] flex items-center justify-center text-xs font-bold">
                                                         {log.user.name.charAt(0)}
                                                     </div>
-                                                    <span className="font-medium text-gray-900 dark:text-white">{log.user.name}</span>
+                                                    <span className="font-medium text-[#1C1A17]">{log.user.name}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${log.action === 'CREATE' ? 'bg-green-50 text-green-700 border-green-100' :
-                                                    log.action === 'UPDATE' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                                    log.action === 'UPDATE' ? 'bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20' :
                                                         log.action === 'DELETE' ? 'bg-red-50 text-red-700 border-red-100' :
-                                                            'bg-gray-50 text-gray-700 border-gray-100'
+                                                            'bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]'
                                                     }`}>
                                                     {log.action}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300">
+                                                <span className="font-mono text-xs bg-[#F3F1EC] px-1.5 py-0.5 rounded text-[#5C5850]">
                                                     {log.entityType}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="max-w-xs text-gray-600 dark:text-gray-400 text-xs font-mono break-all">
+                                                <div className="max-w-xs text-[#5C5850] text-xs font-mono break-all">
                                                     {formatDetails(log)}
                                                 </div>
                                             </td>
@@ -354,7 +354,7 @@ export default function AuditLogPage() {
                             </table>
                         </div>
                     ) : (
-                        <div className="text-center py-12 text-gray-500">
+                        <div className="text-center py-12 text-[#8C8880]">
                             <FileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
                             <p>No audit logs found</p>
                         </div>

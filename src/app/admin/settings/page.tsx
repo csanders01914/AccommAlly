@@ -108,8 +108,8 @@ export default function TenantSettingsPage() {
         return (
             <div className="p-8">
                 <div className="animate-pulse space-y-4">
-                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-8 bg-[#F3F1EC] rounded w-1/4"></div>
+                    <div className="h-4 bg-[#F3F1EC] rounded w-1/2"></div>
                 </div>
             </div>
         );
@@ -118,20 +118,20 @@ export default function TenantSettingsPage() {
     return (
         <div className="p-8 max-w-2xl">
             <div className="mb-8 pl-1">
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3 tracking-tight">
-                    <Building className="w-8 h-8 text-indigo-700 dark:text-indigo-400" />
+                <h1 className="text-2xl font-bold text-[#1C1A17] flex items-center gap-3">
+                    <Building className="w-7 h-7 text-[#0D9488]" />
                     Organization Settings
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 mt-2 text-lg font-medium">Manage your organization's branding and appearance.</p>
+                <p className="text-[#8C8880] mt-1">Manage your organization's branding and appearance.</p>
             </div>
 
-            <div className="space-y-8 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md p-8 rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm">
+            <div className="space-y-8 bg-[#ffffff] p-8 rounded-xl border border-[#E5E2DB] shadow-sm">
                 {/* Branding Colors */}
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Brand Colors</h2>
+                    <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">Brand Colors</h2>
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                 Primary Color
                             </label>
                             <div className="flex items-center gap-3">
@@ -142,15 +142,15 @@ export default function TenantSettingsPage() {
                                         onChange={(e) => setPrimaryColor(e.target.value)}
                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                     />
-                                    <div className="h-10 w-10 rounded border border-white/20 shadow-sm" style={{ backgroundColor: primaryColor }}></div>
+                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: primaryColor }}></div>
                                 </div>
-                                <span className="font-mono text-sm text-gray-600 dark:text-gray-300 border border-white/10 px-3 py-2 rounded-md bg-white/20 dark:bg-gray-800/50">{primaryColor}</span>
+                                <span className="font-mono text-sm text-[#5C5850] border border-[#E5E2DB] px-3 py-2 rounded-md bg-[#F8F7F5]">{primaryColor}</span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">Used for buttons, links, and active states.</p>
+                            <p className="text-xs text-[#8C8880] mt-2">Used for buttons, links, and active states.</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                 Secondary Color
                             </label>
                             <div className="flex items-center gap-3">
@@ -161,23 +161,23 @@ export default function TenantSettingsPage() {
                                         onChange={(e) => setSecondaryColor(e.target.value)}
                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                     />
-                                    <div className="h-10 w-10 rounded border border-white/20 shadow-sm" style={{ backgroundColor: secondaryColor }}></div>
+                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: secondaryColor }}></div>
                                 </div>
-                                <span className="font-mono text-sm text-gray-600 dark:text-gray-300 border border-white/10 px-3 py-2 rounded-md bg-white/20 dark:bg-gray-800/50">{secondaryColor}</span>
+                                <span className="font-mono text-sm text-[#5C5850] border border-[#E5E2DB] px-3 py-2 rounded-md bg-[#F8F7F5]">{secondaryColor}</span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">Used for accents and highlights.</p>
+                            <p className="text-xs text-[#8C8880] mt-2">Used for accents and highlights.</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 dark:border-gray-700/30 pt-8"></div>
+                <div className="border-t border-[#E5E2DB] pt-8"></div>
 
                 {/* Sidebar Appearance */}
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sidebar Appearance</h2>
+                    <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">Sidebar Appearance</h2>
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                 Sidebar Background
                             </label>
                             <div className="flex items-center gap-3">
@@ -188,14 +188,14 @@ export default function TenantSettingsPage() {
                                         onChange={(e) => setSidebarBackground(e.target.value)}
                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                     />
-                                    <div className="h-10 w-10 rounded border border-white/20 shadow-sm" style={{ backgroundColor: sidebarBackground }}></div>
+                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: sidebarBackground }}></div>
                                 </div>
-                                <span className="font-mono text-sm text-gray-600 dark:text-gray-300 border border-white/10 px-3 py-2 rounded-md bg-white/20 dark:bg-gray-800/50">{sidebarBackground}</span>
+                                <span className="font-mono text-sm text-[#5C5850] border border-[#E5E2DB] px-3 py-2 rounded-md bg-[#F8F7F5]">{sidebarBackground}</span>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                 Sidebar Text Color
                             </label>
                             <div className="flex items-center gap-3">
@@ -206,29 +206,29 @@ export default function TenantSettingsPage() {
                                         onChange={(e) => setSidebarForeground(e.target.value)}
                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                     />
-                                    <div className="h-10 w-10 rounded border border-white/20 shadow-sm" style={{ backgroundColor: sidebarForeground }}></div>
+                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: sidebarForeground }}></div>
                                 </div>
-                                <span className="font-mono text-sm text-gray-600 dark:text-gray-300 border border-white/10 px-3 py-2 rounded-md bg-white/20 dark:bg-gray-800/50">{sidebarForeground}</span>
+                                <span className="font-mono text-sm text-[#5C5850] border border-[#E5E2DB] px-3 py-2 rounded-md bg-[#F8F7F5]">{sidebarForeground}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 dark:border-gray-700/30 pt-8"></div>
+                <div className="border-t border-[#E5E2DB] pt-8"></div>
 
                 {/* Page Appearance */}
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Page Appearance</h2>
+                    <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">Page Appearance</h2>
                     <div>
                         <div>
                             <div className="flex items-center gap-4 mb-4">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Background Style:</label>
-                                <div className="flex bg-white/20 dark:bg-gray-800/50 p-1 rounded-lg border border-white/10">
+                                <label className="text-sm font-medium text-[#5C5850]">Background Style:</label>
+                                <div className="flex bg-[#F8F7F5] p-1 rounded-lg border border-[#E5E2DB]">
                                     <button
                                         onClick={() => setPageBackgroundMode('solid')}
                                         className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${pageBackgroundMode === 'solid'
-                                            ? 'bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                                            ? 'bg-[#0D9488]/10 text-[#0D9488] shadow-sm'
+                                            : 'text-[#5C5850] hover:text-[#1C1A17]'
                                             }`}
                                     >
                                         Solid Color
@@ -236,8 +236,8 @@ export default function TenantSettingsPage() {
                                     <button
                                         onClick={() => setPageBackgroundMode('gradient')}
                                         className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${pageBackgroundMode === 'gradient'
-                                            ? 'bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                                            ? 'bg-[#0D9488]/10 text-[#0D9488] shadow-sm'
+                                            : 'text-[#5C5850] hover:text-[#1C1A17]'
                                             }`}
                                     >
                                         Gradient
@@ -247,7 +247,7 @@ export default function TenantSettingsPage() {
 
                             {pageBackgroundMode === 'solid' ? (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                         Solid Color
                                     </label>
                                     <div className="flex items-center gap-3">
@@ -258,16 +258,16 @@ export default function TenantSettingsPage() {
                                                 onChange={(e) => setPageBackground(e.target.value)}
                                                 className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                             />
-                                            <div className="h-10 w-10 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: pageBackground }}></div>
+                                            <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: pageBackground }}></div>
                                         </div>
-                                        <span className="font-mono text-sm text-gray-500 border border-gray-200 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-900 dark:border-gray-600">{pageBackground}</span>
+                                        <span className="font-mono text-sm text-[#5C5850] border border-[#E5E2DB] px-3 py-2 rounded-md bg-[#F8F7F5]">{pageBackground}</span>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                                 Start Color
                                             </label>
                                             <div className="flex items-center gap-3">
@@ -278,13 +278,13 @@ export default function TenantSettingsPage() {
                                                         onChange={(e) => setPageGradientStart(e.target.value)}
                                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                                     />
-                                                    <div className="h-10 w-10 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: pageGradientStart }}></div>
+                                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: pageGradientStart }}></div>
                                                 </div>
-                                                <span className="font-mono text-xs text-gray-500 border border-gray-200 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-900 dark:border-gray-600">{pageGradientStart}</span>
+                                                <span className="font-mono text-xs text-[#5C5850] border border-[#E5E2DB] px-2 py-1 rounded-md bg-[#F8F7F5]">{pageGradientStart}</span>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                                 End Color
                                             </label>
                                             <div className="flex items-center gap-3">
@@ -295,20 +295,20 @@ export default function TenantSettingsPage() {
                                                         onChange={(e) => setPageGradientEnd(e.target.value)}
                                                         className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0 opacity-0 absolute inset-0 z-10"
                                                     />
-                                                    <div className="h-10 w-10 rounded border border-gray-200 shadow-sm" style={{ backgroundColor: pageGradientEnd }}></div>
+                                                    <div className="h-10 w-10 rounded border border-[#E5E2DB] shadow-sm" style={{ backgroundColor: pageGradientEnd }}></div>
                                                 </div>
-                                                <span className="font-mono text-xs text-gray-500 border border-gray-200 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-900 dark:border-gray-600">{pageGradientEnd}</span>
+                                                <span className="font-mono text-xs text-[#5C5850] border border-[#E5E2DB] px-2 py-1 rounded-md bg-[#F8F7F5]">{pageGradientEnd}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                             Direction
                                         </label>
                                         <select
                                             value={pageGradientDirection}
                                             onChange={(e) => setPageGradientDirection(e.target.value)}
-                                            className="w-full px-3 py-2 border border-white/20 dark:border-gray-600 rounded-lg bg-white/50 dark:bg-gray-800/50 text-sm backdrop-blur-sm"
+                                            className="w-full px-3 py-2 border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                         >
                                             <option value="to bottom">Top to Bottom</option>
                                             <option value="to right">Left to Right</option>
@@ -318,27 +318,27 @@ export default function TenantSettingsPage() {
                                             <option value="135deg">135 Degrees</option>
                                         </select>
                                     </div>
-                                    <div className="mt-2 p-4 rounded-lg border border-gray-200 dark:border-gray-700" style={{ background: `linear-gradient(${pageGradientDirection}, ${pageGradientStart}, ${pageGradientEnd})` }}>
-                                        <p className="text-center text-sm font-medium text-gray-800 dark:text-gray-100 bg-white/50 dark:bg-black/20 backdrop-blur-sm py-2 px-4 rounded inline-block mx-auto">Preview</p>
+                                    <div className="mt-2 p-4 rounded-lg border border-[#E5E2DB]" style={{ background: `linear-gradient(${pageGradientDirection}, ${pageGradientStart}, ${pageGradientEnd})` }}>
+                                        <p className="text-center text-sm font-medium text-[#1C1A17] bg-[#ffffff]/70 py-2 px-4 rounded inline-block mx-auto">Preview</p>
                                     </div>
                                 </div>
                             )}
-                            <p className="text-xs text-gray-500 mt-2">Customize the main background color or gradient of the application.</p>
+                            <p className="text-xs text-[#8C8880] mt-2">Customize the main background color or gradient of the application.</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 dark:border-gray-700/30 pt-8"></div>
+                <div className="border-t border-[#E5E2DB] pt-8"></div>
 
                 {/* Logo Upload */}
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Organization Logo</h2>
+                    <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">Organization Logo</h2>
                     <div className="flex flex-col sm:flex-row items-start gap-6">
                         <div className="shrink-0">
                             {logo ? (
                                 <div className="relative group">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={logo} alt="Organization Logo" className="h-32 w-auto object-contain border border-white/20 rounded-lg p-2 bg-white/50 backdrop-blur-sm" />
+                                    <img src={logo} alt="Organization Logo" className="h-32 w-auto object-contain border border-[#E5E2DB] rounded-lg p-2 bg-[#F8F7F5]" />
                                     <button
                                         onClick={() => setLogo(null)}
                                         className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-1 hover:bg-red-200 transition-colors shadow-sm"
@@ -348,18 +348,18 @@ export default function TenantSettingsPage() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="h-32 w-32 border-2 border-dashed border-white/30 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 bg-white/10 dark:bg-gray-800/30">
+                                <div className="h-32 w-32 border-2 border-dashed border-[#E5E2DB] rounded-lg flex items-center justify-center text-[#8C8880] bg-[#F8F7F5]">
                                     <span className="text-sm font-medium">No Logo</span>
                                 </div>
                             )}
                         </div>
 
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                                 Upload New Logo
                             </label>
                             <div className="flex items-center gap-4">
-                                <label className="cursor-pointer btn-secondary px-4 py-2 border border-white/20 rounded-lg hover:bg-white/20 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 bg-white/10 backdrop-blur-sm">
+                                <label className="cursor-pointer px-4 py-2 border border-[#E5E2DB] bg-[#F8F7F5] hover:bg-[#F3F1EC] text-[#5C5850] rounded-lg transition-colors flex items-center gap-2">
                                     <Upload className="w-4 h-4" />
                                     <span>Choose File</span>
                                     <input
@@ -369,26 +369,26 @@ export default function TenantSettingsPage() {
                                         className="hidden"
                                     />
                                 </label>
-                                <span className="text-sm text-gray-500">Max size: 500KB. PNG, JPG, SVG.</span>
+                                <span className="text-sm text-[#8C8880]">Max size: 500KB. PNG, JPG, SVG.</span>
                             </div>
-                            <p className="text-sm text-gray-500 mt-3">
+                            <p className="text-sm text-[#8C8880] mt-3">
                                 This logo will appear in the sidebar and navigation bar. For best results, use a transparent PNG or SVG with a height of at least 40px.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 dark:border-gray-700/30 pt-8 flex items-center gap-4">
+                <div className="border-t border-[#E5E2DB] pt-8 flex items-center gap-4">
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 shadow-sm"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] font-medium rounded-lg transition-colors disabled:opacity-50 shadow-sm"
                     >
                         <Save className="w-4 h-4" />
                         {saving ? 'Saving...' : 'Save Changes'}
                     </button>
                     {message && (
-                        <span className={`text-sm font-medium ${message.includes('Error') ? 'text-red-600' : 'text-green-600'} animate-fade-in`}>
+                        <span className={`text-sm font-medium ${message.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
                             {message}
                         </span>
                     )}

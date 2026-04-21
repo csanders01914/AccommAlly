@@ -460,35 +460,35 @@ function AdminDashboardContent() {
         <div className="p-6 space-y-6 h-full flex flex-col">
             <div className="flex items-center justify-between flex-shrink-0">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-gray-950 dark:text-white flex items-center gap-3 drop-shadow-sm">
-                        <Shield className="w-8 h-8 text-indigo-700 drop-shadow-sm" />
+                    <h1 className="text-2xl font-bold text-[#1C1A17] flex items-center gap-3">
+                        <Shield className="w-7 h-7 text-[#0D9488]" />
                         Admin Console
                     </h1>
-                    <p className="text-gray-700 dark:text-gray-300 mt-1 font-medium drop-shadow-sm">System monitoring and user management</p>
+                    <p className="text-[#8C8880] mt-1">System monitoring and user management</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExportReport}
-                        className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-[#ffffff] bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm flex items-center gap-2"
                     >
                         <FileText className="w-4 h-4" />
                         Export Grant Report
                     </button>
                     <button
                         onClick={() => router.push('/dashboard/tasks')}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                        className="px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#ffffff] border border-[#E5E2DB] rounded-lg hover:bg-[#F8F7F5] transition-colors"
                     >
                         Back to Dashboard
                     </button>
                 </div>
             </div>
 
-            {/* Unified Glass Container */}
-            <div className="flex-1 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm overflow-hidden flex flex-col">
+            {/* Main Container */}
+            <div className="flex-1 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm overflow-hidden flex flex-col">
 
                 {/* Tabs Header */}
-                <div className="p-4 border-b border-white/10 dark:border-gray-700/30">
-                    <div className="flex space-x-1 bg-white/20 dark:bg-gray-800/50 p-1 rounded-xl border border-white/10 dark:border-gray-700/30 w-fit">
+                <div className="p-4 border-b border-[#E5E2DB]">
+                    <div className="flex space-x-1 bg-[#F8F7F5] p-1 rounded-lg border border-[#E5E2DB] w-fit">
                         {[
                             { id: 'overview', label: 'Overview', icon: LayoutDashboard },
                             { id: 'users', label: 'User Management', icon: Users },
@@ -503,10 +503,10 @@ function AdminDashboardContent() {
                                 key={tab.id}
                                 onClick={() => (tab as any).href ? router.push((tab as any).href) : setActiveTab(tab.id)}
                                 className={cn(
-                                    "px-4 py-2 text-sm font-medium rounded-lg flex items-center gap-2 transition-all",
+                                    "px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 transition-all",
                                     activeTab === tab.id
-                                        ? "bg-white/80 dark:bg-gray-700 text-indigo-600 shadow-sm"
-                                        : "text-gray-600 hover:text-gray-900 hover:bg-white/20 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800/50"
+                                        ? "bg-[#ffffff] text-[#0D9488] shadow-sm"
+                                        : "text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]"
                                 )}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -524,72 +524,72 @@ function AdminDashboardContent() {
                         <div className="space-y-6">
                             {/* Metrics */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm transition-all hover:bg-white/50 dark:hover:bg-gray-800/50">
-                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Cases</h3>
-                                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalCases}</p>
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#F8F7F5]">
+                                    <h3 className="text-sm font-semibold text-[#5C5850]">Total Cases</h3>
+                                    <p className="text-3xl font-bold text-[#1C1A17] mt-2">{stats.totalCases}</p>
                                 </div>
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm transition-all hover:bg-white/50 dark:hover:bg-gray-800/50">
-                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Active Cases</h3>
-                                    <p className="text-3xl font-bold text-blue-700 dark:text-blue-400 mt-2">{stats.activeCases}</p>
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#F8F7F5]">
+                                    <h3 className="text-sm font-semibold text-[#5C5850]">Active Cases</h3>
+                                    <p className="text-3xl font-bold text-[#0D9488] mt-2">{stats.activeCases}</p>
                                 </div>
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm transition-all hover:bg-white/50 dark:hover:bg-gray-800/50">
-                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Users</h3>
-                                    <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-400 mt-2">{stats.totalUsers}</p>
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#F8F7F5]">
+                                    <h3 className="text-sm font-semibold text-[#5C5850]">Total Users</h3>
+                                    <p className="text-3xl font-bold text-[#0D9488] mt-2">{stats.totalUsers}</p>
                                 </div>
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm transition-all hover:bg-white/50 dark:hover:bg-gray-800/50">
-                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Documents</h3>
-                                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalDocuments}</p>
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#F8F7F5]">
+                                    <h3 className="text-sm font-semibold text-[#5C5850]">Documents</h3>
+                                    <p className="text-3xl font-bold text-[#1C1A17] mt-2">{stats.totalDocuments}</p>
                                 </div>
                             </div>
 
                             {/* Operational Intelligence (Phase 1) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Urgency Heatmap */}
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm">
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm">
                                     <div className="mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Case Urgency Heatmap</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Tracks active cases by days since last update</p>
+                                        <h3 className="text-lg font-semibold text-[#1C1A17]">Case Urgency Heatmap</h3>
+                                        <p className="text-xs text-[#8C8880]">Tracks active cases by days since last update</p>
                                     </div>
                                     <UrgencyHeatmap data={intelligence?.urgencyStats ?? null} isLoading={isLoading} />
                                 </div>
 
                                 {/* Program Distribution */}
-                                <div className="bg-white/40 dark:bg-gray-800/40 p-6 rounded-xl border border-white/20 dark:border-gray-700/30 backdrop-blur-sm shadow-sm">
+                                <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm">
                                     <div className="mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Program Distribution</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Active accommodations by program type</p>
+                                        <h3 className="text-lg font-semibold text-[#1C1A17]">Program Distribution</h3>
+                                        <p className="text-xs text-[#8C8880]">Active accommodations by program type</p>
                                     </div>
                                     <ProgramDistribution data={intelligence?.programDistribution ?? null} isLoading={isLoading} />
                                 </div>
                             </div>
 
                             {/* Recent Audit Activity Table */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-                                <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-                                    <h3 className="font-semibold text-gray-900 dark:text-white">Recent System Activity</h3>
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB]">
+                                <div className="p-6 border-b border-[#E5E2DB]">
+                                    <h3 className="font-semibold text-[#1C1A17]">Recent System Activity</h3>
                                 </div>
                                 <table className="w-full text-left font-sm">
-                                    <thead className="bg-gray-50 dark:bg-gray-800/50">
+                                    <thead className="bg-[#F8F7F5]">
                                         <tr>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Time</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">User</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Action</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Entity</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Time</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Entity</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    <tbody className="divide-y divide-[#F3F1EC]">
                                         {recentLogs.map(log => (
-                                            <tr key={log.id}>
-                                                <td className="px-6 py-3 text-sm text-gray-500">
+                                            <tr key={log.id} className="hover:bg-[#F8F7F5] transition-colors">
+                                                <td className="px-6 py-3 text-sm text-[#8C8880]">
                                                     {format(new Date(log.timestamp), 'MMM d, HH:mm')}
                                                 </td>
-                                                <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                                                <td className="px-6 py-3 text-sm font-medium text-[#1C1A17]">
                                                     {log.user?.name || log.userId || 'Unknown'}
                                                 </td>
-                                                <td className="px-6 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                                <td className="px-6 py-3 text-sm text-[#5C5850]">
                                                     {log.action}
                                                 </td>
-                                                <td className="px-6 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                                <td className="px-6 py-3 text-sm text-[#5C5850]">
                                                     {log.entityType}
                                                 </td>
                                             </tr>
@@ -602,7 +602,7 @@ function AdminDashboardContent() {
 
                     {/* CLIENTS TAB */}
                     {activeTab === 'clients' && (
-                        <div className="bg-transparent rounded-xl border border-white/20 dark:border-gray-700/30 p-6 backdrop-blur-sm bg-white/10 dark:bg-gray-800/20">
+                        <div className="bg-[#F8F7F5] rounded-xl border border-[#E5E2DB] p-6">
                             <ClientManagement />
                         </div>
                     )}
@@ -611,7 +611,7 @@ function AdminDashboardContent() {
                     {activeTab === 'users' && (
                         <div className="space-y-4">
                             {/* Role Filter Tabs */}
-                            <div className="flex items-center gap-2 p-1 bg-white/20 dark:bg-gray-800/50 border border-white/10 dark:border-gray-700/30 rounded-lg w-fit">
+                            <div className="flex items-center gap-2 p-1 bg-[#F8F7F5] border border-[#E5E2DB] rounded-lg w-fit">
                                 {[
                                     { id: 'ALL', label: 'All Users' },
                                     { id: 'COORDINATOR', label: 'Coordinators' },
@@ -624,8 +624,8 @@ function AdminDashboardContent() {
                                         className={cn(
                                             "px-4 py-2 text-sm font-medium rounded-md transition-all",
                                             userRoleFilter === role.id
-                                                ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                                                : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                                ? "bg-[#ffffff] text-[#1C1A17] shadow-sm"
+                                                : "text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]"
                                         )}
                                     >
                                         {role.label}
@@ -638,44 +638,44 @@ function AdminDashboardContent() {
                                 ))}
                             </div>
 
-                            <div className="bg-transparent rounded-xl border border-white/20 dark:border-gray-700/30 overflow-hidden">
-                                <div className="p-4 flex items-center justify-between border-b border-white/10 dark:border-gray-700/30 bg-white/20 dark:bg-gray-800/30">
-                                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
+                                <div className="p-4 flex items-center justify-between border-b border-[#E5E2DB] bg-[#F8F7F5]">
+                                    <h3 className="font-semibold text-[#1C1A17]">
                                         {userRoleFilter === 'ALL' ? 'All Users' :
                                             userRoleFilter === 'ADMIN' ? 'Administrators' :
                                                 userRoleFilter === 'AUDITOR' ? 'Auditors' : 'Coordinators'}
                                     </h3>
                                     <button
                                         onClick={() => setIsCreateUserOpen(true)}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-medium transition-colors"
                                     >
                                         <Users className="w-4 h-4" />
                                         Create User
                                     </button>
                                 </div>
                                 <table className="w-full text-left">
-                                    <thead className="bg-white/10 dark:bg-gray-800/30 border-b border-white/10 dark:border-gray-700/30">
+                                    <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
                                         <tr>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">User</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Role</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Last Login</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Actions</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Role</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Status</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Last Login</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    <tbody className="divide-y divide-[#F3F1EC]">
                                         {users
                                             .filter(u => userRoleFilter === 'ALL' || u.role === userRoleFilter)
                                             .map(u => (
-                                                <tr key={u.id} className="hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors border-b border-white/5 dark:border-gray-800/50">
+                                                <tr key={u.id} className="hover:bg-[#F8F7F5] transition-colors">
                                                     <td className="px-6 py-3">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 font-medium">
+                                                            <div className="w-8 h-8 rounded-full bg-[#F3F1EC] flex items-center justify-center text-[#5C5850] font-medium text-sm">
                                                                 {u.name.charAt(0)}
                                                             </div>
                                                             <div>
-                                                                <p className="font-medium text-gray-900 dark:text-white">{u.name}</p>
-                                                                <p className="text-xs text-gray-500">{u.email}</p>
+                                                                <p className="font-medium text-[#1C1A17]">{u.name}</p>
+                                                                <p className="text-xs text-[#8C8880]">{u.email}</p>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -686,7 +686,7 @@ function AdminDashboardContent() {
                                                                 ? "bg-purple-50 text-purple-700 border-purple-200"
                                                                 : u.role === 'AUDITOR'
                                                                     ? "bg-amber-50 text-amber-700 border-amber-200"
-                                                                    : "bg-blue-50 text-blue-700 border-blue-200"
+                                                                    : "bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20"
                                                         )}>
                                                             {u.role}
                                                         </span>
@@ -700,7 +700,7 @@ function AdminDashboardContent() {
                                                             <span className="text-green-600 text-sm font-medium">Active</span>
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-3 text-sm text-gray-500">
+                                                    <td className="px-6 py-3 text-sm text-[#8C8880]">
                                                         {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d, yyyy') : 'Never'}
                                                     </td>
                                                     <td className="px-6 py-3 text-right">
@@ -710,7 +710,7 @@ function AdminDashboardContent() {
                                                                     setEditingUser(u);
                                                                     setIsEditUserOpen(true);
                                                                 }}
-                                                                className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                                                                className="p-1 text-[#8C8880] hover:text-[#0D9488] transition-colors"
                                                                 title="Edit"
                                                             >
                                                                 <Edit2 className="w-4 h-4" />
@@ -719,7 +719,7 @@ function AdminDashboardContent() {
                                                             {u.lockedUntil && new Date(u.lockedUntil) > new Date() ? (
                                                                 <button
                                                                     onClick={() => handleUserAction(u.id, 'unlock')}
-                                                                    className="p-1 text-gray-500 hover:text-green-600 transition-colors"
+                                                                    className="p-1 text-[#8C8880] hover:text-green-600 transition-colors"
                                                                     title="Unlock"
                                                                 >
                                                                     <Unlock className="w-4 h-4" />
@@ -727,7 +727,7 @@ function AdminDashboardContent() {
                                                             ) : (
                                                                 <button
                                                                     onClick={() => handleUserAction(u.id, 'lock')}
-                                                                    className="p-1 text-gray-500 hover:text-orange-600 transition-colors"
+                                                                    className="p-1 text-[#8C8880] hover:text-orange-600 transition-colors"
                                                                     title="Lock"
                                                                 >
                                                                     <Lock className="w-4 h-4" />
@@ -736,7 +736,7 @@ function AdminDashboardContent() {
 
                                                             <button
                                                                 onClick={() => handleDeleteUser(u.id)}
-                                                                className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                                                                className="p-1 text-[#8C8880] hover:text-red-600 transition-colors"
                                                                 title="Delete"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -747,7 +747,7 @@ function AdminDashboardContent() {
                                             ))}
                                         {users.filter(u => userRoleFilter === 'ALL' || u.role === userRoleFilter).length === 0 && (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                                <td colSpan={5} className="px-6 py-12 text-center text-[#8C8880]">
                                                     No users found in this category.
                                                 </td>
                                             </tr>
@@ -762,63 +762,63 @@ function AdminDashboardContent() {
                     {activeTab === 'resources' && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Asset Inventory</h2>
+                                <h2 className="text-xl font-bold text-[#1C1A17]">Asset Inventory</h2>
                                 <button
                                     onClick={() => setIsAddInventoryOpen(true)}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium flex items-center gap-2 shadow-sm transition-all"
+                                    className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] font-medium flex items-center gap-2 shadow-sm transition-all"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add Asset
                                 </button>
                             </div>
 
-                            <div className="bg-transparent rounded-xl shadow-sm border border-white/20 dark:border-gray-700/30 overflow-hidden">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
                                 <table className="w-full text-left text-sm">
-                                    <thead className="bg-white/10 dark:bg-gray-800/30 text-gray-500 font-medium border-b border-white/10 dark:border-gray-700/30">
+                                    <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
                                         <tr>
-                                            <th className="px-6 py-4">Asset Tag</th>
-                                            <th className="px-6 py-4">Name</th>
-                                            <th className="px-6 py-4">Category</th>
-                                            <th className="px-6 py-4">Status</th>
-                                            <th className="px-6 py-4">Assigned To</th>
-                                            <th className="px-6 py-4">Added</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Asset Tag</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Name</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Category</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Status</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Assigned To</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Added</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    <tbody className="divide-y divide-[#F3F1EC]">
                                         {inventory.length === 0 ? (
                                             <tr>
-                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                                                    <Box className="w-12 h-12 mx-auto mb-3 text-gray-200" />
+                                                <td colSpan={6} className="px-6 py-12 text-center text-[#8C8880]">
+                                                    <Box className="w-12 h-12 mx-auto mb-3 text-[#E5E2DB]" />
                                                     No assets found
                                                 </td>
                                             </tr>
                                         ) : (
                                             inventory.map((item: any) => (
-                                                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                    <td className="px-6 py-4 font-mono text-xs font-bold text-gray-500">{item.assetTag}</td>
-                                                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{item.name}</td>
-                                                    <td className="px-6 py-4 text-gray-500">{item.category}</td>
+                                                <tr key={item.id} className="hover:bg-[#F8F7F5] transition-colors">
+                                                    <td className="px-6 py-4 font-mono text-xs font-bold text-[#8C8880]">{item.assetTag}</td>
+                                                    <td className="px-6 py-4 font-medium text-[#1C1A17]">{item.name}</td>
+                                                    <td className="px-6 py-4 text-[#5C5850]">{item.category}</td>
                                                     <td className="px-6 py-4">
                                                         <span className={cn(
                                                             "px-2 py-1 rounded-full text-xs font-semibold border",
                                                             item.status === 'AVAILABLE' ? "bg-green-50 text-green-700 border-green-100" :
-                                                                item.status === 'ASSIGNED' ? "bg-blue-50 text-blue-700 border-blue-100" :
-                                                                    "bg-gray-100 text-gray-700 border-gray-200"
+                                                                item.status === 'ASSIGNED' ? "bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20" :
+                                                                    "bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]"
                                                         )}>
                                                             {item.status}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-gray-500">
+                                                    <td className="px-6 py-4 text-[#5C5850]">
                                                         {item.assignedToUser ? (
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">
+                                                                <div className="w-6 h-6 rounded-full bg-[#0D9488]/10 flex items-center justify-center text-[#0D9488] text-xs font-bold">
                                                                     {item.assignedToUser.name[0]}
                                                                 </div>
                                                                 {item.assignedToUser.name}
                                                             </div>
                                                         ) : '-'}
                                                     </td>
-                                                    <td className="px-6 py-4 text-gray-400 text-xs">
+                                                    <td className="px-6 py-4 text-[#8C8880] text-xs">
                                                         {format(new Date(item.createdAt), 'MMM d, yyyy')}
                                                     </td>
                                                 </tr>
@@ -834,12 +834,12 @@ function AdminDashboardContent() {
                     {activeTab === 'audit' && (
                         <div className="space-y-4">
                             {/* Filters & Actions */}
-                            <div className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 flex flex-col md:flex-row gap-4 items-end">
+                            <div className="bg-[#ffffff] p-4 rounded-xl border border-[#E5E2DB] flex flex-col md:flex-row gap-4 items-end">
                                 <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                                     <div>
-                                        <label className="block text-xs font-semibold text-gray-500 mb-1">User</label>
+                                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">User</label>
                                         <select
-                                            className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                            className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                             value={auditUser}
                                             onChange={e => setAuditUser(e.target.value)}
                                         >
@@ -848,19 +848,19 @@ function AdminDashboardContent() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-gray-500 mb-1">Start Date</label>
+                                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Start Date</label>
                                         <input
                                             type="date"
-                                            className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                            className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                             value={auditStartDate}
                                             onChange={e => setAuditStartDate(e.target.value)}
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-gray-500 mb-1">End Date</label>
+                                        <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">End Date</label>
                                         <input
                                             type="date"
-                                            className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm"
+                                            className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#F8F7F5] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                             value={auditEndDate}
                                             onChange={e => setAuditEndDate(e.target.value)}
                                         />
@@ -883,42 +883,42 @@ function AdminDashboardContent() {
                             </div>
 
                             {/* Table */}
-                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
                                 <table className="w-full text-left">
-                                    <thead className="bg-gray-50 dark:bg-gray-800/50">
+                                    <thead className="bg-[#F8F7F5]">
                                         <tr>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Timestamp</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">User</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Action</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Details</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Timestamp</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
+                                            <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Details</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                    <tbody className="divide-y divide-[#F3F1EC]">
                                         {auditLogs.length > 0 ? auditLogs.map(log => (
-                                            <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                                            <tr key={log.id} className="hover:bg-[#F8F7F5] transition-colors">
+                                                <td className="px-6 py-3 text-sm text-[#8C8880] whitespace-nowrap">
                                                     {format(new Date(log.timestamp), 'MMM d, HH:mm:ss')}
                                                 </td>
-                                                <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                                                <td className="px-6 py-3 text-sm font-medium text-[#1C1A17]">
                                                     {log.user?.name || log.userId || 'Unknown'}
                                                 </td>
                                                 <td className="px-6 py-3">
                                                     <span className={cn("px-2 py-0.5 rounded text-xs font-mono border",
                                                         log.action.includes('DELETE') ? "bg-red-50 text-red-600 border-red-100" :
                                                             log.action.includes('CREATE') ? "bg-green-50 text-green-600 border-green-100" :
-                                                                "bg-gray-100 text-gray-600 border-gray-200"
+                                                                "bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]"
                                                     )}>
                                                         {log.action}
                                                     </span>
-                                                    {log.entityType && <span className="ml-2 text-xs text-gray-400">{log.entityType}</span>}
+                                                    {log.entityType && <span className="ml-2 text-xs text-[#8C8880]">{log.entityType}</span>}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs break-all">
+                                                <td className="px-6 py-4 text-sm text-[#5C5850] max-w-xs break-all">
                                                     {formatAuditDetails(log)}
                                                 </td>
                                             </tr>
                                         )) : (
                                             <tr>
-                                                <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
+                                                <td colSpan={4} className="px-6 py-12 text-center text-[#8C8880]">
                                                     No audit logs found for the selected filters.
                                                 </td>
                                             </tr>
@@ -956,14 +956,13 @@ function AdminDashboardContent() {
                     {activeTab === 'tools' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Time Decoder Widget */}
-                            {/* Time Decoder Widget */}
-                            <div className="bg-white/40 dark:bg-gray-800/40 rounded-xl border border-white/20 dark:border-gray-700/30 p-6 backdrop-blur-sm">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6">
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <Clock className="w-5 h-5 text-indigo-600" />
+                                    <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
+                                        <Clock className="w-5 h-5 text-[#0D9488]" />
                                         Timestamp Decoder
                                     </h3>
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-[#8C8880] mt-1">
                                         Enter a Claim Number (e.g., AA...) or DCN to decode its exact creation timestamp.
                                     </p>
                                 </div>
@@ -974,12 +973,12 @@ function AdminDashboardContent() {
                                         value={lookupQuery}
                                         onChange={(e) => setLookupQuery(e.target.value)}
                                         placeholder="Enter Claim # or DCN..."
-                                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="flex-1 px-4 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                     />
                                     <button
                                         type="submit"
                                         disabled={isLookingUp || !lookupQuery.trim()}
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2"
+                                        className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2 transition-colors"
                                     >
                                         {isLookingUp ? (
                                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -994,31 +993,31 @@ function AdminDashboardContent() {
                                     <div className={cn(
                                         "p-4 rounded-lg border",
                                         lookupResult.success
-                                            ? "bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800"
-                                            : "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800"
+                                            ? "bg-green-50 border-green-200"
+                                            : "bg-red-50 border-red-200"
                                     )}>
                                         {lookupResult.success ? (
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-medium text-gray-500">Type</span>
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white uppercase">
+                                                    <span className="text-sm font-medium text-[#8C8880]">Type</span>
+                                                    <span className="text-sm font-bold text-[#1C1A17] uppercase">
                                                         {lookupResult.type.replace('_', ' ')}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-medium text-gray-500">Creation Time</span>
-                                                    <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                                    <span className="text-sm font-medium text-[#8C8880]">Creation Time</span>
+                                                    <span className="text-sm font-bold text-[#0D9488]">
                                                         {lookupResult.localTime}
                                                     </span>
                                                 </div>
                                                 {lookupResult.details && (
-                                                    <div className="pt-3 border-t border-gray-200 dark:border-gray-700/50">
-                                                        <p className="text-xs font-medium text-gray-500 mb-2">Details:</p>
+                                                    <div className="pt-3 border-t border-[#E5E2DB]">
+                                                        <p className="text-xs font-medium text-[#8C8880] mb-2">Details:</p>
                                                         <div className="grid grid-cols-2 gap-2 text-xs">
                                                             {Object.entries(lookupResult.details).map(([k, v]) => (
                                                                 <div key={k}>
-                                                                    <span className="text-gray-500 capitalize">{k}: </span>
-                                                                    <span className="font-mono text-gray-700 dark:text-gray-300">{String(v)}</span>
+                                                                    <span className="text-[#8C8880] capitalize">{k}: </span>
+                                                                    <span className="font-mono text-[#5C5850]">{String(v)}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1026,7 +1025,7 @@ function AdminDashboardContent() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="flex items-start gap-3 text-red-700 dark:text-red-400">
+                                            <div className="flex items-start gap-3 text-red-700">
                                                 <div className="text-sm">
                                                     <p className="font-bold">Lookup Failed</p>
                                                     <p>{lookupResult.error || lookupResult.message}</p>
@@ -1038,22 +1037,21 @@ function AdminDashboardContent() {
                             </div>
 
                             {/* System Health Widget */}
-                            {/* System Health Widget */}
-                            <div className="bg-white/40 dark:bg-gray-800/40 rounded-xl border border-white/20 dark:border-gray-700/30 p-6 backdrop-blur-sm">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6">
                                 <div className="mb-6 flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
                                             <Activity className="w-5 h-5 text-green-600" />
                                             System Health
                                         </h3>
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        <p className="text-sm text-[#8C8880] mt-1">
                                             Monitor database connectivity and system status.
                                         </p>
                                     </div>
                                     <button
                                         onClick={handleHealthCheck}
                                         disabled={isHealthLoading}
-                                        className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                        className="p-2 text-[#8C8880] hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                     >
                                         <Activity className={cn("w-5 h-5", isHealthLoading && "animate-spin")} />
                                     </button>
@@ -1062,8 +1060,8 @@ function AdminDashboardContent() {
                                 {healthData ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                                <div className="text-xs text-gray-500 uppercase font-medium mb-1">Status</div>
+                                            <div className="p-3 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB]">
+                                                <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Status</div>
                                                 <div className={cn(
                                                     "font-bold",
                                                     healthData.status === 'healthy' ? "text-green-600" : "text-red-600"
@@ -1071,45 +1069,44 @@ function AdminDashboardContent() {
                                                     {healthData.status.toUpperCase()}
                                                 </div>
                                             </div>
-                                            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                                <div className="text-xs text-gray-500 uppercase font-medium mb-1">DB Latency</div>
-                                                <div className="font-mono text-gray-900 dark:text-white">
+                                            <div className="p-3 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB]">
+                                                <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">DB Latency</div>
+                                                <div className="font-mono text-[#1C1A17]">
                                                     {healthData.database?.latency || 'N/A'}
                                                 </div>
                                             </div>
-                                            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                                <div className="text-xs text-gray-500 uppercase font-medium mb-1">Uptime</div>
-                                                <div className="font-mono text-gray-900 dark:text-white">
+                                            <div className="p-3 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB]">
+                                                <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Uptime</div>
+                                                <div className="font-mono text-[#1C1A17]">
                                                     {(healthData.system?.uptime / 3600).toFixed(2)}h
                                                 </div>
                                             </div>
-                                            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                                <div className="text-xs text-gray-500 uppercase font-medium mb-1">Memory</div>
-                                                <div className="font-mono text-gray-900 dark:text-white">
+                                            <div className="p-3 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB]">
+                                                <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Memory</div>
+                                                <div className="font-mono text-[#1C1A17]">
                                                     {healthData.system?.memory?.rss || 'N/A'}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-xs text-gray-400 text-center pt-2 border-t border-gray-100 dark:border-gray-800">
+                                        <div className="text-xs text-[#8C8880] text-center pt-2 border-t border-[#E5E2DB]">
                                             Last checked: {new Date(healthData.timestamp).toLocaleTimeString()}
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8 text-gray-500">
+                                    <div className="text-center py-8 text-[#8C8880]">
                                         Click icon to run system check
                                     </div>
                                 )}
                             </div>
 
                             {/* Encryption Tool Widget */}
-                            {/* Encryption Tool Widget */}
-                            <div className="bg-white/40 dark:bg-gray-800/40 rounded-xl border border-white/20 dark:border-gray-700/30 p-6 md:col-span-2 backdrop-blur-sm">
+                            <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 md:col-span-2">
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <Lock className="w-5 h-5 text-blue-600" />
+                                    <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
+                                        <Lock className="w-5 h-5 text-[#0D9488]" />
                                         Encryption Helper
                                     </h3>
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-[#8C8880] mt-1">
                                         Encrypt or decrypt sensitive data using system keys. Use with caution.
                                     </p>
                                 </div>
@@ -1122,18 +1119,18 @@ function AdminDashboardContent() {
                                                 value={cryptoInput}
                                                 onChange={(e) => setCryptoInput(e.target.value)}
                                                 placeholder="Enter text to process..."
-                                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                className="w-full px-4 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                                             />
                                         </div>
-                                        <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                                        <div className="flex bg-[#F8F7F5] border border-[#E5E2DB] rounded-lg p-1">
                                             <button
                                                 type="button"
                                                 onClick={() => setCryptoMode('encrypt')}
                                                 className={cn(
                                                     "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
                                                     cryptoMode === 'encrypt'
-                                                        ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                                                        : "text-gray-500 hover:text-gray-700"
+                                                        ? "bg-[#ffffff] shadow-sm text-[#0D9488]"
+                                                        : "text-[#5C5850] hover:text-[#1C1A17]"
                                                 )}
                                             >
                                                 Encrypt
@@ -1144,8 +1141,8 @@ function AdminDashboardContent() {
                                                 className={cn(
                                                     "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
                                                     cryptoMode === 'decrypt'
-                                                        ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                                                        : "text-gray-500 hover:text-gray-700"
+                                                        ? "bg-[#ffffff] shadow-sm text-[#0D9488]"
+                                                        : "text-[#5C5850] hover:text-[#1C1A17]"
                                                 )}
                                             >
                                                 Decrypt
@@ -1154,14 +1151,14 @@ function AdminDashboardContent() {
                                         <button
                                             type="submit"
                                             disabled={isCryptoLoading || !cryptoInput.trim()}
-                                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+                                            className="px-6 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 font-medium transition-colors"
                                         >
                                             {isCryptoLoading ? 'Processing...' : 'Process'}
                                         </button>
                                     </div>
 
                                     {cryptoOutput && (
-                                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg font-mono text-sm break-all text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+                                        <div className="mt-4 p-4 bg-[#F8F7F5] rounded-lg font-mono text-sm break-all text-[#1C1A17] border border-[#E5E2DB]">
                                             {cryptoOutput}
                                         </div>
                                     )}
@@ -1169,15 +1166,14 @@ function AdminDashboardContent() {
                             </div>
 
                             {/* Data Retention Widget */}
-                            {/* Data Retention Widget */}
-                            <div className="bg-white/40 dark:bg-gray-800/40 rounded-xl border border-red-200/50 dark:border-red-900/30 p-6 md:col-span-2 backdrop-blur-sm">
+                            <div className="bg-[#ffffff] rounded-xl border border-red-200 p-6 md:col-span-2">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
                                             <Trash2 className="w-5 h-5 text-red-600" />
                                             Data Retention Policy
                                         </h3>
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        <p className="text-sm text-[#8C8880] mt-1">
                                             Manage automated data cleanup tasks.
                                         </p>
                                     </div>
@@ -1186,11 +1182,11 @@ function AdminDashboardContent() {
                                     </span>
                                 </div>
 
-                                <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                                <div className="mt-6 p-4 bg-[#F8F7F5] rounded-lg border border-[#E5E2DB]">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h4 className="font-semibold text-gray-900 dark:text-white">5-Year Message Retention</h4>
-                                            <p className="text-sm text-gray-500 mt-1 max-w-xl">
+                                            <h4 className="font-semibold text-[#1C1A17]">5-Year Message Retention</h4>
+                                            <p className="text-sm text-[#8C8880] mt-1 max-w-xl">
                                                 Enforce the 5-year retention policy by permanently deleting all messages and associated metadata
                                                 created more than 5 years ago from the current timestamp.
                                             </p>
@@ -1228,31 +1224,31 @@ function AdminDashboardContent() {
 
 // Missing Components Stubs
 // Chart Helpers
-const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = ['#0D9488', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 function UrgencyHeatmap({ data, isLoading }: { data: any; isLoading?: boolean }) {
-    if (isLoading) return <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse h-64" />;
-    if (!data || data.length === 0) return <div className="p-4 text-gray-500 text-center bg-gray-50 dark:bg-gray-800 rounded h-64 flex items-center justify-center">No data available</div>;
+    if (isLoading) return <div className="p-4 bg-[#F3F1EC] rounded animate-pulse h-64" />;
+    if (!data || data.length === 0) return <div className="p-4 text-[#8C8880] text-center bg-[#F8F7F5] rounded h-64 flex items-center justify-center">No data available</div>;
 
     return (
-        <div className="h-64 w-full bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl p-2 border border-white/20 dark:border-gray-700/30">
+        <div className="h-64 w-full bg-[#F8F7F5] rounded-xl p-2 border border-[#E5E2DB]">
             <ResponsiveContainer width="100%" height="100%">
                 <RechartsBarChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E2DB" opacity={0.6} />
                     <XAxis
                         dataKey="range"
-                        stroke="#888888"
+                        stroke="#8C8880"
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
                     />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <YAxis stroke="#8C8880" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                     <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff', borderRadius: '0.5rem' }}
-                        itemStyle={{ color: '#fff' }}
-                        cursor={{ fill: 'transparent' }}
+                        contentStyle={{ backgroundColor: '#ffffff', borderColor: '#E5E2DB', color: '#1C1A17', borderRadius: '0.5rem' }}
+                        itemStyle={{ color: '#1C1A17' }}
+                        cursor={{ fill: 'rgba(13,148,136,0.05)' }}
                     />
-                    <Bar dataKey="count" name="Urgent Cases" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" name="Urgent Cases" fill="#0D9488" radius={[4, 4, 0, 0]} />
                 </RechartsBarChart>
             </ResponsiveContainer>
         </div>
@@ -1260,11 +1256,11 @@ function UrgencyHeatmap({ data, isLoading }: { data: any; isLoading?: boolean })
 }
 
 function ProgramDistribution({ data, isLoading }: { data: any; isLoading?: boolean }) {
-    if (isLoading) return <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse h-64" />;
-    if (!data || data.length === 0) return <div className="p-4 text-gray-500 text-center bg-gray-50 dark:bg-gray-800 rounded h-64 flex items-center justify-center">No data available</div>;
+    if (isLoading) return <div className="p-4 bg-[#F3F1EC] rounded animate-pulse h-64" />;
+    if (!data || data.length === 0) return <div className="p-4 text-[#8C8880] text-center bg-[#F8F7F5] rounded h-64 flex items-center justify-center">No data available</div>;
 
     return (
-        <div className="h-64 w-full bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl p-2 border border-white/20 dark:border-gray-700/30">
+        <div className="h-64 w-full bg-[#F8F7F5] rounded-xl p-2 border border-[#E5E2DB]">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
@@ -1273,7 +1269,7 @@ function ProgramDistribution({ data, isLoading }: { data: any; isLoading?: boole
                         cy="50%"
                         innerRadius={60}
                         outerRadius={80}
-                        fill="#8884d8"
+                        fill="#0D9488"
                         paddingAngle={5}
                         dataKey="value"
                     >
@@ -1282,8 +1278,8 @@ function ProgramDistribution({ data, isLoading }: { data: any; isLoading?: boole
                         ))}
                     </Pie>
                     <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#fff', borderRadius: '0.5rem' }}
-                        itemStyle={{ color: '#fff' }}
+                        contentStyle={{ backgroundColor: '#ffffff', borderColor: '#E5E2DB', color: '#1C1A17', borderRadius: '0.5rem' }}
+                        itemStyle={{ color: '#1C1A17' }}
                     />
                     <Legend verticalAlign="bottom" height={36} />
                 </PieChart>
@@ -1299,12 +1295,12 @@ function AddInventoryModal({ isOpen, onClose, onSuccess }: any) {
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-900 border border-white/20 p-6 rounded-2xl shadow-xl max-w-md w-full">
-                <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Add Inventory</h2>
-                <p className="text-gray-500 dark:text-gray-400 mb-4">Inventory form goes here.</p>
+            <div className="bg-[#ffffff] border border-[#E5E2DB] p-6 rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] max-w-md w-full">
+                <h2 className="text-xl font-bold mb-4 text-[#1C1A17]">Add Inventory</h2>
+                <p className="text-[#8C8880] mb-4">Inventory form goes here.</p>
                 <div className="flex justify-end gap-2">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors">Close</button>
-                    <button onClick={() => { onSuccess(); onClose(); }} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium transition-colors shadow-sm">Save (Stub)</button>
+                    <button onClick={onClose} className="px-4 py-2 bg-[#F8F7F5] hover:bg-[#F3F1EC] border border-[#E5E2DB] rounded-lg text-sm font-medium text-[#5C5850] transition-colors">Close</button>
+                    <button onClick={() => { onSuccess(); onClose(); }} className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] text-sm font-medium transition-colors shadow-sm">Save (Stub)</button>
                 </div>
             </div>
         </div>
@@ -1313,7 +1309,7 @@ function AddInventoryModal({ isOpen, onClose, onSuccess }: any) {
 
 export default function AdminDashboard() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>}>
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#F8F7F5]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D9488]"></div></div>}>
             <AdminDashboardContent />
         </Suspense>
     );

@@ -42,6 +42,7 @@ model Tenant {
   messageFolders        MessageFolder[]
   notes                 Note[]
   reminders             Reminder[]
+  reportExportPayments  ReportExportPayment[]
   tasks                 Task[]
   users                 User[]
 
@@ -116,6 +117,7 @@ model User {
   messageFolders         MessageFolder[]
   notes                  Note[]
   reminders              Reminder[]
+  reportExportPayments   ReportExportPayment[]
   assignedTasks          Task[]            @relation("AssignedTo")
   createdTasks           Task[]            @relation("CreatedBy")
   tenant                 Tenant            @relation(fields: [tenantId], references: [id])
@@ -800,6 +802,40 @@ model RateLimit {
   resetAt DateTime
 
   @@index([resetAt])
+}
+
+/// Records a per-export Stripe payment. CC data is NEVER stored — Stripe holds it.
+/// stripePaymentIntentIdEnc is AES-256-GCM encrypted at rest.
+/// exportedAt is updated each time the token is redeemed (within its 5-min TTL).
+model ReportExportPayment {
+  id                        String                   @id @default(cuid())
+  tenantId                  String
+  userId                    String
+  /// AES-256-GCM encrypted Stripe PaymentIntent ID (e.g. pi_3...)
+  stripePaymentIntentIdEnc  String
+  /// Charge in cents (e.g. 500 = $5.00)
+  amountCents               Int
+  /// Estimated print-page count used to calculate the charge
+  pageCount                 Int
+  status                    ReportExportPaymentStatus @default(PENDING)
+  /// Timestamp of the most recent successful download (informational — NOT an access gate)
+  exportedAt                DateTime?
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ReportExportPaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
 }
 
 enum TenantStatus {

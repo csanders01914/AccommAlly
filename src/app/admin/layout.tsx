@@ -53,8 +53,8 @@ export default function AdminLayout({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <div className="flex items-center justify-center min-h-screen bg-[#F8F7F5]">
+                <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
             </div>
         );
     }

@@ -4,20 +4,24 @@ import {
     getComplianceMetrics,
     getFinancialMetrics,
     getTrendMetrics,
-    getWorkflowMetrics
+    getWorkflowMetrics,
 } from '@/lib/reports';
 import { requireAuth } from '@/lib/require-auth';
-import { withTenantScope } from '@/lib/prisma-tenant'; // Assuming auth helper exists, or we check session
+import { withTenantScope } from '@/lib/prisma-tenant';
 import logger from '@/lib/logger';
 
+/**
+ * GET /api/reports?type=compliance|financial|trends|workflow
+ *
+ * Open to all authenticated users — used by the report tab components
+ * for data display. The paid export flow uses /api/reports/export instead.
+ */
 export async function GET(request: NextRequest) {
-    // Check auth - assuming similar pattern to other APIs
     const { session, error } = await requireAuth();
-
     if (error) return error;
 
     const tenantPrisma = withTenantScope(prisma, session.tenantId);
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    void tenantPrisma; // scoped client available if needed by future queries
 
     const searchParams = request.nextUrl.searchParams;
     const type = searchParams.get('type');

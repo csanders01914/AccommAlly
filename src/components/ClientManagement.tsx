@@ -90,15 +90,15 @@ export function ClientManagement() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Client Management</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage the list of clients available for case creation.</p>
+                    <h2 className="text-xl font-semibold text-[#1C1A17]">Client Management</h2>
+                    <p className="text-sm text-[#8C8880] mt-1">Manage the list of clients available for case creation.</p>
                 </div>
             </div>
 
             {/* Add Client Form */}
-            <form onSubmit={handleAddClient} className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex gap-4 items-end">
+            <form onSubmit={handleAddClient} className="bg-[#F8F7F5] p-4 rounded-lg border border-[#E5E2DB] flex gap-4 items-end">
                 <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                         Client Name
                     </label>
                     <input
@@ -106,12 +106,12 @@ export function ClientManagement() {
                         value={newClientName}
                         onChange={(e) => setNewClientName(e.target.value)}
                         placeholder="e.g. Acme Corp"
-                        className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                         required
                     />
                 </div>
                 <div className="w-1/3">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
                         Code (Optional)
                     </label>
                     <input
@@ -119,13 +119,13 @@ export function ClientManagement() {
                         value={newClientCode}
                         onChange={(e) => setNewClientCode(e.target.value)}
                         placeholder="e.g. ACME"
-                        className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
                     />
                 </div>
                 <button
                     type="submit"
                     disabled={isLoading || !newClientName.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     Add Client
@@ -133,29 +133,29 @@ export function ClientManagement() {
             </form>
 
             {message && (
-                <div className={cn("p-3 rounded-md text-sm", message.type === 'success' ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>
+                <div className={cn("p-3 rounded-lg text-sm border", message.type === 'success' ? "bg-green-50 text-green-700 border-green-100" : "bg-red-50 text-red-700 border-red-100")}>
                     {message.text}
                 </div>
             )}
 
             {/* Client List */}
-            <div className="border rounded-lg overflow-hidden border-gray-200 dark:border-gray-700">
+            <div className="rounded-lg overflow-hidden border border-[#E5E2DB]">
                 <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 font-medium border-b border-gray-200 dark:border-gray-700">
+                    <thead className="bg-[#F8F7F5] border-b border-[#E5E2DB]">
                         <tr>
-                            <th className="px-4 py-3">Name</th>
-                            <th className="px-4 py-3">Code</th>
-                            <th className="px-4 py-3 text-right">Status</th>
-                            <th className="px-4 py-3 text-right">Actions</th>
+                            <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Name</th>
+                            <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Code</th>
+                            <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Status</th>
+                            <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                    <tbody className="divide-y divide-[#F3F1EC] bg-[#ffffff]">
                         {clients.length > 0 ? clients.map(client => (
-                            <tr key={client.id}>
-                                <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{client.name}</td>
-                                <td className="px-4 py-3 text-gray-500">{client.code || '-'}</td>
+                            <tr key={client.id} className="hover:bg-[#F8F7F5] transition-colors">
+                                <td className="px-4 py-3 font-medium text-[#1C1A17]">{client.name}</td>
+                                <td className="px-4 py-3 text-[#8C8880]">{client.code || '-'}</td>
                                 <td className="px-4 py-3 text-right">
-                                    <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-xs font-medium", client.active !== false ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300" : "bg-gray-100 text-gray-800")}>
+                                    <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-xs font-medium", client.active !== false ? "bg-green-100 text-green-800" : "bg-[#F3F1EC] text-[#5C5850]")}>
                                         {client.active !== false ? 'Active' : 'Inactive'}
                                     </span>
                                 </td>
@@ -163,7 +163,7 @@ export function ClientManagement() {
                                     <button
                                         onClick={() => handleDeleteClient(client.id)}
                                         disabled={deletingId === client.id}
-                                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                                        className="text-red-600 hover:text-red-700 disabled:opacity-50"
                                         title="Delete Client"
                                     >
                                         {deletingId === client.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -172,7 +172,7 @@ export function ClientManagement() {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">No clients found</td>
+                                <td colSpan={4} className="px-4 py-8 text-center text-[#8C8880]">No clients found</td>
                             </tr>
                         )}
                     </tbody>
