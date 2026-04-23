@@ -286,7 +286,7 @@ export default function EquipmentPage() {
  <ProductImages product={product} />
  
  <div className="p-5 flex-1 flex flex-col">
- <h3 className="font-semibold text-lg text-[#1C1A17] mb-2 line-clamp-2">{product.title}</h3>
+ <h3 className="font-bold text-base text-white mb-1 line-clamp-2">{product.title}</h3>
  <p className="text-[#5C5850] text-sm flex-1 line-clamp-3 mb-6">
  {product.description || 'No description available.'}
  </p>
