@@ -7,7 +7,7 @@ import { getOrCreateCsrfToken, setCsrfCookie } from '@/lib/csrf';
  * Called on page load to bootstrap the double-submit cookie pattern.
  */
 export async function GET() {
-    const token = await getOrCreateCsrfToken();
-    const response = NextResponse.json({ csrfToken: token });
-    return setCsrfCookie(response, token);
+ const token = await getOrCreateCsrfToken();
+ const response = NextResponse.json({ csrfToken: token });
+ return setCsrfCookie(response, token);
 }

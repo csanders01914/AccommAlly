@@ -14,99 +14,99 @@ const AUDITOR_PATHS = ["/auditor"];
  * Generate CSRF token using Web Crypto API (Edge Runtime compatible)
  */
 function generateCsrfToken(): string {
-    const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+ const bytes = new Uint8Array(32);
+ crypto.getRandomValues(bytes);
+ return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function buildCspHeader(nonce: string): string {
-    return [
-        `default-src 'self'`,
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com`,
-        `style-src 'self' 'unsafe-inline'`, // required for Tailwind CSS v4 dynamic styles
-        `img-src 'self' data: blob: https://*.stripe.com`,
-        `font-src 'self' data:`,
-        `connect-src 'self' https://api.stripe.com`,
-        `frame-src https://js.stripe.com https://hooks.stripe.com`,
-        `frame-ancestors 'self'`,
-        `base-uri 'self'`,
-        `form-action 'self'`,
-    ].join('; ');
+ return [
+ `default-src 'self'`,
+ `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com`,
+ `style-src 'self' 'unsafe-inline'`, // required for Tailwind CSS v4 dynamic styles
+ `img-src 'self' data: blob: https://*.stripe.com`,
+ `font-src 'self' data:`,
+ `connect-src 'self' https://api.stripe.com`,
+ `frame-src https://js.stripe.com https://hooks.stripe.com`,
+ `frame-ancestors 'self'`,
+ `base-uri 'self'`,
+ `form-action 'self'`,
+ ].join('; ');
 }
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+ const { pathname } = request.nextUrl;
 
-    // Generate a fresh nonce for every request
-    // Use raw random bytes (not a UUID string) for proper cryptographic entropy
-    const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
-    const cspHeader = buildCspHeader(nonce);
+ // Generate a fresh nonce for every request
+ // Use raw random bytes (not a UUID string) for proper cryptographic entropy
+ const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
+ const cspHeader = buildCspHeader(nonce);
 
-    // Pass nonce to layout via a request header
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-nonce', nonce);
+ // Pass nonce to layout via a request header
+ const requestHeaders = new Headers(request.headers);
+ requestHeaders.set('x-nonce', nonce);
 
-    // Check if path is protected
-    const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
+ // Check if path is protected
+ const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
 
-    if (isProtected) {
-        const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-        const session = token ? await verifyToken(token) : null;
+ if (isProtected) {
+ const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+ const session = token ? await verifyToken(token) : null;
 
-        if (!session) {
-            // Redirect to login with return URL
-            const url = new URL("/", request.url);
-            url.searchParams.set("callbackUrl", pathname);
-            const redirectResponse = NextResponse.redirect(url);
-            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
-            return redirectResponse;
-        }
+ if (!session) {
+ // Redirect to login with return URL
+ const url = new URL("/", request.url);
+ url.searchParams.set("callbackUrl", pathname);
+ const redirectResponse = NextResponse.redirect(url);
+ redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+ return redirectResponse;
+ }
 
-        // Role-based access control
-        const isAdminPath = ADMIN_PATHS.some((path) => pathname.startsWith(path));
-        if (isAdminPath && session.role !== "ADMIN" && session.role !== "SUPER_ADMIN") {
-            const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
-            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
-            return redirectResponse;
-        }
+ // Role-based access control
+ const isAdminPath = ADMIN_PATHS.some((path) => pathname.startsWith(path));
+ if (isAdminPath && session.role !== "ADMIN" && session.role !== "SUPER_ADMIN") {
+ const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+ redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+ return redirectResponse;
+ }
 
-        // Auditor path access control (ADMIN or AUDITOR)
-        const isAuditorPath = AUDITOR_PATHS.some((path) => pathname.startsWith(path));
-        if (isAuditorPath && session.role !== "ADMIN" && session.role !== "AUDITOR") {
-            const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
-            redirectResponse.headers.set('Content-Security-Policy', cspHeader);
-            return redirectResponse;
-        }
-    }
+ // Auditor path access control (ADMIN or AUDITOR)
+ const isAuditorPath = AUDITOR_PATHS.some((path) => pathname.startsWith(path));
+ if (isAuditorPath && session.role !== "ADMIN" && session.role !== "AUDITOR") {
+ const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
+ redirectResponse.headers.set('Content-Security-Policy', cspHeader);
+ return redirectResponse;
+ }
+ }
 
-    const response = NextResponse.next({ request: { headers: requestHeaders } });
+ const response = NextResponse.next({ request: { headers: requestHeaders } });
 
-    // Set CSP on every response
-    response.headers.set('Content-Security-Policy', cspHeader);
+ // Set CSP on every response
+ response.headers.set('Content-Security-Policy', cspHeader);
 
-    // Ensure CSRF cookie is set on every response
-    if (!request.cookies.get(CSRF_COOKIE_NAME)?.value) {
-        response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
-            httpOnly: false, // Must be readable by JavaScript for double-submit
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/',
-            maxAge: SESSION_MAX_AGE_SECONDS,
-        });
-    }
+ // Ensure CSRF cookie is set on every response
+ if (!request.cookies.get(CSRF_COOKIE_NAME)?.value) {
+ response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {
+ httpOnly: false, // Must be readable by JavaScript for double-submit
+ secure: process.env.NODE_ENV === 'production',
+ sameSite: 'strict',
+ path: '/',
+ maxAge: SESSION_MAX_AGE_SECONDS,
+ });
+ }
 
-    return response;
+ return response;
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes — handled by requireAuth server-side)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico|images|public).*)',
-    ],
+ matcher: [
+ /*
+ * Match all request paths except for the ones starting with:
+ * - api (API routes — handled by requireAuth server-side)
+ * - _next/static (static files)
+ * - _next/image (image optimization files)
+ * - favicon.ico (favicon file)
+ */
+ '/((?!api|_next/static|_next/image|favicon.ico|images|public).*)',
+ ],
 };

@@ -9,45 +9,45 @@ import logger from '@/lib/logger';
  * Get Super-Admin session info
  */
 export async function GET(request: NextRequest) {
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
+ try {
+ const cookieStore = await cookies();
+ const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
 
-        const session = await getSuperAdminSession(token);
+ const session = await getSuperAdminSession(token);
 
-        if (!session) {
-            return NextResponse.json(
-                { authenticated: false },
-                { status: 401 }
-            );
-        }
+ if (!session) {
+ return NextResponse.json(
+ { authenticated: false },
+ { status: 401 }
+ );
+ }
 
-        // Verify super admin still exists and is active
-        const superAdmin = await prisma.superAdmin.findUnique({
-            where: { id: session.id },
-            select: { id: true, name: true, email: true, active: true },
-        });
+ // Verify super admin still exists and is active
+ const superAdmin = await prisma.superAdmin.findUnique({
+ where: { id: session.id },
+ select: { id: true, name: true, email: true, active: true },
+ });
 
-        if (!superAdmin || !superAdmin.active) {
-            return NextResponse.json(
-                { authenticated: false },
-                { status: 401 }
-            );
-        }
+ if (!superAdmin || !superAdmin.active) {
+ return NextResponse.json(
+ { authenticated: false },
+ { status: 401 }
+ );
+ }
 
-        return NextResponse.json({
-            authenticated: true,
-            superAdmin: {
-                id: superAdmin.id,
-                name: superAdmin.name,
-                email: superAdmin.email,
-            },
-        });
-    } catch (error) {
-        logger.error({ err: error }, 'Super-Admin session error:');
-        return NextResponse.json(
-            { authenticated: false },
-            { status: 500 }
-        );
-    }
+ return NextResponse.json({
+ authenticated: true,
+ superAdmin: {
+ id: superAdmin.id,
+ name: superAdmin.name,
+ email: superAdmin.email,
+ },
+ });
+ } catch (error) {
+ logger.error({ err: error }, 'Super-Admin session error:');
+ return NextResponse.json(
+ { authenticated: false },
+ { status: 500 }
+ );
+ }
 }

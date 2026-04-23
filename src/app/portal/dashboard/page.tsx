@@ -6,440 +6,440 @@ import { useRouter } from 'next/navigation';
 import { Shield, FileText, Calendar, Clock, LogOut, CheckCircle, Loader2, AlertCircle, RefreshCw, MessageSquare, Send, Download, User } from 'lucide-react';
 
 interface Document {
-    id: string;
-    fileName: string;
-    createdAt: string;
-    category: string;
+ id: string;
+ fileName: string;
+ createdAt: string;
+ category: string;
 }
 
 interface PortalMessage {
-    id: string;
-    subject: string | null;
-    content: string;
-    createdAt: string;
-    direction: 'PORTAL_INBOUND' | 'PORTAL_OUTBOUND';
-    read: boolean;
+ id: string;
+ subject: string | null;
+ content: string;
+ createdAt: string;
+ direction: 'PORTAL_INBOUND' | 'PORTAL_OUTBOUND';
+ read: boolean;
 }
 
 interface CaseData {
-    caseNumber: string;
-    createdAt: string;
-    status: string;
-    clientName: string;
-    updatedAt: string;
-    documents: Document[];
-    createdById: string;
-    createdBy?: { name: string };
+ caseNumber: string;
+ createdAt: string;
+ status: string;
+ clientName: string;
+ updatedAt: string;
+ documents: Document[];
+ createdById: string;
+ createdBy?: { name: string };
 }
 
 export default function PortalDashboard() {
-    const router = useRouter();
-    const [data, setData] = useState<CaseData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+ const router = useRouter();
+ const [data, setData] = useState<CaseData | null>(null);
+ const [loading, setLoading] = useState(true);
+ const [error, setError] = useState<string | null>(null);
 
-    // Messaging state
-    const [messages, setMessages] = useState<PortalMessage[]>([]);
-    const [messagesLoading, setMessagesLoading] = useState(false);
-    const [newMessage, setNewMessage] = useState('');
-    const [messageSubject, setMessageSubject] = useState('');
-    const [sendingMessage, setSendingMessage] = useState(false);
-    const [messageSuccess, setMessageSuccess] = useState<string | null>(null);
-    const [messageError, setMessageError] = useState<string | null>(null);
+ // Messaging state
+ const [messages, setMessages] = useState<PortalMessage[]>([]);
+ const [messagesLoading, setMessagesLoading] = useState(false);
+ const [newMessage, setNewMessage] = useState('');
+ const [messageSubject, setMessageSubject] = useState('');
+ const [sendingMessage, setSendingMessage] = useState(false);
+ const [messageSuccess, setMessageSuccess] = useState<string | null>(null);
+ const [messageError, setMessageError] = useState<string | null>(null);
 
-    // Active tab
-    const [activeTab, setActiveTab] = useState<'status' | 'messages'>('status');
+ // Active tab
+ const [activeTab, setActiveTab] = useState<'status' | 'messages'>('status');
 
-    const fetchData = useCallback(() => {
-        setLoading(true);
-        setError(null);
-        apiFetch('/api/public/portal/status')
-            .then(async (res) => {
-                if (res.ok) return res.json();
-                if (res.status === 401) {
-                    router.push('/portal');
-                    throw new Error('Unauthorized');
-                }
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Failed to load case data');
-            })
-            .then(setData)
-            .catch((err) => {
-                if (err.message !== 'Unauthorized') {
-                    setError(err.message || 'An error occurred while loading your case.');
-                }
-            })
-            .finally(() => setLoading(false));
-    }, [router]);
+ const fetchData = useCallback(() => {
+ setLoading(true);
+ setError(null);
+ apiFetch('/api/public/portal/status')
+ .then(async (res) => {
+ if (res.ok) return res.json();
+ if (res.status === 401) {
+ router.push('/portal');
+ throw new Error('Unauthorized');
+ }
+ const errorData = await res.json().catch(() => ({}));
+ throw new Error(errorData.error || 'Failed to load case data');
+ })
+ .then(setData)
+ .catch((err) => {
+ if (err.message !== 'Unauthorized') {
+ setError(err.message || 'An error occurred while loading your case.');
+ }
+ })
+ .finally(() => setLoading(false));
+ }, [router]);
 
-    const fetchMessages = useCallback(async () => {
-        setMessagesLoading(true);
-        try {
-            const res = await apiFetch('/api/public/portal/messages');
-            if (res.ok) {
-                const data = await res.json();
-                setMessages(data.messages || []);
-            }
-        } catch (e) {
-            console.error('Failed to fetch messages:', e);
-        } finally {
-            setMessagesLoading(false);
-        }
-    }, []);
+ const fetchMessages = useCallback(async () => {
+ setMessagesLoading(true);
+ try {
+ const res = await apiFetch('/api/public/portal/messages');
+ if (res.ok) {
+ const data = await res.json();
+ setMessages(data.messages || []);
+ }
+ } catch (e) {
+ console.error('Failed to fetch messages:', e);
+ } finally {
+ setMessagesLoading(false);
+ }
+ }, []);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+ useEffect(() => {
+ fetchData();
+ }, [fetchData]);
 
-    useEffect(() => {
-        if (activeTab === 'messages') {
-            fetchMessages();
-        }
-    }, [activeTab, fetchMessages]);
+ useEffect(() => {
+ if (activeTab === 'messages') {
+ fetchMessages();
+ }
+ }, [activeTab, fetchMessages]);
 
-    const handleLogout = async () => {
-        await apiFetch('/api/public/portal/logout', { method: 'POST' });
-        router.push('/portal');
-    };
+ const handleLogout = async () => {
+ await apiFetch('/api/public/portal/logout', { method: 'POST' });
+ router.push('/portal');
+ };
 
-    const handleViewDocument = (docId: string) => {
-        window.open(`/api/public/portal/documents/${docId}`, '_blank');
-    };
+ const handleViewDocument = (docId: string) => {
+ window.open(`/api/public/portal/documents/${docId}`, '_blank');
+ };
 
-    const handleSendMessage = async () => {
-        if (!newMessage.trim()) return;
+ const handleSendMessage = async () => {
+ if (!newMessage.trim()) return;
 
-        setSendingMessage(true);
-        setMessageError(null);
-        setMessageSuccess(null);
+ setSendingMessage(true);
+ setMessageError(null);
+ setMessageSuccess(null);
 
-        try {
-            const res = await apiFetch('/api/public/portal/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    subject: messageSubject.trim() || null,
-                    content: newMessage.trim()
-                })
-            });
+ try {
+ const res = await apiFetch('/api/public/portal/messages', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({
+ subject: messageSubject.trim() || null,
+ content: newMessage.trim()
+ })
+ });
 
-            if (res.ok) {
-                setNewMessage('');
-                setMessageSubject('');
-                setMessageSuccess('Message sent successfully!');
-                fetchMessages();
-                setTimeout(() => setMessageSuccess(null), 5000);
-            } else {
-                const data = await res.json();
-                setMessageError(data.error || 'Failed to send message');
-            }
-        } catch (e) {
-            setMessageError('Failed to send message. Please try again.');
-        } finally {
-            setSendingMessage(false);
-        }
-    };
+ if (res.ok) {
+ setNewMessage('');
+ setMessageSubject('');
+ setMessageSuccess('Message sent successfully!');
+ fetchMessages();
+ setTimeout(() => setMessageSuccess(null), 5000);
+ } else {
+ const data = await res.json();
+ setMessageError(data.error || 'Failed to send message');
+ }
+ } catch (e) {
+ setMessageError('Failed to send message. Please try again.');
+ } finally {
+ setSendingMessage(false);
+ }
+ };
 
-    if (loading) return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-        </div>
-    );
+ if (loading) return (
+ <div className="min-h-screen bg-[#FAF6EE] flex items-center justify-center">
+ <Loader2 className="w-8 h-8 text-[#0D9488] animate-spin" />
+ </div>
+ );
 
-    if (error || !data) return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 text-center">
-                <div className="inline-flex p-3 rounded-2xl bg-red-600/30 mb-4 ring-1 ring-red-500/50">
-                    <AlertCircle className="w-8 h-8 text-red-400" />
-                </div>
-                <h2 className="text-xl font-bold text-white mb-2">Unable to Load Case</h2>
-                <p className="text-blue-200/70 text-sm mb-6">
-                    {error || 'We could not retrieve your case information. Please try again or contact support.'}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button
-                        onClick={fetchData}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-                    >
-                        <RefreshCw className="w-4 h-4" /> Try Again
-                    </button>
-                    <button
-                        onClick={() => router.push('/portal')}
-                        className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all"
-                    >
-                        Back to Login
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+ if (error || !data) return (
+ <div className="min-h-screen bg-[#FAF6EE] flex items-center justify-center p-4">
+ <div className="max-w-md w-full bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-3xl p-8 text-center">
+ <div className="inline-flex p-3 rounded-2xl bg-red-50 mb-4 ring-1 ring-red-200">
+ <AlertCircle className="w-8 h-8 text-red-500" />
+ </div>
+ <h2 className="text-xl font-bold text-[#1C1A17] mb-2">Unable to Load Case</h2>
+ <p className="text-[#5C5850] text-sm mb-6">
+ {error || 'We could not retrieve your case information. Please try again or contact support.'}
+ </p>
+ <div className="flex flex-col sm:flex-row gap-3 justify-center">
+ <button
+ onClick={fetchData}
+ className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
+ >
+ <RefreshCw className="w-4 h-4" /> Try Again
+ </button>
+ <button
+ onClick={() => router.push('/portal')}
+ className="px-4 py-2 bg-[#ffffff] border border-[#E5E2DB] hover:bg-[#F3F1EC] text-[#5C5850] font-medium rounded-xl transition-all"
+ >
+ Back to Login
+ </button>
+ </div>
+ </div>
+ </div>
+ );
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'OPEN': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-            case 'APPROVED': return 'text-green-400 bg-green-400/10 border-green-400/20';
-            case 'DENIED': return 'text-red-400 bg-red-400/10 border-red-400/20';
-            default: return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
-        }
-    };
+ const getStatusColor = (status: string) => {
+ switch (status) {
+ case 'OPEN': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
+ case 'APPROVED': return 'text-green-400 bg-green-400/10 border-green-400/20';
+ case 'DENIED': return 'text-red-400 bg-red-400/10 border-red-400/20';
+ default: return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+ }
+ };
 
-    return (
-        <div className="min-h-screen bg-slate-900">
-            {/* Header */}
-            <header className="border-b border-white/10 bg-slate-900/50 backdrop-blur-lg sticky top-0 z-10">
-                <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Shield className="w-6 h-6 text-blue-500" />
-                        <span className="text-white font-bold">AccommAlly Portal</span>
-                    </div>
-                    <button onClick={handleLogout} className="text-sm text-blue-200/70 hover:text-white flex items-center gap-2">
-                        <LogOut className="w-4 h-4" /> Sign Out
-                    </button>
-                </div>
-            </header>
+ return (
+ <div className="min-h-screen bg-[#FAF6EE]">
+ {/* Header */}
+ <header className="border-b border-[#E5E2DB] bg-[#ffffff] sticky top-0 z-10">
+ <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+ <div className="flex items-center gap-3">
+ <Shield className="w-6 h-6 text-[#0D9488]" />
+ <span className="text-[#1C1A17] font-bold">AccommAlly Portal</span>
+ </div>
+ <button onClick={handleLogout} className="text-sm text-[#5C5850] hover:text-[#1C1A17] flex items-center gap-2">
+ <LogOut className="w-4 h-4" /> Sign Out
+ </button>
+ </div>
+ </header>
 
-            {/* Tab Navigation */}
-            <div className="max-w-3xl mx-auto px-4 pt-4">
-                <div className="flex gap-2 bg-white/5 p-1 rounded-xl">
-                    <button
-                        onClick={() => setActiveTab('status')}
-                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === 'status'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-blue-200/70 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <FileText className="w-4 h-4" /> Case Status
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('messages')}
-                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === 'messages'
-                            ? 'bg-blue-600 text-white'
-                            : 'text-blue-200/70 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <MessageSquare className="w-4 h-4" /> Messages
-                    </button>
-                </div>
-            </div>
+ {/* Tab Navigation */}
+ <div className="max-w-3xl mx-auto px-4 pt-4">
+ <div className="flex gap-2 bg-[#ffffff] border border-[#E5E2DB] p-1 rounded-xl shadow-sm w-fit">
+ <button
+ onClick={() => setActiveTab('status')}
+ className={`py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === 'status'
+ ? 'bg-[#0D9488] text-white shadow-sm'
+ : 'text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]'
+ }`}
+ >
+ <FileText className="w-4 h-4" /> Case Status
+ </button>
+ <button
+ onClick={() => setActiveTab('messages')}
+ className={`py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === 'messages'
+ ? 'bg-[#0D9488] text-white shadow-sm'
+ : 'text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]'
+ }`}
+ >
+ <MessageSquare className="w-4 h-4" /> Messages
+ </button>
+ </div>
+ </div>
 
-            <main className="max-w-3xl mx-auto px-4 py-6">
-                {/* STATUS TAB */}
-                {activeTab === 'status' && (
-                    <>
-                        {/* Status Card */}
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                                <div>
-                                    <h1 className="text-2xl font-bold text-white mb-1">Case # {data.caseNumber}</h1>
-                                    <p className="text-blue-200/70 text-sm">Created on {new Date(data.createdAt).toLocaleDateString()}</p>
-                                </div>
-                                <div className={`px-4 py-2 rounded-full border text-sm font-bold flex items-center gap-2 ${getStatusColor(data.status)}`}>
-                                    {data.status === 'APPROVED' ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Clock className="w-4 h-4" aria-hidden="true" />}
-                                    {data.status}
-                                </div>
-                            </div>
+ <main className="max-w-3xl mx-auto px-4 py-6">
+ {/* STATUS TAB */}
+ {activeTab === 'status' && (
+ <>
+ {/* Status Card */}
+ <div className="bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-2xl p-6 mb-8">
+ <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+ <div>
+ <h1 className="text-2xl font-bold text-[#1C1A17] mb-1">Case # {data.caseNumber}</h1>
+ <p className="text-[#5C5850] text-sm">Created on {new Date(data.createdAt).toLocaleDateString()}</p>
+ </div>
+ <div className={`px-4 py-2 rounded-full border text-sm font-bold flex items-center gap-2 ${getStatusColor(data.status)}`}>
+ {data.status === 'APPROVED' ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Clock className="w-4 h-4" aria-hidden="true" />}
+ {data.status}
+ </div>
+ </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-slate-900/50 rounded-xl p-4">
-                                    <p className="text-blue-200/70 text-xs uppercase font-semibold mb-2">Applicant</p>
-                                    <p className="text-white font-medium">{data.clientName}</p>
-                                </div>
-                                <div className="bg-slate-900/50 rounded-xl p-4">
-                                    <p className="text-blue-200/70 text-xs uppercase font-semibold mb-2">Assigned Examiner</p>
-                                    <p className="text-white font-medium">{data.createdBy?.name || 'Pending Assignment'}</p>
-                                </div>
-                                <div className="bg-slate-900/50 rounded-xl p-4">
-                                    <p className="text-blue-200/70 text-xs uppercase font-semibold mb-2">Last Updated</p>
-                                    <p className="text-white font-medium">{new Date(data.updatedAt).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                        </div>
+ <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div className="bg-[#FAF6EE] border border-[#E5E2DB] rounded-xl p-4">
+ <p className="text-[#8C8880] text-xs uppercase font-semibold mb-2">Applicant</p>
+ <p className="text-[#1C1A17] font-medium">{data.clientName}</p>
+ </div>
+ <div className="bg-[#FAF6EE] border border-[#E5E2DB] rounded-xl p-4">
+ <p className="text-[#8C8880] text-xs uppercase font-semibold mb-2">Assigned Examiner</p>
+ <p className="text-[#1C1A17] font-medium">{data.createdBy?.name || 'Pending Assignment'}</p>
+ </div>
+ <div className="bg-[#FAF6EE] border border-[#E5E2DB] rounded-xl p-4">
+ <p className="text-[#8C8880] text-xs uppercase font-semibold mb-2">Last Updated</p>
+ <p className="text-[#1C1A17] font-medium">{new Date(data.updatedAt).toLocaleDateString()}</p>
+ </div>
+ </div>
+ </div>
 
-                        {/* Timeline / Steps */}
-                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-blue-400" aria-hidden="true" /> Process Timeline
-                        </h3>
-                        <ol className="space-y-4 mb-8">
-                            <li><Step completed={true} title="Request Submitted" date={data.createdAt} /></li>
-                            <li><Step completed={data.status !== 'OPEN'} title="Coordinator Review" active={data.status === 'OPEN'} /></li>
-                            <li><Step completed={data.status === 'APPROVED' || data.status === 'DENIED'} title="Decision Made" active={false} /></li>
-                        </ol>
+ {/* Timeline / Steps */}
+ <h3 className="text-lg font-semibold text-[#1C1A17] mb-4 flex items-center gap-2">
+ <Calendar className="w-5 h-5 text-[#0D9488]" aria-hidden="true" /> Process Timeline
+ </h3>
+ <ol className="space-y-4 mb-8">
+ <li><Step completed={true} title="Request Submitted" date={data.createdAt} /></li>
+ <li><Step completed={data.status !== 'OPEN'} title="Coordinator Review" active={data.status === 'OPEN'} /></li>
+ <li><Step completed={data.status === 'APPROVED' || data.status === 'DENIED'} title="Decision Made" active={false} /></li>
+ </ol>
 
-                        {/* Documents */}
-                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-400" aria-hidden="true" /> Documents
-                        </h3>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                            {data.documents && data.documents.length > 0 ? (
-                                <ul className="space-y-3">
-                                    {data.documents.map((doc) => (
-                                        <li key={doc.id} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg hover:bg-slate-800/70 transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded bg-blue-500/20 flex items-center justify-center">
-                                                    <FileText className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-white text-sm font-medium">{doc.fileName}</p>
-                                                    <p className="text-blue-200/70 text-xs">{new Date(doc.createdAt).toLocaleDateString()}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-blue-200/60 font-mono uppercase">{doc.category}</span>
-                                                <button
-                                                    onClick={() => handleViewDocument(doc.id)}
-                                                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                                                    title="View/Download"
-                                                >
-                                                    <Download className="w-4 h-4 text-blue-400" />
-                                                </button>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-blue-200/70 text-center py-4">No documents on file.</p>
-                            )}
-                        </div>
-                    </>
-                )}
+ {/* Documents */}
+ <h3 className="text-lg font-semibold text-[#1C1A17] mb-4 flex items-center gap-2">
+ <FileText className="w-5 h-5 text-[#0D9488]" aria-hidden="true" /> Documents
+ </h3>
+ <div className="bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-2xl p-6">
+ {data.documents && data.documents.length > 0 ? (
+ <ul className="space-y-3">
+ {data.documents.map((doc) => (
+ <li key={doc.id} className="flex items-center justify-between p-3 bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg hover:bg-[#F3F1EC] transition-colors">
+ <div className="flex items-center gap-3">
+ <div className="w-8 h-8 rounded bg-[#0D9488]/10 flex items-center justify-center">
+ <FileText className="w-4 h-4 text-[#0D9488]" aria-hidden="true" />
+ </div>
+ <div>
+ <p className="text-[#1C1A17] text-sm font-medium">{doc.fileName}</p>
+ <p className="text-[#8C8880] text-xs">{new Date(doc.createdAt).toLocaleDateString()}</p>
+ </div>
+ </div>
+ <div className="flex items-center gap-2">
+ <span className="text-xs text-[#5C5850] font-mono uppercase">{doc.category}</span>
+ <button
+ onClick={() => handleViewDocument(doc.id)}
+ className="p-2 hover:bg-[#E5E2DB] rounded-lg transition-colors"
+ title="View/Download"
+ >
+ <Download className="w-4 h-4 text-[#0D9488]" />
+ </button>
+ </div>
+ </li>
+ ))}
+ </ul>
+ ) : (
+ <p className="text-[#5C5850] text-center py-4">No documents on file.</p>
+ )}
+ </div>
+ </>
+ )}
 
-                {/* MESSAGES TAB */}
-                {activeTab === 'messages' && (
-                    <div className="space-y-6">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-                            {/* Messages Header */}
-                            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                                    <MessageSquare className="w-5 h-5 text-blue-400" />
-                                    Messages with Your Examiner
-                                </h3>
-                                <button
-                                    onClick={fetchMessages}
-                                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                                    title="Refresh"
-                                >
-                                    <RefreshCw className={`w-4 h-4 text-blue-300 ${messagesLoading ? 'animate-spin' : ''}`} />
-                                </button>
-                            </div>
+ {/* MESSAGES TAB */}
+ {activeTab === 'messages' && (
+ <div className="space-y-6">
+ <div className="bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-2xl overflow-hidden">
+ {/* Messages Header */}
+ <div className="px-6 py-4 border-b border-[#E5E2DB] bg-[#FAF6EE] flex items-center justify-between">
+ <h3 className="text-lg font-semibold text-[#1C1A17] flex items-center gap-2">
+ <MessageSquare className="w-5 h-5 text-[#0D9488]" />
+ Messages with Your Examiner
+ </h3>
+ <button
+ onClick={fetchMessages}
+ className="p-2 hover:bg-[#E5E2DB] rounded-lg transition-colors"
+ title="Refresh"
+ >
+ <RefreshCw className={`w-4 h-4 text-[#0D9488] ${messagesLoading ? 'animate-spin' : ''}`} />
+ </button>
+ </div>
 
-                            {/* Messages List */}
-                            <div className="max-h-96 overflow-y-auto p-4 space-y-3">
-                                {messagesLoading && messages.length === 0 ? (
-                                    <div className="flex justify-center py-8">
-                                        <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-                                    </div>
-                                ) : messages.length === 0 ? (
-                                    <p className="text-center text-blue-200/60 py-8">
-                                        No messages yet. Send a message to your examiner below.
-                                    </p>
-                                ) : (
-                                    messages.map((msg) => (
-                                        <div
-                                            key={msg.id}
-                                            className={`p-4 rounded-xl shadow-lg ${msg.direction === 'PORTAL_INBOUND'
-                                                ? 'bg-blue-600 border-2 border-blue-400 ml-4'
-                                                : 'bg-emerald-700 border-2 border-emerald-500 mr-4'
-                                                }`}
-                                        >
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${msg.direction === 'PORTAL_INBOUND' ? 'bg-blue-400' : 'bg-emerald-400'
-                                                    }`}>
-                                                    <User className="w-3 h-3 text-slate-900" />
-                                                </div>
-                                                <span className="text-sm font-bold text-white">
-                                                    {msg.direction === 'PORTAL_INBOUND' ? 'You' : 'Examiner'}
-                                                </span>
-                                                <span className="text-xs text-white/80 ml-auto">
-                                                    {new Date(msg.createdAt).toLocaleString()}
-                                                </span>
-                                            </div>
-                                            {msg.subject && (
-                                                <p className="text-sm font-semibold text-white mb-2 border-b border-white/30 pb-2">{msg.subject}</p>
-                                            )}
-                                            <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+ {/* Messages List */}
+ <div className="max-h-96 overflow-y-auto p-4 space-y-3">
+ {messagesLoading && messages.length === 0 ? (
+ <div className="flex justify-center py-8">
+ <Loader2 className="w-6 h-6 text-[#0D9488] animate-spin" />
+ </div>
+ ) : messages.length === 0 ? (
+ <p className="text-center text-[#5C5850] py-8">
+ No messages yet. Send a message to your examiner below.
+ </p>
+ ) : (
+ messages.map((msg) => (
+ <div
+ key={msg.id}
+ className={`p-4 rounded-xl shadow-sm border ${msg.direction === 'PORTAL_INBOUND'
+ ? 'bg-[#ffffff] border-[#E5E2DB] ml-4'
+ : 'bg-[#FAF6EE] border-[#E5E2DB] mr-4'
+ }`}
+ >
+ <div className="flex items-center gap-2 mb-2">
+ <div className={`w-6 h-6 rounded-full flex items-center justify-center ${msg.direction === 'PORTAL_INBOUND' ? 'bg-[#0D9488]/10' : 'bg-[#E5E2DB]'
+ }`}>
+ <User className={`w-3 h-3 ${msg.direction === 'PORTAL_INBOUND' ? 'text-[#0D9488]' : 'text-[#5C5850]'}`} />
+ </div>
+ <span className="text-sm font-bold text-[#1C1A17]">
+ {msg.direction === 'PORTAL_INBOUND' ? 'You' : 'Examiner'}
+ </span>
+ <span className="text-xs text-[#8C8880] ml-auto">
+ {new Date(msg.createdAt).toLocaleString()}
+ </span>
+ </div>
+ {msg.subject && (
+ <p className="text-sm font-semibold text-[#1C1A17] mb-2 border-b border-[#E5E2DB] pb-2">{msg.subject}</p>
+ )}
+ <p className="text-sm text-[#1C1A17] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+ </div>
+ ))
+ )}
+ </div>
 
-                            {/* Compose Message */}
-                            <div className="p-4 border-t border-white/10 space-y-3">
-                                {messageError && (
-                                    <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 p-3 rounded-lg">
-                                        <AlertCircle className="w-4 h-4" />
-                                        {messageError}
-                                    </div>
-                                )}
-                                {messageSuccess && (
-                                    <div className="flex items-center gap-2 text-green-400 text-sm bg-green-500/10 p-3 rounded-lg">
-                                        <CheckCircle className="w-4 h-4" />
-                                        {messageSuccess}
-                                    </div>
-                                )}
+ {/* Compose Message */}
+ <div className="p-4 border-t border-[#E5E2DB] bg-[#FAF6EE] space-y-3">
+ {messageError && (
+ <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+ <AlertCircle className="w-4 h-4" />
+ {messageError}
+ </div>
+ )}
+ {messageSuccess && (
+ <div className="flex items-center gap-2 text-green-700 text-sm bg-green-50 p-3 rounded-lg border border-green-200">
+ <CheckCircle className="w-4 h-4" />
+ {messageSuccess}
+ </div>
+ )}
 
-                                <input
-                                    type="text"
-                                    placeholder="Subject (optional)"
-                                    value={messageSubject}
-                                    onChange={(e) => setMessageSubject(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-blue-200/50 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                />
-                                <div className="flex gap-3">
-                                    <textarea
-                                        placeholder="Type your message to the examiner..."
-                                        value={newMessage}
-                                        onChange={(e) => setNewMessage(e.target.value)}
-                                        rows={3}
-                                        className="flex-1 bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-blue-200/50 outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-                                    />
-                                    <button
-                                        onClick={handleSendMessage}
-                                        disabled={!newMessage.trim() || sendingMessage}
-                                        className="self-end px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-medium rounded-lg transition-all flex items-center gap-2"
-                                    >
-                                        {sendingMessage ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                            <>
-                                                <Send className="w-4 h-4" />
-                                                Send
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </main>
-        </div>
-    );
+ <input
+ type="text"
+ placeholder="Subject (optional)"
+ value={messageSubject}
+ onChange={(e) => setMessageSubject(e.target.value)}
+ className="w-full bg-[#ffffff] border border-[#E5E2DB] rounded-lg px-4 py-2 text-[#1C1A17] placeholder-[#8C8880] outline-none focus:ring-2 focus:ring-[#0D9488] text-sm"
+ />
+ <div className="flex gap-3">
+ <textarea
+ placeholder="Type your message to the examiner..."
+ value={newMessage}
+ onChange={(e) => setNewMessage(e.target.value)}
+ rows={3}
+ className="flex-1 bg-[#ffffff] border border-[#E5E2DB] rounded-lg px-4 py-2 text-[#1C1A17] placeholder-[#8C8880] outline-none focus:ring-2 focus:ring-[#0D9488] resize-none text-sm"
+ />
+ <button
+ onClick={handleSendMessage}
+ disabled={!newMessage.trim() || sendingMessage}
+ className="self-end px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] disabled:bg-[#0D9488]/50 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-2"
+ >
+ {sendingMessage ? (
+ <Loader2 className="w-4 h-4 animate-spin" />
+ ) : (
+ <>
+ <Send className="w-4 h-4" />
+ Send
+ </>
+ )}
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ )}
+ </main>
+ </div>
+ );
 }
 
 interface StepProps {
-    completed: boolean;
-    title: string;
-    date?: string;
-    active?: boolean;
+ completed: boolean;
+ title: string;
+ date?: string;
+ active?: boolean;
 }
 
 function Step({ completed, title, date, active }: StepProps) {
-    return (
-        <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${completed ? 'bg-green-500 border-green-500 text-slate-900' :
-                    active ? 'bg-blue-600 border-blue-600 text-white animate-pulse' :
-                        'border-white/20 text-white/20'
-                    }`}>
-                    {completed ? <CheckCircle className="w-5 h-5" aria-hidden="true" /> : <div className="w-2 h-2 bg-current rounded-full" />}
-                </div>
-                <div className="w-0.5 h-full bg-white/10 min-h-[30px]" />
-            </div>
-            <div className={`pb-8 ${completed || active ? 'opacity-100' : 'opacity-50'}`}>
-                <p className="text-white font-medium">{title}</p>
-                {date && <p className="text-sm text-blue-200/70">{new Date(date).toLocaleDateString()}</p>}
-                {active && <p className="text-sm text-blue-400">In Progress</p>}
-            </div>
-        </div>
-    );
+ return (
+ <div className="flex gap-4">
+ <div className="flex flex-col items-center">
+ <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${completed ? 'bg-green-50 border-green-500 text-green-600' :
+ active ? 'bg-[#0D9488]/10 border-[#0D9488] text-[#0D9488] animate-pulse' :
+ 'border-[#E5E2DB] text-[#E5E2DB]'
+ }`}>
+ {completed ? <CheckCircle className="w-5 h-5" aria-hidden="true" /> : <div className="w-2 h-2 bg-current rounded-full" />}
+ </div>
+ <div className="w-0.5 h-full bg-[#E5E2DB] min-h-[30px]" />
+ </div>
+ <div className={`pb-8 ${completed || active ? 'opacity-100' : 'opacity-60'}`}>
+ <p className="text-[#1C1A17] font-medium">{title}</p>
+ {date && <p className="text-sm text-[#8C8880]">{new Date(date).toLocaleDateString()}</p>}
+ {active && <p className="text-sm text-[#0D9488]">In Progress</p>}
+ </div>
+ </div>
+ );
 }

@@ -9,13 +9,13 @@ import type { SuperAdminSession } from '@/lib/super-admin-auth';
  * Returns the session if valid, null otherwise.
  */
 export async function requireSuperAdmin(): Promise<SuperAdminSession | null> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
-    const session = await getSuperAdminSession(token);
-    if (!session) return null;
-    const admin = await prisma.superAdmin.findUnique({
-        where: { id: session.id },
-        select: { id: true, active: true },
-    });
-    return admin?.active ? session : null;
+ const cookieStore = await cookies();
+ const token = cookieStore.get(SUPER_ADMIN_SESSION_COOKIE_NAME)?.value;
+ const session = await getSuperAdminSession(token);
+ if (!session) return null;
+ const admin = await prisma.superAdmin.findUnique({
+ where: { id: session.id },
+ select: { id: true, active: true },
+ });
+ return admin?.active ? session : null;
 }

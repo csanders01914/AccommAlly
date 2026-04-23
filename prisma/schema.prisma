@@ -50,6 +50,7 @@ model Tenant {
   reportExportPayments  ReportExportPayment[]
   tasks                 Task[]
   users                 User[]
+  consultationRequests  ConsultationRequest[]
 
   @@index([slug])
   @@index([status])
@@ -127,6 +128,7 @@ model User {
   reportExportPayments   ReportExportPayment[]
   assignedTasks          Task[]            @relation("AssignedTo")
   createdTasks           Task[]            @relation("CreatedBy")
+  consultationRequests   ConsultationRequest[]
   tenant                 Tenant            @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
@@ -301,6 +303,7 @@ model Accommodation {
   isLongTerm          Boolean             @default(false)
   startDate           DateTime
   endDate             DateTime?
+  decisionLogic       Json?
   estimatedCost       Decimal?            @db.Decimal(10, 2)
   actualCost          Decimal?            @db.Decimal(10, 2)
   reviewDate          DateTime?
@@ -942,4 +945,65 @@ model MessageAttachment {
   createdAt DateTime @default(now())
 
   @@index([messageId])
+}
+
+/// Global Suggested Equipment / Affiliate Products
+model AffiliateProduct {
+  id          String                  @id @default(cuid())
+  title       String
+  description String?
+  productUrl  String
+  category    String?
+  price       Decimal?                @db.Decimal(10, 2)
+  order       Int                     @default(0)
+  active      Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  images      AffiliateProductImage[]
+
+  @@index([active])
+  @@index([order])
+}
+
+model AffiliateProductImage {
+  id        String           @id @default(cuid())
+  productId String
+  fileName  String
+  fileType  String
+  fileData  Bytes
+  order     Int              @default(0)
+  createdAt DateTime         @default(now())
+  
+  product   AffiliateProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([productId])
+  @@index([order])
+}
+
+/// Request for ADA professional consultation
+model ConsultationRequest {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  userId              String
+  name                String
+  phoneNumber         String
+  availability        String
+  description         String
+  status              String   @default("PENDING") // PENDING, SUBMITTED
+  isEnterpriseSkipped Boolean  @default(false)
+  
+  // AES-256-GCM encrypted Stripe PaymentIntent ID
+  stripePaymentIntentIdEnc String?
+  amountCents         Int?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenant              Tenant   @relation(fields: [tenantId], references: [id])
+  user                User     @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
 }

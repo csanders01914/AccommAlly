@@ -9,20 +9,20 @@ import logger from '@/lib/logger';
  * Returns template names/ids for the current tenant. No file data.
  */
 export async function GET() {
-    try {
-        const { session, error } = await requireAuth();
-        if (error) return error;
+ try {
+ const { session, error } = await requireAuth();
+ if (error) return error;
 
-        const tenantPrisma = withTenantScope(prisma, session.tenantId);
+ const tenantPrisma = withTenantScope(prisma, session.tenantId);
 
-        const templates = await tenantPrisma.documentTemplate.findMany({
-            select: { id: true, name: true, description: true },
-            orderBy: { name: 'asc' },
-        });
+ const templates = await tenantPrisma.documentTemplate.findMany({
+ select: { id: true, name: true, description: true },
+ orderBy: { name: 'asc' },
+ });
 
-        return NextResponse.json({ templates });
-    } catch (err) {
-        logger.error({ err: err }, 'GET /api/document-templates error:');
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
+ return NextResponse.json({ templates });
+ } catch (err) {
+ logger.error({ err: err }, 'GET /api/document-templates error:');
+ return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+ }
 }

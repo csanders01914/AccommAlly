@@ -5,14 +5,14 @@ import { SubscriptionPage } from '@/components/subscription/SubscriptionPage';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-    title: 'Subscription — AccommAlly',
-    description: 'Manage your AccommAlly subscription plan and billing.',
+ title: 'Subscription — AccommAlly',
+ description: 'Manage your AccommAlly subscription plan and billing.',
 };
 
 export default async function AdminSubscriptionPage() {
-    const session = await getSession();
-    if (!session) redirect('/login');
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role as string)) redirect('/dashboard');
+ const session = await getSession();
+ if (!session) redirect('/login');
+ if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role as string)) redirect('/dashboard');
 
-    return <SubscriptionPage currentUserId={session.id as string} />;
+ return <SubscriptionPage currentUserId={session.id as string} />;
 }

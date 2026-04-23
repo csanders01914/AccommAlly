@@ -1,9 +1,9 @@
 // Session & auth
 export const SESSION_DURATION = '8h';
-export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;           // 8 hours
-export const PORTAL_SESSION_MAX_AGE_SECONDS = 60 * 60;         // 1 hour
+export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 hours
+export const PORTAL_SESSION_MAX_AGE_SECONDS = 60 * 60; // 1 hour
 export const SUPER_ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 4; // 4 hours
-export const ACCOUNT_LOCKOUT_DURATION_SECONDS = 15 * 60;       // 15 min lockout after failed logins
+export const ACCOUNT_LOCKOUT_DURATION_SECONDS = 15 * 60; // 15 min lockout after failed logins
 
 // Cookie names
 export const SESSION_COOKIE_NAME = 'session_token';
@@ -31,3 +31,14 @@ export const RATE_LIMIT_SUPER_ADMIN_MAX = 5;
 // Pagination
 export const DEFAULT_PAGE_SIZE = 50;
 export const MAX_PAGE_SIZE = 200;
+
+// Equipment
+export const EQUIPMENT_CATEGORIES = [
+ "Auditory/Hearing",
+ "Visual",
+ "Mobility/Ergonomics",
+ "Cognitive/Focus",
+ "Software/Digital",
+ "Accessories",
+ "Other"
+];

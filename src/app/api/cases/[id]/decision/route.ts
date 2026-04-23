@@ -7,56 +7,56 @@ import { format, addDays } from 'date-fns';
 import logger from '@/lib/logger';
 
 export async function POST(
-    request: NextRequest,
-    context: { params: Promise<{ id: string }> } // Corrected types for Next.js 15
+ request: NextRequest,
+ context: { params: Promise<{ id: string }> } // Corrected types for Next.js 15
 ) {
-    try {
-        const { session, error } = await requireAuth();
+ try {
+ const { session, error } = await requireAuth();
 
-        if (error) return error;
+ if (error) return error;
 
-        const tenantPrisma = withTenantScope(prisma, session.tenantId);
-        if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-        }
+ const tenantPrisma = withTenantScope(prisma, session.tenantId);
+ if (!session || (session.role !== 'ADMIN' && session.role !== 'COORDINATOR')) {
+ return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+ }
 
-        const { id } = await context.params;
-        const body = await request.json();
-        const { type, missingInfo, reason } = body as { type: DecisionType; missingInfo?: string; reason?: string };
+ const { id } = await context.params;
+ const body = await request.json();
+ const { type, missingInfo, reason } = body as { type: DecisionType; missingInfo?: string; reason?: string };
 
-        if (!type) {
-            return NextResponse.json({ error: 'Type is required' }, { status: 400 });
-        }
+ if (!type) {
+ return NextResponse.json({ error: 'Type is required' }, { status: 400 });
+ }
 
-        // Fetch Case Data
-        const kase = await prisma.case.findUnique({
-            where: { id },
-            include: {
-                accommodations: true
-            }
-        });
+ // Fetch Case Data
+ const kase = await prisma.case.findUnique({
+ where: { id },
+ include: {
+ accommodations: true
+ }
+ });
 
-        if (!kase) {
-            return NextResponse.json({ error: 'Case not found' }, { status: 404 });
-        }
+ if (!kase) {
+ return NextResponse.json({ error: 'Case not found' }, { status: 404 });
+ }
 
-        // Prepare Data for Template
-        const templateData: Record<string, string> = {
-            clientName: kase.clientName,
-            caseNumber: kase.caseNumber,
-            accommodations: kase.accommodations.map((a: { type: string; description: string }) => `- ${a.type}: ${a.description}`).join('\n') || 'None specified',
-            reason: reason || '[Reason not provided]',
-            missingInfo: missingInfo || '[Details not provided]',
-            dueDate: format(addDays(new Date(), 10), 'MMM d, yyyy') // Default 10 days out
-        };
+ // Prepare Data for Template
+ const templateData: Record<string, string> = {
+ clientName: kase.clientName,
+ caseNumber: kase.caseNumber,
+ accommodations: kase.accommodations.map((a: { type: string; description: string }) => `- ${a.type}: ${a.description}`).join('\n') || 'None specified',
+ reason: reason || '[Reason not provided]',
+ missingInfo: missingInfo || '[Details not provided]',
+ dueDate: format(addDays(new Date(), 10), 'MMM d, yyyy') // Default 10 days out
+ };
 
-        // Generate Content
-        const generated = fillTemplate(type, templateData);
+ // Generate Content
+ const generated = fillTemplate(type, templateData);
 
-        return NextResponse.json(generated);
+ return NextResponse.json(generated);
 
-    } catch (error) {
-        logger.error({ err: error }, 'Decision Gen Error:');
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    }
+ } catch (error) {
+ logger.error({ err: error }, 'Decision Gen Error:');
+ return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+ }
 }
