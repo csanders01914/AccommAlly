@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     take: 5,
   });
 
-  const record = pendingRecords.find((r) => {
+  const record = pendingRecords.find((r: (typeof pendingRecords)[number]) => {
     try {
       return decrypt(r.stripePaymentIntentIdEnc) === paymentIntentId;
     } catch {
