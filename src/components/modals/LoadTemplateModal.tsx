@@ -13,8 +13,8 @@ interface LoadTemplateModalProps {
  cases: Case[];
 }
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const selectCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const selectCls = 'form-input';
 
 export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: LoadTemplateModalProps) {
  const [templates, setTemplates] = useState<Template[]>([]);
@@ -47,13 +47,13 @@ export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: Load
 
  return (
  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-md overflow-hidden">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- <FileText className="w-4 h-4 text-[#0D9488]" /> Load Template
+ <div className="modal-container w-full max-w-md overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+ <FileText className="w-4 h-4 text-primary-500" /> Load Template
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -62,16 +62,16 @@ export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: Load
  <div>
  <label className={labelCls}>Template</label>
  {loadingTemplates ? (
- <p className="text-sm text-[#8C8880]">Loading…</p>
+ <p className="text-sm text-text-muted">Loading…</p>
  ) : templates.length === 0 ? (
- <p className="text-sm text-[#8C8880]">No templates available for this account.</p>
+ <p className="text-sm text-text-muted">No templates available for this account.</p>
  ) : (
  <select value={selectedTemplateId} onChange={e => setSelectedTemplateId(e.target.value)} className={selectCls}>
  <option value="">Select a template…</option>
  {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
  </select>
  )}
- {selectedTemplateId && (() => { const sel = templates.find(t => t.id === selectedTemplateId); return sel?.description ? <p className="text-xs text-[#8C8880] mt-1">{sel.description}</p> : null; })()}
+ {selectedTemplateId && (() => { const sel = templates.find(t => t.id === selectedTemplateId); return sel?.description ? <p className="text-xs text-text-muted mt-1">{sel.description}</p> : null; })()}
  </div>
  {!linkedCaseId && (
  <div>
@@ -84,9 +84,9 @@ export function LoadTemplateModal({ onClose, onLoad, linkedCaseId, cases }: Load
  )}
  </div>
 
- <div className="px-6 py-4 border-t border-[#E5E2DB] bg-[#FAF6EE] flex justify-end gap-3">
- <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">Cancel</button>
- <button onClick={handleLoad} disabled={applying || loadingTemplates} className="px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 transition-colors">
+ <div className="px-6 py-4 border-t border-border bg-background flex justify-end gap-3">
+ <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">Cancel</button>
+ <button onClick={handleLoad} disabled={applying || loadingTemplates} className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50 transition-colors">
  {applying ? 'Loading…' : 'Load Template'}
  </button>
  </div>

@@ -32,7 +32,7 @@ export function FinancialTab() {
  .finally(() => setLoading(false));
  }, []);
 
- if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-blue-500" /></div>;
+ if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-primary-500" /></div>;
  if (!data) return <div>Failed to load data</div>;
 
  const totalSpend = data.internalExternal.reduce((acc, curr) => acc + curr.value, 0);
@@ -42,26 +42,26 @@ export function FinancialTab() {
 
  {/* Summary Cards */}
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Spend</p>
- <h3 className="text-2xl font-bold mt-1 text-gray-800 dark:text-white">${totalSpend.toLocaleString()}</h3>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <p className="text-sm font-medium text-text-secondary">Total Spend</p>
+ <h3 className="text-2xl font-bold mt-1 text-text-primary">${totalSpend.toLocaleString()}</h3>
  </div>
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Cost Center</p>
- <h3 className="text-lg font-bold mt-1 truncate text-gray-800 dark:text-white">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <p className="text-sm font-medium text-text-secondary">Top Cost Center</p>
+ <h3 className="text-lg font-bold mt-1 truncate text-text-primary">
  {data.costByJobFamily.sort((a, b) => b.value - a.value)[0]?.name || 'N/A'}
  </h3>
  </div>
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Potential Tax Credits</p>
- <h3 className="text-2xl font-bold mt-1 text-gray-800 dark:text-white">{data.taxCreditEligible.length} <span className="text-xs font-normal text-gray-500">items</span></h3>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <p className="text-sm font-medium text-text-secondary">Potential Tax Credits</p>
+ <h3 className="text-2xl font-bold mt-1 text-text-primary">{data.taxCreditEligible.length} <span className="text-xs font-normal text-text-muted">items</span></h3>
  </div>
  </div>
 
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  {/* Cost Analysis Chart */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
  <TrendingUp className="h-5 w-5 text-green-500" />
  Cost by Job Family
  </h3>
@@ -82,9 +82,9 @@ export function FinancialTab() {
  </div>
 
  {/* Internal vs External */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
- <PieChartIcon className="h-5 w-5 text-purple-500" />
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
+ <PieChartIcon className="h-5 w-5 text-primary-500" />
  Internal vs External Spend
  </h3>
  <div className="h-[300px] w-full flex items-center justify-center">
@@ -115,16 +115,16 @@ export function FinancialTab() {
  </div>
 
  {/* Tax Credit Table */}
- <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden ">
- <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+ <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
+ <div className="p-6 border-b border-border">
  <h3 className="text-lg font-semibold flex items-center gap-2">
- <DollarSign className="h-5 w-5 text-blue-500" />
+ <DollarSign className="h-5 w-5 text-primary-500" />
  Potential Tax Credit Eligibility (Disabled Access Credit)
  </h3>
  </div>
  <div className="overflow-x-auto">
  <table className="w-full text-left text-sm">
- <thead className="bg-white/20 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
+ <thead className="bg-white/20 /50 text-text-secondary">
  <tr>
  <th className="px-6 py-3 font-medium">Type</th>
  <th className="px-6 py-3 font-medium">Description</th>
@@ -135,8 +135,8 @@ export function FinancialTab() {
  {data.taxCreditEligible.map((item) => (
  <tr key={item.id} className="hover:bg-white/20 dark:hover:bg-gray-800/30">
  <td className="px-6 py-4 font-medium">{item.type.replace(/_/g, ' ')}</td>
- <td className="px-6 py-4 text-gray-500 truncate max-w-xs">{item.description}</td>
- <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">${Number(item.actualCost).toLocaleString()}</td>
+ <td className="px-6 py-4 text-text-muted truncate max-w-xs">{item.description}</td>
+ <td className="px-6 py-4 font-medium text-text-primary">${Number(item.actualCost).toLocaleString()}</td>
  </tr>
  ))}
  </tbody>

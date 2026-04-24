@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe, StripeCardElementOptions } from '@stripe/stripe-js';
 import { X, Lock, ShieldCheck, CreditCard, Loader2, CheckCircle2 } from 'lucide-react';
@@ -43,7 +43,7 @@ interface PaymentModalProps {
 export function PaymentModal({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
  return (
  <div
- className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 "
+ className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
  onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
  role="dialog"
  aria-modal="true"
@@ -88,9 +88,14 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
  const [clientSecret, setClientSecret] = useState<string | null>(null);
  const [status, setStatus] = useState<'idle' | 'loading-intent' | 'ready' | 'processing' | 'success' | 'error'>('loading-intent');
  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+ // Guard against React StrictMode double-invoke and rapid modal close/reopen
+ const intentCreated = useRef(false);
 
- // Create PaymentIntent on mount
+ // Create PaymentIntent once per mount — the server will reuse any recent
+ // pending intent or cancel stale ones before issuing a fresh one.
  useEffect(() => {
+ if (intentCreated.current) return;
+ intentCreated.current = true;
  const create = async () => {
  try {
  const data = await apiFetchJSON<{ clientSecret: string }>(
@@ -110,6 +115,7 @@ function CheckoutForm({ priceInfo, onSuccess, onClose }: PaymentModalProps) {
  const handlePay = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!stripe || !elements || !clientSecret) return;
+ if (status === 'processing' || status === 'success') return;
 
  setStatus('processing');
  setErrorMsg(null);

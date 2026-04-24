@@ -1,7 +1,5 @@
-// Reading file first before removing state to ensure correct context
-
 import { useState, useEffect } from 'react';
-import { User, LogOut, FileText, ChevronLeft, Save, Lock, Bell, Shield, Building, Plus } from 'lucide-react';
+import { User, LogOut, FileText, ChevronLeft, Save, Lock, Bell, Shield } from 'lucide-react';
 import { apiFetch } from '@/lib/api-client';
 
 interface UserSettingsPageProps {
@@ -192,9 +190,9 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  };
 
  return (
- <div className="bg-gray-50 dark:bg-gray-950 h-full">
+ <div className="bg-background h-full">
  {/* Header */}
- <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
+ <header className="bg-surface border-b border-border sticky top-0 z-20">
  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
  <div className="flex items-center justify-between h-16">
  <div className="flex items-center gap-3">
@@ -202,7 +200,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
  <FileText className="w-5 h-5 text-white" />
  </div>
- <span className="font-bold text-xl text-gray-900 dark:text-white">Settings</span>
+ <span className="font-bold text-xl text-text-primary">Settings</span>
  </div>
  </div>
  </div>
@@ -216,7 +214,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  onClick={() => setActiveTab('profile')}
  className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'profile'
  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
- : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+ : 'text-text-secondary hover:bg-surface-raised  dark:hover:bg-gray-800'
  }`}
  >
  <User className="w-4 h-4" />
@@ -226,7 +224,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  onClick={() => setActiveTab('security')}
  className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'security'
  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
- : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+ : 'text-text-secondary hover:bg-surface-raised  dark:hover:bg-gray-800'
  }`}
  >
  <Lock className="w-4 h-4" />
@@ -236,7 +234,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  onClick={() => setActiveTab('preferences')}
  className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === 'preferences'
  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
- : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
+ : 'text-text-secondary hover:bg-surface-raised  dark:hover:bg-gray-800'
  }`}
  >
  <Bell className="w-4 h-4" />
@@ -247,7 +245,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  </nav>
 
  {/* Content Area */}
- <div className="flex-1 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+ <div className="flex-1 bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
  <div className="p-6 sm:p-8">
  {message && (
  <div className={`mb-6 p-4 rounded-lg text-sm ${message.type === 'success'
@@ -260,49 +258,49 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
  {activeTab === 'profile' && (
  <form onSubmit={handleSave} className="space-y-6 max-w-lg">
- <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Profile Information</h2>
+ <h2 className="text-lg font-semibold text-text-primary mb-6">Profile Information</h2>
 
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Full Name
  </label>
  <input
  type="text"
  value={name}
  onChange={(e) => setName(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  required
  />
  </div>
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Username
  </label>
  <input
  type="text"
  value={username}
  onChange={(e) => setUsername(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  />
  </div>
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Email Address
  </label>
  <input
  type="email"
  value={email}
  onChange={(e) => setEmail(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  required
  />
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Pronouns
  </label>
  <input
@@ -310,7 +308,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  value={pronouns}
  onChange={(e) => setPronouns(e.target.value)}
  placeholder="e.g. they/them"
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  />
  </div>
 
@@ -318,7 +316,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <button
  type="submit"
  disabled={isLoading}
- className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+ className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
  >
  <Save className="w-4 h-4" />
  Save Changes
@@ -331,17 +329,17 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <div className="space-y-8">
  {/* 2FA Section */}
  <div>
- <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Two-Factor Authentication</h2>
- <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 border border-gray-200 dark:border-gray-800">
+ <h2 className="text-lg font-semibold text-text-primary mb-4">Two-Factor Authentication</h2>
+ <div className="bg-surface-raised rounded-lg p-6 border border-border">
  <div className="flex items-start justify-between mb-6">
  <div>
  <div className="flex items-center gap-2 mb-1">
- <Shield className={`w-5 h-5 ${twoFactorEnabled ? 'text-green-600' : 'text-gray-400'}`} />
- <span className="font-medium text-gray-900 dark:text-white">
+ <Shield className={`w-5 h-5 ${twoFactorEnabled ? 'text-green-600' : 'text-text-muted'}`} />
+ <span className="font-medium text-text-primary">
  {twoFactorEnabled ? '2FA is Enabled' : '2FA is Disabled'}
  </span>
  </div>
- <p className="text-sm text-gray-500 dark:text-gray-400">
+ <p className="text-sm text-text-muted">
  Protect your account by requiring an additional code when logging in.
  </p>
  </div>
@@ -358,7 +356,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <button
  onClick={handleEnable2FA}
  disabled={isLoading}
- className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+ className="px-4 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors"
  >
  Setup 2FA
  </button>
@@ -368,25 +366,25 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
  {/* Setup Flow */}
  {!twoFactorEnabled && setupStep === 'qr' && (
- <div className="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+ <div className="space-y-6 border-t border-border pt-6">
  <div className="grid md:grid-cols-2 gap-8">
  <div className="space-y-4">
- <p className="text-sm text-gray-600 dark:text-gray-300">
+ <p className="text-sm text-text-secondary">
  1. Scan this QR code with your authenticator app (Google Authenticator, Authy, etc).
  </p>
  {qrCode && (
- <div className="p-4 bg-white rounded-lg inline-block border border-gray-200">
+ <div className="p-4 bg-white rounded-lg inline-block border border-border">
  {/* eslint-disable-next-line @next/next/no-img-element */}
  <img src={qrCode} alt="2FA QR Code" className="w-40 h-40" />
  </div>
  )}
- <div className="text-xs text-gray-500 font-mono bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">
+ <div className="text-xs text-text-muted font-mono bg-surface-raised p-2 rounded break-all">
  Secret: {secret}
  </div>
  </div>
 
  <div className="space-y-4">
- <p className="text-sm text-gray-600 dark:text-gray-300">
+ <p className="text-sm text-text-secondary">
  2. Enter the 6-digit code from your app to verify.
  </p>
  <div className="flex gap-2">
@@ -395,7 +393,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  value={token}
  onChange={(e) => setToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
  placeholder="000000"
- className="w-32 px-4 py-2 text-center tracking-widest text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-32 px-4 py-2 text-center tracking-widest text-lg border border-border-strong rounded-lg bg-surface text-text-primary"
  />
  <button
  onClick={handleVerify2FA}
@@ -405,7 +403,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  Verify & Enable
  </button>
  </div>
- <p className="text-xs text-gray-500">
+ <p className="text-xs text-text-muted">
  Can&apos;t scan? Enter the secret key manually in your app.
  </p>
  </div>
@@ -415,7 +413,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
 
  {/* Success / Recovery Codes */}
  {((twoFactorEnabled && setupStep === 'success') || showRecoveryCodes) && (
- <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+ <div className="mt-6 border-t border-border pt-6">
  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-900/50">
  <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
  Save your Recovery Codes!
@@ -424,9 +422,9 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  If you lose access to your device, these codes are the only way to access your account.
  Store them somewhere safe.
  </p>
- <div className="grid grid-cols-2 gap-2 font-mono text-sm bg-white dark:bg-gray-900 p-4 rounded border border-yellow-100 dark:border-yellow-900/30">
+ <div className="grid grid-cols-2 gap-2 font-mono text-sm bg-surface p-4 rounded border border-yellow-100 dark:border-yellow-900/30">
  {recoveryCodes.map((code, i) => (
- <div key={i} className="text-gray-600 dark:text-gray-400 select-all p-1">
+ <div key={i} className="text-text-secondary select-all p-1">
  {code}
  </div>
  ))}
@@ -448,44 +446,44 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  </div>
  </div>
 
- <form onSubmit={handlePasswordChange} className="space-y-6 max-w-lg border-t border-gray-200 dark:border-gray-800 pt-8">
- <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Change Password</h2>
+ <form onSubmit={handlePasswordChange} className="space-y-6 max-w-lg border-t border-border pt-8">
+ <h2 className="text-lg font-semibold text-text-primary">Change Password</h2>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Current Password
  </label>
  <input
  type="password"
  value={currentPassword}
  onChange={(e) => setCurrentPassword(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  required
  />
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  New Password
  </label>
  <input
  type="password"
  value={newPassword}
  onChange={(e) => setNewPassword(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  required
  />
  </div>
 
  <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+ <label className="block text-sm font-medium text-text-secondary mb-1">
  Confirm New Password
  </label>
  <input
  type="password"
  value={confirmPassword}
  onChange={(e) => setConfirmPassword(e.target.value)}
- className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+ className="w-full px-4 py-2 border border-border-strong rounded-lg bg-surface text-text-primary"
  required
  />
  </div>
@@ -494,7 +492,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <button
  type="submit"
  disabled={isLoading}
- className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+ className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
  >
  <Save className="w-4 h-4" />
  Update Password
@@ -508,12 +506,12 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <div className="space-y-8 max-w-lg">
  {/* Notifications */}
  <div>
- <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notifications</h2>
+ <h2 className="text-lg font-semibold text-text-primary mb-4">Notifications</h2>
  <div className="space-y-4">
  <div className="flex items-center justify-between">
  <div>
- <p className="font-medium text-gray-900 dark:text-white">Email Notifications</p>
- <p className="text-sm text-gray-500">Receive updates about your cases via email</p>
+ <p className="font-medium text-text-primary">Email Notifications</p>
+ <p className="text-sm text-text-muted">Receive updates about your cases via email</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -522,13 +520,13 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  onChange={(e) => setNotifications({ ...notifications, email: e.target.checked })}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-strong after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
  </label>
  </div>
  <div className="flex items-center justify-between">
  <div>
- <p className="font-medium text-gray-900 dark:text-white">SMS Notifications</p>
- <p className="text-sm text-gray-500">Receive urgent alerts via text message</p>
+ <p className="font-medium text-text-primary">SMS Notifications</p>
+ <p className="text-sm text-text-muted">Receive urgent alerts via text message</p>
  </div>
  <label className="relative inline-flex items-center cursor-pointer">
  <input
@@ -537,7 +535,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  onChange={(e) => setNotifications({ ...notifications, sms: e.target.checked })}
  className="sr-only peer"
  />
- <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+ <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-strong after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
  </label>
  </div>
  </div>
@@ -547,7 +545,7 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  <button
  onClick={handleSave}
  disabled={isLoading}
- className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+ className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
  >
  <Save className="w-4 h-4" />
  Save Preferences
@@ -562,121 +560,5 @@ export function UserSettingsPage({ user, onUpdateUser }: UserSettingsPageProps) 
  </div>
  </main >
  </div >
- );
-}
-
-function OrganizationSettings() {
- const [loading, setLoading] = useState(true);
- const [primaryColor, setPrimaryColor] = useState('#6366f1');
- const [secondaryColor, setSecondaryColor] = useState('#a855f7');
- const [saving, setSaving] = useState(false);
- const [message, setMessage] = useState('');
-
- useEffect(() => {
- const fetchSettings = async () => {
- try {
- const res = await apiFetch('/api/tenant/settings');
- if (res.ok) {
- const data = await res.json();
- if (data.settings) {
- setPrimaryColor(data.settings.branding?.primaryColor || '#6366f1');
- setSecondaryColor(data.settings.branding?.secondaryColor || '#a855f7');
- }
- }
- } catch (e) {
- console.error('Failed to load settings', e);
- } finally {
- setLoading(false);
- }
- };
- fetchSettings();
- }, []);
-
- const handleSave = async () => {
- setSaving(true);
- setMessage('');
-
- try {
- const newSettings = {
- branding: {
- primaryColor,
- secondaryColor
- }
- };
-
- const res = await apiFetch('/api/tenant/settings', {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ settings: newSettings })
- });
-
- if (!res.ok) throw new Error('Failed to update');
-
- setMessage('Organization branding updated!');
- setTimeout(() => setMessage(''), 3000);
- } catch (e) {
- setMessage('Error saving settings');
- } finally {
- setSaving(false);
- }
- };
-
- if (loading) return <div className="text-center py-8">Loading...</div>;
-
- return (
- <div className="space-y-6 max-w-lg">
- <div>
- <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Organization Branding</h2>
- <p className="text-sm text-gray-500 mb-6">Customize the look and feel of AccommAlly for your organization.</p>
-
- <div className="space-y-6">
- <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
- Primary Color
- </label>
- <div className="flex items-center gap-3">
- <input
- type="color"
- value={primaryColor}
- onChange={(e) => setPrimaryColor(e.target.value)}
- className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0"
- />
- <span className="font-mono text-sm text-gray-500">{primaryColor}</span>
- </div>
- </div>
-
- <div>
- <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
- Secondary Color
- </label>
- <div className="flex items-center gap-3">
- <input
- type="color"
- value={secondaryColor}
- onChange={(e) => setSecondaryColor(e.target.value)}
- className="h-10 w-10 rounded cursor-pointer bg-transparent border-none p-0"
- />
- <span className="font-mono text-sm text-gray-500">{secondaryColor}</span>
- </div>
- </div>
-
- <div className="pt-4 flex items-center gap-4">
- <button
- onClick={handleSave}
- disabled={saving}
- className="btn-primary flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
- >
- <Save className="w-4 h-4" />
- {saving ? 'Saving...' : 'Save Branding'}
- </button>
- {message && (
- <span className={`text-sm ${message.includes('Error') ? 'text-red-500' : 'text-green-600'}`}>
- {message}
- </span>
- )}
- </div>
- </div>
- </div>
- </div>
  );
 }

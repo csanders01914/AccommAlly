@@ -193,18 +193,18 @@ export function AnnotationThreadPanel({
  const isDeleted = comment.deleted;
 
  return (
- <div key={comment.id} className={`${isReply ? 'ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-3' : ''} py-2`}>
+ <div key={comment.id} className={`${isReply ? 'ml-6 border-l-2 border-border  pl-3' : ''} py-2`}>
  <div className="flex items-start justify-between gap-2">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
+ <span className="text-xs font-semibold text-text-secondary truncate">
  {comment.createdBy.name}
  </span>
- <span className="text-xs text-gray-400 flex-shrink-0">
+ <span className="text-xs text-text-muted flex-shrink-0">
  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
  </span>
  {locked && !isDeleted && (
- <Lock className="w-3 h-3 text-gray-400 flex-shrink-0" aria-label="Locked — cannot be edited" />
+ <Lock className="w-3 h-3 text-text-muted flex-shrink-0" aria-label="Locked — cannot be edited" />
  )}
  </div>
 
@@ -213,27 +213,27 @@ export function AnnotationThreadPanel({
  <textarea
  value={editText}
  onChange={e => setEditText(e.target.value)}
- className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
+ className="w-full text-sm border border-border-strong rounded px-2 py-1 bg-surface text-text-primary resize-none focus:outline-none focus:ring-1 focus:ring-primary-500"
  rows={3}
  />
  <div className="flex gap-1">
  <button
  onClick={() => saveEdit(comment.id, isReply)}
  disabled={isSubmitting || !editText.trim()}
- className="text-xs px-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+ className="text-xs px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50"
  >
  Save
  </button>
  <button
  onClick={() => setEditingId(null)}
- className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300"
+ className="text-xs px-2 py-1 bg-gray-200 text-text-secondary rounded hover:bg-gray-300"
  >
  Cancel
  </button>
  </div>
  </div>
  ) : (
- <p className={`text-sm ${isDeleted ? 'italic text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}>
+ <p className={`text-sm ${isDeleted ? 'italic text-text-muted' : 'text-text-primary '}`}>
  {comment.content}
  </p>
  )}
@@ -243,14 +243,14 @@ export function AnnotationThreadPanel({
  <div className="flex gap-1 flex-shrink-0">
  <button
  onClick={() => startEdit(comment.id, comment.content)}
- className="p-1 text-gray-400 hover:text-indigo-600 rounded"
+ className="p-1 text-text-muted hover:text-primary-500 rounded"
  title="Edit"
  >
  <Pencil className="w-3.5 h-3.5" />
  </button>
  <button
  onClick={() => deleteComment(comment.id, isReply)}
- className="p-1 text-gray-400 hover:text-red-500 rounded"
+ className="p-1 text-text-muted hover:text-red-500 rounded"
  title="Delete"
  >
  <Trash2 className="w-3.5 h-3.5" />
@@ -263,17 +263,17 @@ export function AnnotationThreadPanel({
  }
 
  return (
- <div className="absolute right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 shadow-xl flex flex-col z-30">
+ <div className="absolute right-0 top-0 h-full w-80 bg-surface border-l border-border shadow-xl flex flex-col z-30">
  {/* Header */}
- <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+ <div className="flex items-center justify-between px-4 py-3 border-b border-border">
  <div className="flex items-center gap-2">
- <MessageSquare className="w-4 h-4 text-indigo-600" />
- <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+ <MessageSquare className="w-4 h-4 text-primary-500" />
+ <span className="text-sm font-semibold text-text-primary">
  {root ? 'Thread' : 'New Note'}
  </span>
  </div>
- <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
- <X className="w-4 h-4 text-gray-500" />
+ <button onClick={onClose} className="p-1 hover:bg-surface-raised dark:hover:bg-gray-800 rounded">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -289,12 +289,12 @@ export function AnnotationThreadPanel({
  {root.replies.map(reply => renderComment(reply, true))}
  </>
  ) : (
- <p className="text-xs text-gray-400 italic">Add the first note below.</p>
+ <p className="text-xs text-text-muted italic">Add the first note below.</p>
  )}
  </div>
 
  {/* Input */}
- <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+ <div className="border-t border-border px-4 py-3">
  {!root ? (
  <div className="space-y-2">
  <textarea
@@ -302,14 +302,14 @@ export function AnnotationThreadPanel({
  value={inputText}
  onChange={e => setInputText(e.target.value)}
  placeholder="Write a note..."
- className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
+ className="w-full text-sm border border-border-strong rounded px-2 py-1 bg-surface text-text-primary resize-none focus:outline-none focus:ring-1 focus:ring-primary-500"
  rows={3}
  onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitNewRoot(); }}
  />
  <button
  onClick={submitNewRoot}
  disabled={isSubmitting || !inputText.trim()}
- className="w-full flex items-center justify-center gap-1 text-xs px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+ className="w-full flex items-center justify-center gap-1 text-xs px-3 py-1.5 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50"
  >
  <Send className="w-3 h-3" /> Save Note
  </button>
@@ -320,14 +320,14 @@ export function AnnotationThreadPanel({
  value={replyText}
  onChange={e => setReplyText(e.target.value)}
  placeholder="Reply..."
- className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
+ className="w-full text-sm border border-border-strong rounded px-2 py-1 bg-surface text-text-primary resize-none focus:outline-none focus:ring-1 focus:ring-primary-500"
  rows={2}
  onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitReply(); }}
  />
  <button
  onClick={submitReply}
  disabled={isSubmitting || !replyText.trim()}
- className="w-full flex items-center justify-center gap-1 text-xs px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+ className="w-full flex items-center justify-center gap-1 text-xs px-3 py-1.5 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50"
  >
  <Send className="w-3 h-3" /> Reply
  </button>

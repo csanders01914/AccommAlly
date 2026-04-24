@@ -93,7 +93,7 @@ function ToolbarBtn({
  'p-1.5 rounded transition-colors',
  active
  ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
- : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700',
+ : 'text-text-secondary  hover:bg-surface-raised dark:hover:bg-gray-700',
  disabled && 'opacity-40 cursor-not-allowed',
  )}
  >
@@ -103,7 +103,7 @@ function ToolbarBtn({
 }
 
 function Divider() {
- return <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-0.5 self-center" />;
+ return <div className="w-px h-5 bg-gray-200 mx-0.5 self-center" />;
 }
 
 function FontFamilyPicker({ editor }: { editor: ReturnType<typeof useEditor> }) {
@@ -137,14 +137,14 @@ function FontFamilyPicker({ editor }: { editor: ReturnType<typeof useEditor> }) 
  <button
  type="button"
  onMouseDown={e => { e.preventDefault(); setOpen(v => !v); }}
- className="flex items-center gap-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[90px] max-w-[120px]"
+ className="flex items-center gap-1 px-2 py-1 text-xs border border-border rounded hover:bg-surface-raised dark:hover:bg-gray-700 min-w-[90px] max-w-[120px]"
  style={{ fontFamily: current || 'inherit' }}
  >
  <span className="truncate flex-1 text-left">{current || 'Font'}</span>
  <ChevronDown className="w-3 h-3 flex-shrink-0" />
  </button>
  {open && (
- <div className="absolute top-full left-0 z-50 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
+ <div className="absolute top-full left-0 z-50 mt-1 w-48 bg-surface border border-border rounded shadow-lg">
  <input
  type="text"
  value={input}
@@ -154,7 +154,7 @@ function FontFamilyPicker({ editor }: { editor: ReturnType<typeof useEditor> }) 
  if (e.key === 'Escape') setOpen(false);
  }}
  placeholder="Type font name…"
- className="w-full px-2 py-1.5 text-xs border-b border-gray-200 dark:border-gray-700 bg-transparent outline-none dark:text-white"
+ className="w-full px-2 py-1.5 text-xs border-b border-border bg-transparent outline-none dark:text-white"
  autoFocus
  />
  <div className="max-h-48 overflow-y-auto">
@@ -164,7 +164,7 @@ function FontFamilyPicker({ editor }: { editor: ReturnType<typeof useEditor> }) 
  type="button"
  onMouseDown={e => { e.preventDefault(); apply(f); }}
  className={cn(
- 'w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200',
+ 'w-full text-left px-3 py-1.5 text-xs hover:bg-surface-raised dark:hover:bg-gray-700 ',
  current === f && 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300',
  )}
  style={{ fontFamily: f }}
@@ -208,26 +208,26 @@ function FontSizePicker({ editor }: { editor: ReturnType<typeof useEditor> }) {
  <button
  type="button"
  onMouseDown={e => { e.preventDefault(); step(-1); }}
- className="px-1 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 text-sm leading-none"
+ className="px-1 text-text-muted hover:text-text-primary dark:hover:text-gray-100 text-sm leading-none"
  title="Decrease font size"
  >−</button>
  <button
  type="button"
  onMouseDown={e => { e.preventDefault(); setOpen(v => !v); }}
- className="w-10 text-center text-xs border border-gray-200 dark:border-gray-700 rounded px-1 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200"
+ className="w-10 text-center text-xs border border-border rounded px-1 py-1 hover:bg-surface-raised dark:hover:bg-gray-700"
  title="Font size"
  >
  {current}
  </button>
  {open && (
- <div className="absolute top-full left-0 z-50 mt-1 w-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
+ <div className="absolute top-full left-0 z-50 mt-1 w-14 bg-surface border border-border rounded shadow-lg">
  {SIZE_PRESETS.map(s => (
  <button
  key={s}
  type="button"
  onMouseDown={e => { e.preventDefault(); apply(s); }}
  className={cn(
- 'w-full text-center px-2 py-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200',
+ 'w-full text-center px-2 py-1 text-xs hover:bg-surface-raised dark:hover:bg-gray-700 ',
  current === s && 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300',
  )}
  >
@@ -239,7 +239,7 @@ function FontSizePicker({ editor }: { editor: ReturnType<typeof useEditor> }) {
  <button
  type="button"
  onMouseDown={e => { e.preventDefault(); step(1); }}
- className="px-1 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 text-sm leading-none"
+ className="px-1 text-text-muted hover:text-text-primary dark:hover:text-gray-100 text-sm leading-none"
  title="Increase font size"
  >+</button>
  </div>
@@ -285,7 +285,7 @@ function LinkButton({ editor }: { editor: ReturnType<typeof useEditor> }) {
  <Link2 className="w-4 h-4" />
  </ToolbarBtn>
  {open && (
- <div className="absolute top-full left-0 z-50 mt-1 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg flex gap-1 min-w-[240px]">
+ <div className="absolute top-full left-0 z-50 mt-1 p-2 bg-surface border border-border rounded shadow-lg flex gap-1 min-w-[240px]">
  <input
  type="url"
  value={url}
@@ -295,13 +295,13 @@ function LinkButton({ editor }: { editor: ReturnType<typeof useEditor> }) {
  if (e.key === 'Escape') setOpen(false);
  }}
  placeholder="https://..."
- className="flex-1 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent outline-none dark:text-white"
+ className="flex-1 px-2 py-1 text-xs border border-border rounded bg-transparent outline-none dark:text-white"
  autoFocus
  />
  <button
  type="button"
  onClick={apply}
- className="px-2 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700"
+ className="px-2 py-1 text-xs bg-primary-500 text-white rounded hover:bg-primary-600"
  >
  Apply
  </button>
@@ -432,14 +432,14 @@ export function RichTextEditor({
  }
 
  return (
- <div className={cn('border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden dark:bg-gray-800', className)}>
+ <div className={cn('border border-border  rounded-lg overflow-hidden ', className)}>
  {/* Hidden file inputs */}
  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageFileChange} />
  <input ref={attachInputRef} type="file" multiple className="hidden" onChange={handleAttachFiles} />
 
  {/* Toolbar */}
  {editor && (
- <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+ <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-border bg-surface-raised /50">
  <FontFamilyPicker editor={editor} />
  <FontSizePicker editor={editor} />
  <Divider />
@@ -484,7 +484,7 @@ export function RichTextEditor({
  <textarea
  value={sourceHtml}
  onChange={e => setSourceHtml(e.target.value)}
- className="w-full p-3 text-xs font-mono bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 outline-none resize-none"
+ className="w-full p-3 text-xs font-mono bg-surface text-text-primary outline-none resize-none"
  style={{ minHeight }}
  spellCheck={false}
  />

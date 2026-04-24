@@ -21,19 +21,19 @@ interface Task {
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
  PENDING: { bg: 'bg-amber-50', text: 'text-amber-700' },
- IN_PROGRESS: { bg: 'bg-blue-50', text: 'text-blue-700' },
- COMPLETED: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
- CANCELLED: { bg: 'bg-[#F3F1EC]', text: 'text-[#8C8880]' },
+ IN_PROGRESS: { bg: 'bg-primary-50', text: 'text-primary-600' },
+ COMPLETED: { bg: 'bg-success/10', text: 'text-success' },
+ CANCELLED: { bg: 'bg-surface-raised', text: 'text-text-muted' },
 };
 
 const PRIORITY_DOT: Record<string, string> = {
  HIGH: 'bg-red-500',
  MEDIUM: 'bg-amber-400',
- LOW: 'bg-emerald-500',
+ LOW: 'bg-success',
 };
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const fieldCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const fieldCls = 'w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors';
 
 export function TaskDetailModal({
  task,
@@ -76,14 +76,14 @@ export function TaskDetailModal({
 
  return (
  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
+ <div className="modal-container w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
  <div className="flex items-center gap-2.5">
- <div className={cn('w-2.5 h-2.5 rounded-full', PRIORITY_DOT[task.priority] ?? 'bg-[#8C8880]')} />
- <h3 className="text-base font-semibold text-[#1C1A17]">Task Details</h3>
+ <div className={cn('w-2.5 h-2.5 rounded-full', PRIORITY_DOT[task.priority] ?? 'bg-text-muted')} />
+ <h3 className="text-base font-semibold text-text-primary">Task Details</h3>
  </div>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -125,34 +125,34 @@ export function TaskDetailModal({
  ) : (
  <>
  <div>
- <h4 className="text-base font-semibold text-[#1C1A17]">{task.title}</h4>
- {task.description && <p className="text-sm text-[#5C5850] mt-1">{task.description}</p>}
+ <h4 className="text-base font-semibold text-text-primary">{task.title}</h4>
+ {task.description && <p className="text-sm text-text-secondary mt-1">{task.description}</p>}
  </div>
  <div className="flex flex-wrap gap-2">
  <span className={cn('text-xs px-2.5 py-1 rounded-full font-medium', statusConfig.bg, statusConfig.text)}>
  {task.status.replace('_', ' ')}
  </span>
- <span className="text-xs px-2.5 py-1 rounded-full bg-[#F3F1EC] text-[#5C5850]">
+ <span className="text-xs px-2.5 py-1 rounded-full bg-surface-raised text-text-secondary">
  {task.priority} Priority
  </span>
- <span className="text-xs px-2.5 py-1 rounded-full bg-[#F3F1EC] text-[#5C5850]">
+ <span className="text-xs px-2.5 py-1 rounded-full bg-surface-raised text-text-secondary">
  {task.category}
  </span>
  </div>
- <div className="space-y-2 text-sm text-[#5C5850]">
+ <div className="space-y-2 text-sm text-text-secondary">
  <div className="flex items-center gap-2">
- <Calendar className="w-4 h-4 text-[#8C8880] flex-shrink-0" />
+ <Calendar className="w-4 h-4 text-text-muted flex-shrink-0" />
  Due: {format(new Date(task.dueDate), 'MMMM d, yyyy')}
  </div>
  {task.case && (
  <div className="flex items-center gap-2">
- <Briefcase className="w-4 h-4 text-[#8C8880] flex-shrink-0" />
+ <Briefcase className="w-4 h-4 text-text-muted flex-shrink-0" />
  Case: {task.case.caseNumber} — {task.case.clientName}
  </div>
  )}
  {task.assignedTo && (
  <div className="flex items-center gap-2">
- <User className="w-4 h-4 text-[#8C8880] flex-shrink-0" />
+ <User className="w-4 h-4 text-text-muted flex-shrink-0" />
  Assigned to: {task.assignedTo.name}
  </div>
  )}
@@ -161,19 +161,19 @@ export function TaskDetailModal({
  )}
  </div>
 
- <div className="px-6 py-4 border-t border-[#E5E2DB] bg-[#FAF6EE] flex gap-2">
+ <div className="px-6 py-4 border-t border-border bg-background flex gap-2">
  {isEditing ? (
  <>
- <button onClick={() => setIsEditing(false)} className="flex-1 px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] border border-[#E5E2DB] bg-[#ffffff] rounded-lg transition-colors">
+ <button onClick={() => setIsEditing(false)} className="flex-1 px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised border border-border bg-surface rounded-lg transition-colors">
  Cancel
  </button>
- <button onClick={handleSave} disabled={loading} className="flex-1 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 transition-colors">
+ <button onClick={handleSave} disabled={loading} className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50 transition-colors">
  {loading ? 'Saving…' : 'Save'}
  </button>
  </>
  ) : (
  <>
- <button onClick={() => setIsEditing(true)} className="flex-1 px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] border border-[#E5E2DB] bg-[#ffffff] rounded-lg flex items-center justify-center gap-2 transition-colors">
+ <button onClick={() => setIsEditing(true)} className="flex-1 px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised border border-border bg-surface rounded-lg flex items-center justify-center gap-2 transition-colors">
  <Edit2 className="w-4 h-4" /> Edit
  </button>
  <button
@@ -181,7 +181,7 @@ export function TaskDetailModal({
  className={cn('flex-1 px-4 py-2 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors',
  task.status === 'COMPLETED'
  ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
- : 'bg-[#0D9488] text-[#ffffff] hover:bg-[#0F766E]'
+ : 'bg-primary-500 text-white hover:bg-primary-600'
  )}
  >
  <CheckCircle className="w-4 h-4" />

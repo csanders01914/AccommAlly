@@ -18,11 +18,11 @@ const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#6366F1', '#EC4899', '#8B5CF6'
 
 export function ProgramDistribution({ data, isLoading }: ProgramDistributionProps) {
  if (isLoading) {
- return <div className="h-64 flex items-center justify-center"><Loader2 className="animate-spin text-gray-400" /></div>;
+ return <div className="h-64 flex items-center justify-center"><Loader2 className="animate-spin text-text-muted" /></div>;
  }
 
  if (!data || data.length === 0) {
- return <div className="h-64 flex items-center justify-center text-gray-500">No program data</div>;
+ return <div className="h-64 flex items-center justify-center text-text-muted">No program data</div>;
  }
 
  return (

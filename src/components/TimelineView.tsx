@@ -56,14 +56,14 @@ export function TimelineView({ caseId }: TimelineViewProps) {
  }, [caseId]);
 
  if (isLoading) {
- return <div className="p-8 text-center text-gray-500">Loading timeline...</div>;
+ return <div className="p-8 text-center text-text-muted">Loading timeline...</div>;
  }
 
  if (events.length === 0) {
  return (
- <div className="p-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
- <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
- <p className="text-gray-500">No activity recorded for this case yet.</p>
+ <div className="p-12 text-center border-2 border-dashed border-border rounded-xl">
+ <Clock className="w-12 h-12 text-text-muted mx-auto mb-3" />
+ <p className="text-text-muted">No activity recorded for this case yet.</p>
  </div>
  );
  }
@@ -83,7 +83,7 @@ export function TimelineView({ caseId }: TimelineViewProps) {
  case 'CREATE': return 'bg-green-100 text-green-700 border-green-200';
  case 'UPDATE': return 'bg-blue-100 text-blue-700 border-blue-200';
  case 'DELETE': return 'bg-red-100 text-red-700 border-red-200';
- default: return 'bg-gray-100 text-gray-700 border-gray-200';
+ default: return 'bg-surface-raised text-text-secondary border-border';
  }
  };
 
@@ -98,23 +98,23 @@ export function TimelineView({ caseId }: TimelineViewProps) {
  </div>
 
  {/* Content Card */}
- <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+ <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-surface p-4 rounded-xl border border-border shadow-sm">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
  <div className="flex items-center gap-2">
  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${getActionColor(event.action)}`}>
  {event.action}
  </span>
- <span className="font-semibold text-gray-900 dark:text-white text-sm">
+ <span className="font-semibold text-text-primary text-sm">
  {event.entityType}
  </span>
  </div>
- <time className="text-xs text-gray-500 font-mono">
+ <time className="text-xs text-text-muted font-mono">
  {format(new Date(event.timestamp), 'MMM d, h:mm a')}
  </time>
  </div>
 
 
- <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+ <div className="text-sm text-text-secondary mt-2">
  {event.entityType === 'Note' && event.action === 'CREATE' ? (
  <span className="italic">"Added a new note..."</span>
  ) : (
@@ -124,19 +124,19 @@ export function TimelineView({ caseId }: TimelineViewProps) {
 
  {/* Detailed Field Changes */}
  {event.raw && event.raw.field && (
- <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 text-xs border border-gray-100 dark:border-gray-800">
- <span className="block text-gray-400 uppercase tracking-wider text-[10px] mb-1 font-semibold">
+ <div className="mt-3 bg-surface-raised rounded-lg p-2 text-xs border border-border">
+ <span className="block text-text-muted uppercase tracking-wider text-[10px] mb-1 font-semibold">
  {event.raw.field} Change
  </span>
  <div className="grid grid-cols-2 gap-4">
- <div className="border-r border-gray-200 dark:border-gray-700 pr-2">
- <span className="block text-gray-400 mb-0.5">From</span>
+ <div className="border-r border-border pr-2">
+ <span className="block text-text-muted mb-0.5">From</span>
  <span className="text-red-500 line-through decoration-red-500/50 block truncate" title={event.raw.oldValue || 'Empty'}>
  {event.raw.oldValue || <span className="italic opacity-50">Empty</span>}
  </span>
  </div>
  <div className="pl-2">
- <span className="block text-gray-400 mb-0.5">To</span>
+ <span className="block text-text-muted mb-0.5">To</span>
  <span className="text-green-600 font-medium block truncate" title={event.raw.newValue || 'Empty'}>
  {event.raw.newValue || <span className="italic opacity-50">Empty</span>}
  </span>
@@ -145,10 +145,10 @@ export function TimelineView({ caseId }: TimelineViewProps) {
  </div>
  )}
 
- <div className="mt-3 flex items-center gap-2 text-xs text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-2">
+ <div className="mt-3 flex items-center gap-2 text-xs text-text-muted border-t border-border pt-2">
  <User className="w-3 h-3" />
- <span className="font-medium text-gray-600 dark:text-gray-400">{event.user.name}</span>
- <span className="text-gray-300">•</span>
+ <span className="font-medium text-text-secondary">{event.user.name}</span>
+ <span className="text-text-muted">•</span>
  <span>{event.user.role}</span>
  </div>
  </div>

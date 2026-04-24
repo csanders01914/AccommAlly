@@ -3,7 +3,6 @@ import { apiFetch } from '@/lib/api-client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { TenantThemeProvider } from './providers/TenantThemeProvider';
 import {
  Home,
  ClipboardList,
@@ -32,8 +31,6 @@ interface SidebarProps {
  settings?: {
  branding?: {
  logo?: string;
- primaryColor?: string;
- secondaryColor?: string;
  }
  }
  }
@@ -120,7 +117,6 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
  : 'U';
 
  return (
- <TenantThemeProvider settings={user.tenant?.settings}>
  <aside
  className={`fixed left-0 top-0 h-screen flex flex-col z-30 transition-all duration-300 ${collapsed ? 'w-[60px]' : 'w-[220px]'}`}
  style={{
@@ -323,6 +319,5 @@ export function Sidebar({ user, unreadCount = 0, initialCollapsed = false, onTog
  currentUser={{ name: user.name, email: user.email || '' }}
  />
  </aside>
- </TenantThemeProvider>
  );
 }

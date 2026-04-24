@@ -78,7 +78,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  <th
  ref={setNodeRef}
  style={style}
- className="p-0 bg-transparent border-b border-[#E5E2DB] select-none group relative overflow-hidden"
+ className="p-0 bg-transparent border-b border-border select-none group relative overflow-hidden"
  aria-sort={undefined}
  >
  {/* Main Sort Button - Wraps content */}
@@ -88,7 +88,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  {...attributes}
  {...listeners}
  onClick={() => !isFilterOpen && onClick?.()}
- className="flex-1 px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8C8880] hover:bg-[#F3F1EC] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0D9488] focus-visible:ring-inset truncate flex items-center gap-1"
+ className="flex-1 px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted hover:bg-surface-raised transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0D9488] focus-visible:ring-inset truncate flex items-center gap-1"
  >
  <span className="truncate flex-1">{children}</span>
  </button>
@@ -106,8 +106,8 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  setIsFilterOpen(!isFilterOpen);
  }}
  className={cn(
- "p-1.5 rounded hover:bg-[#F3F1EC] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0D9488]",
- filterValue ? "text-[#0D9488]" : "text-[#C8C4BB] opacity-0 group-hover:opacity-100 focus:opacity-100"
+ "p-1.5 rounded hover:bg-surface-raised transition-colors focus:outline-none focus:ring-2 focus:ring-[#0D9488]",
+ filterValue ? "text-primary-500" : "text-border-strong opacity-0 group-hover:opacity-100 focus:opacity-100"
  )}
  >
  <Filter className="w-3.5 h-3.5" />
@@ -129,7 +129,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  onKeyDown={handleResizeKeyDown}
  onPointerDown={handleResizePointerDown}
  onClick={(e) => e.stopPropagation()}
- className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#0D9488] z-10 focus:bg-[#0F766E] focus:outline-none transition-colors"
+ className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-primary-500 z-10 focus:bg-primary-600 focus:outline-none transition-colors"
  />
  )}
 
@@ -143,7 +143,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  }}
  />
  <div
- className="absolute top-full left-0 mt-1 w-48 bg-[#ffffff] rounded-lg shadow-lg border border-[#E5E2DB] p-2 z-50 pointer-events-auto cursor-default"
+ className="absolute top-full left-0 mt-1 w-48 bg-surface rounded-lg shadow-lg border border-border p-2 z-50 pointer-events-auto cursor-default"
  onPointerDown={(e) => e.stopPropagation()}
  onClick={(e) => e.stopPropagation()}
  role="dialog"
@@ -154,7 +154,7 @@ export function SortableHeader({ id, children, onClick, onFilter, filterValue, w
  placeholder="Filter..."
  value={filterValue || ''}
  onChange={(e) => onFilter?.(e.target.value)}
- className="w-full px-2 py-1 text-xs border border-[#E5E2DB] rounded bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:border-[#0D9488]"
+ className="w-full px-2 py-1 text-xs border border-border rounded bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:border-primary-500"
  autoFocus
  />
  </div>

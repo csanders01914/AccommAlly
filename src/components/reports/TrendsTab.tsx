@@ -26,7 +26,7 @@ export function TrendsTab() {
  .finally(() => setLoading(false));
  }, []);
 
- if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-blue-500" /></div>;
+ if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-primary-500" /></div>;
  if (!data) return <div>Failed to load data</div>;
 
  return (
@@ -34,9 +34,9 @@ export function TrendsTab() {
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
  {/* Accommodation Type Distribution */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
- <PieChartIcon className="h-5 w-5 text-blue-500" />
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
+ <PieChartIcon className="h-5 w-5 text-primary-500" />
  Accommodation Type Distribution
  </h3>
  <div className="h-[350px] w-full">
@@ -64,12 +64,12 @@ export function TrendsTab() {
  </div>
 
  {/* High Frequency Job Roles */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
  <BarChart3 className="h-5 w-5 text-orange-500" />
  High-Frequency Job Roles
  </h3>
- <p className="text-sm text-gray-500 mb-4">Roles requesting accommodations most frequently</p>
+ <p className="text-sm text-text-muted mb-4">Roles requesting accommodations most frequently</p>
  <div className="h-[350px] w-full">
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={data.jobRoleStats} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
@@ -85,8 +85,8 @@ export function TrendsTab() {
  </div>
 
  {/* Denial Reasons */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
  <XCircle className="h-5 w-5 text-red-500" />
  Denial Reasons Breakdown
  </h3>

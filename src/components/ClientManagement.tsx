@@ -90,15 +90,15 @@ export function ClientManagement() {
  <div className="space-y-6">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="text-xl font-semibold text-[#1C1A17]">Client Management</h2>
- <p className="text-sm text-[#8C8880] mt-1">Manage the list of clients available for case creation.</p>
+ <h2 className="text-xl font-semibold text-text-primary">Client Management</h2>
+ <p className="text-sm text-text-muted mt-1">Manage the list of clients available for case creation.</p>
  </div>
  </div>
 
  {/* Add Client Form */}
- <form onSubmit={handleAddClient} className="bg-[#FAF6EE] p-4 rounded-lg border border-[#E5E2DB] flex gap-4 items-end">
+ <form onSubmit={handleAddClient} className="bg-background p-4 rounded-lg border border-border flex gap-4 items-end">
  <div className="flex-1">
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">
  Client Name
  </label>
  <input
@@ -106,12 +106,12 @@ export function ClientManagement() {
  value={newClientName}
  onChange={(e) => setNewClientName(e.target.value)}
  placeholder="e.g. Acme Corp"
- className="w-full px-3 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full px-3 py-2 border border-border bg-surface text-text-primary placeholder-text-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  required
  />
  </div>
  <div className="w-1/3">
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">
  Code (Optional)
  </label>
  <input
@@ -119,13 +119,13 @@ export function ClientManagement() {
  value={newClientCode}
  onChange={(e) => setNewClientCode(e.target.value)}
  placeholder="e.g. ACME"
- className="w-full px-3 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full px-3 py-2 border border-border bg-surface text-text-primary placeholder-text-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
  <button
  type="submit"
  disabled={isLoading || !newClientName.trim()}
- className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+ className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
  >
  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
  Add Client
@@ -139,23 +139,23 @@ export function ClientManagement() {
  )}
 
  {/* Client List */}
- <div className="rounded-lg overflow-hidden border border-[#E5E2DB]">
+ <div className="rounded-lg overflow-hidden border border-border">
  <table className="w-full text-sm text-left">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
+ <thead className="bg-background border-b border-border">
  <tr>
- <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Name</th>
- <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Code</th>
- <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Status</th>
- <th className="px-4 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Actions</th>
+ <th className="px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Name</th>
+ <th className="px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Code</th>
+ <th className="px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em] text-right">Status</th>
+ <th className="px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em] text-right">Actions</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-[#F3F1EC] bg-[#ffffff]">
+ <tbody className="divide-y divide-[#F3F1EC] bg-surface">
  {clients.length > 0 ? clients.map(client => (
- <tr key={client.id} className="hover:bg-[#FAF6EE] transition-colors">
- <td className="px-4 py-3 font-medium text-[#1C1A17]">{client.name}</td>
- <td className="px-4 py-3 text-[#8C8880]">{client.code || '-'}</td>
+ <tr key={client.id} className="hover:bg-background transition-colors">
+ <td className="px-4 py-3 font-medium text-text-primary">{client.name}</td>
+ <td className="px-4 py-3 text-text-muted">{client.code || '-'}</td>
  <td className="px-4 py-3 text-right">
- <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-xs font-medium", client.active !== false ? "bg-green-100 text-green-800" : "bg-[#F3F1EC] text-[#5C5850]")}>
+ <span className={cn("inline-flex items-center px-2 py-0.5 rounded text-xs font-medium", client.active !== false ? "bg-green-100 text-green-800" : "bg-surface-raised text-text-secondary")}>
  {client.active !== false ? 'Active' : 'Inactive'}
  </span>
  </td>
@@ -172,7 +172,7 @@ export function ClientManagement() {
  </tr>
  )) : (
  <tr>
- <td colSpan={4} className="px-4 py-8 text-center text-[#8C8880]">No clients found</td>
+ <td colSpan={4} className="px-4 py-8 text-center text-text-muted">No clients found</td>
  </tr>
  )}
  </tbody>

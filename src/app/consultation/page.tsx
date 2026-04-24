@@ -1,355 +1,482 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiFetchJSON } from '@/lib/api-client';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe, StripeCardElementOptions } from '@stripe/stripe-js';
-import { Loader2, Headset, CheckCircle2, Lock, ShieldCheck, ArrowRight, Calendar, Phone, User, MessageSquare } from 'lucide-react';
+import {
+  Loader2, Headset, CheckCircle2, Lock, ShieldCheck, ArrowRight,
+  Calendar, Phone, User, MessageSquare, Users,
+} from 'lucide-react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '');
 
 const CARD_ELEMENT_OPTIONS: StripeCardElementOptions = {
- style: {
- base: {
- color: '#F0EEE8',
- fontFamily: 'Georgia, serif',
- fontSize: '16px',
- fontSmoothing: 'antialiased',
- '::placeholder': { color: 'rgba(240,238,232,0.35)' },
- },
- invalid: { color: '#F87171', iconColor: '#F87171' },
- },
+  style: {
+    base: {
+      color: '#1C1A17',
+      fontFamily: 'var(--font-dm-sans), system-ui, sans-serif',
+      fontSize: '15px',
+      fontSmoothing: 'antialiased',
+      '::placeholder': { color: 'rgba(140,136,128,0.6)' },
+    },
+    invalid: { color: '#DC2626', iconColor: '#DC2626' },
+  },
 };
 
-export default function ConsultationPage() {
- const [step, setStep] = useState<'LOADING' | 'INTRO' | 'PAYMENT' | 'FORM' | 'SUCCESS'>('LOADING');
- const [isEnterprise, setIsEnterprise] = useState(false);
- const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+// ── Left Column ──────────────────────────────────────────────────────────────
 
- // Form data
- const [name, setName] = useState('');
- const [phoneNumber, setPhoneNumber] = useState('');
- const [availability, setAvailability] = useState('');
- const [description, setDescription] = useState('');
- const [submitting, setSubmitting] = useState(false);
- const [errorMsg, setErrorMsg] = useState<string | null>(null);
+const INCLUDED_ITEMS = [
+  '60-minute session with a certified ADA expert',
+  'Pre-session review of your submitted details',
+  'Real-time guidance on accommodation decisions',
+  'Written summary of recommendations delivered after the session',
+];
 
- useEffect(() => {
- apiFetchJSON<{ isEnterprise: boolean }>('/api/consultation/check-eligibility')
- .then((data) => {
- setIsEnterprise(data.isEnterprise);
- setStep('INTRO');
- })
- .catch(() => {
- setStep('INTRO'); // Allow to fail gracefully
- });
- }, []);
+const HOW_IT_WORKS_STEPS = [
+  {
+    title: 'Submit the form',
+    desc: 'Provide your availability and a brief description of your accommodation challenge.',
+  },
+  {
+    title: 'We confirm within 24 hours',
+    desc: 'An expert is matched and a session time is confirmed via phone or email.',
+  },
+  {
+    title: 'Attend and receive a summary',
+    desc: 'Join the session — a written summary of recommendations follows within 48 hours.',
+  },
+];
 
- const handleStart = () => {
- if (isEnterprise) {
- setStep('FORM');
- } else {
- setStep('PAYMENT');
- }
- };
+const TRUST_ITEMS = [
+  { icon: Lock, label: 'Confidential & Private' },
+  { icon: ShieldCheck, label: 'No commitment' },
+  { icon: Users, label: 'Certified ADA Experts' },
+];
 
- const handleFormSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- setSubmitting(true);
- setErrorMsg(null);
- try {
- await apiFetchJSON('/api/consultation/submit', {
- method: 'POST',
- body: JSON.stringify({
- name,
- phoneNumber,
- availability,
- description,
- paymentIntentId
- }),
- });
- setStep('SUCCESS');
- } catch (err: any) {
- setErrorMsg(err.message ?? 'An error occurred while submitting your request.');
- } finally {
- setSubmitting(false);
- }
- };
+function LeftColumn() {
+  return (
+    <div className="flex flex-col gap-10">
+      {/* Icon + Headline */}
+      <div>
+        <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center mb-4">
+          <Headset className="w-6 h-6 text-primary-500" />
+        </div>
+        <h1 className="font-display text-3xl text-text-primary leading-snug mb-3">
+          ADA Professional Consultation
+        </h1>
+        <p className="text-text-secondary text-base leading-relaxed">
+          Connect with our certified ADA experts for a 60-minute one-on-one session covering
+          accommodations, compliance risks, and strategic decisions.
+        </p>
+      </div>
 
- return (
- <div className="min-h-screen relative flex flex-col items-center justify-center p-6" style={{ backgroundColor: '#13110E', color: '#F0EEE8' }}>
- {/* Background Effects */}
- <div className="absolute inset-0 overflow-hidden pointer-events-none">
- <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px] opacity-20" style={{ backgroundColor: '#0D9488' }} />
- <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[100px] opacity-10" style={{ backgroundColor: '#6366f1' }} />
- </div>
+      {/* What's Included */}
+      <div>
+        <p className="form-label mb-3">What's Included</p>
+        <ul className="flex flex-col gap-3">
+          {INCLUDED_ITEMS.map((item) => (
+            <li key={item} className="flex items-start gap-3">
+              <CheckCircle2 className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
+              <span className="text-text-secondary text-sm">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
- <div className="relative z-10 w-full max-w-2xl">
- {step === 'LOADING' && (
- <div className="flex flex-col items-center gap-4 py-20">
- <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#0D9488' }} />
- <p className="tracking-wide" style={{ color: 'rgba(240,238,232,0.6)' }}>Loading your workspace...</p>
- </div>
- )}
+      {/* How It Works */}
+      <div>
+        <p className="form-label mb-3">How It Works</p>
+        <div className="flex flex-col">
+          {HOW_IT_WORKS_STEPS.map((step, i) => (
+            <div key={step.title} className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <div className="w-7 h-7 rounded-full bg-primary-50 text-primary-600 text-sm font-semibold flex items-center justify-center shrink-0">
+                  {i + 1}
+                </div>
+                {i < HOW_IT_WORKS_STEPS.length - 1 && (
+                  <div className="w-px flex-1 bg-border my-1" />
+                )}
+              </div>
+              <div className="pb-5">
+                <p className="text-sm font-medium text-text-primary">{step.title}</p>
+                <p className="text-sm text-text-muted mt-0.5">{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
- {step === 'INTRO' && (
- <div className="rounded-3xl p-10 overflow-hidden shadow-2xl transition-all duration-500 ease-out translate-y-0 opacity-100" style={{ backgroundColor: 'rgba(28,26,23,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.05)' }}>
- <div className="flex justify-center mb-6">
- <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)' }}>
- <Headset className="w-8 h-8 text-white" />
- </div>
- </div>
- <h1 className="text-4xl font-bold text-center mb-4 tracking-tight" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif' }}>
- ADA Professional Consultation
- </h1>
- <p className="text-center text-lg mb-8" style={{ color: 'rgba(240,238,232,0.7)' }}>
- Connect with our certified ADA experts to discuss accommodations, compliance risks, and strategic decisions in a 60-minute one-on-one session.
- </p>
- 
- <div className="flex flex-col items-center gap-6">
- {!isEnterprise && (
- <div className="rounded-xl px-6 py-4 w-full flex items-center justify-between" style={{ backgroundColor: 'rgba(13,148,136,0.1)', border: '1px solid rgba(13,148,136,0.2)' }}>
- <div>
- <p className="font-semibold" style={{ color: '#0D9488' }}>Consultation Fee</p>
- <p className="text-sm" style={{ color: 'rgba(240,238,232,0.5)' }}>One-time flat rate</p>
- </div>
- <p className="text-2xl font-bold font-serif">$50</p>
- </div>
- )}
- {isEnterprise && (
- <div className="rounded-xl px-6 py-4 w-full flex items-center gap-3" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
- <CheckCircle2 className="text-indigo-400 w-6 h-6 shrink-0" />
- <div>
- <p className="font-semibold text-indigo-400">Enterprise Benefit Applied</p>
- <p className="text-sm" style={{ color: 'rgba(240,238,232,0.5)' }}>Consultations are included at no additional cost for your workspace.</p>
- </div>
- </div>
- )}
-
- <button
- onClick={handleStart}
- className="group w-full py-4 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] shadow-lg"
- style={{ background: '#F0EEE8', color: '#13110E' }}
- >
- {isEnterprise ? 'Continue to Request Form' : 'Proceed to Payment'}
- <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
- </button>
- </div>
- </div>
- )}
-
- {step === 'PAYMENT' && (
- <Elements stripe={stripePromise}>
- <PaymentStep 
- onSuccess={(id) => { setPaymentIntentId(id); setStep('FORM'); }} 
- onBack={() => setStep('INTRO')} 
- />
- </Elements>
- )}
-
- {step === 'FORM' && (
- <div className="rounded-3xl p-8 overflow-hidden shadow-2xl transition-all duration-500 ease-out" style={{ backgroundColor: 'rgba(28,26,23,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.05)' }}>
- <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif' }}>Request Details</h2>
- <p className="text-sm mb-6" style={{ color: 'rgba(240,238,232,0.6)' }}>Please provide your details so our expert can prepare for your session.</p>
- 
- {errorMsg && (
- <div className="mb-6 p-4 rounded-xl text-sm" style={{ backgroundColor: 'rgba(248,113,113,0.1)', color: '#F87171', border: '1px solid rgba(248,113,113,0.2)' }}>
- {errorMsg}
- </div>
- )}
-
- <form onSubmit={handleFormSubmit} className="space-y-5">
- <div className="space-y-1.5">
- <label className="text-sm font-medium flex items-center gap-1.5" style={{ color: 'rgba(240,238,232,0.8)' }}><User className="w-4 h-4"/> Full Name</label>
- <input
- type="text"
- required
- value={name}
- onChange={(e) => setName(e.target.value)}
- placeholder="Jane Doe"
- className="w-full bg-transparent px-4 py-3 rounded-xl border focus:outline-none transition-colors"
- style={{ borderColor: 'rgba(240,238,232,0.15)', color: '#F0EEE8' }}
- onFocus={e => e.target.style.borderColor = '#0D9488'}
- onBlur={e => e.target.style.borderColor = 'rgba(240,238,232,0.15)'}
- />
- </div>
- <div className="space-y-1.5">
- <label className="text-sm font-medium flex items-center gap-1.5" style={{ color: 'rgba(240,238,232,0.8)' }}><Phone className="w-4 h-4"/> Phone Number</label>
- <input
- type="tel"
- required
- value={phoneNumber}
- onChange={(e) => setPhoneNumber(e.target.value)}
- placeholder="(555) 123-4567"
- className="w-full bg-transparent px-4 py-3 rounded-xl border focus:outline-none transition-colors"
- style={{ borderColor: 'rgba(240,238,232,0.15)', color: '#F0EEE8' }}
- onFocus={e => e.target.style.borderColor = '#0D9488'}
- onBlur={e => e.target.style.borderColor = 'rgba(240,238,232,0.15)'}
- />
- </div>
- <div className="space-y-1.5">
- <label className="text-sm font-medium flex items-center gap-1.5" style={{ color: 'rgba(240,238,232,0.8)' }}><Calendar className="w-4 h-4"/> Typical Availability</label>
- <input
- type="text"
- required
- value={availability}
- onChange={(e) => setAvailability(e.target.value)}
- placeholder="e.g., Tuesdays and Thursdays 1pm - 4pm EST"
- className="w-full bg-transparent px-4 py-3 rounded-xl border focus:outline-none transition-colors"
- style={{ borderColor: 'rgba(240,238,232,0.15)', color: '#F0EEE8' }}
- onFocus={e => e.target.style.borderColor = '#0D9488'}
- onBlur={e => e.target.style.borderColor = 'rgba(240,238,232,0.15)'}
- />
- </div>
- <div className="space-y-1.5">
- <label className="text-sm font-medium flex items-center gap-1.5" style={{ color: 'rgba(240,238,232,0.8)' }}><MessageSquare className="w-4 h-4"/> Brief Description of Issue</label>
- <textarea
- required
- rows={4}
- value={description}
- onChange={(e) => setDescription(e.target.value)}
- placeholder="What accommodation challenges are you currently facing?"
- className="w-full bg-transparent px-4 py-3 rounded-xl border focus:outline-none transition-colors resize-none"
- style={{ borderColor: 'rgba(240,238,232,0.15)', color: '#F0EEE8' }}
- onFocus={e => e.target.style.borderColor = '#0D9488'}
- onBlur={e => e.target.style.borderColor = 'rgba(240,238,232,0.15)'}
- />
- </div>
- <div className="pt-2">
- <button
- type="submit"
- disabled={submitting}
- className="group w-full py-4 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
- style={{ background: '#0D9488', color: '#FFF' }}
- onMouseEnter={e => { if (!submitting) e.currentTarget.style.backgroundColor = '#0F766E'; }}
- onMouseLeave={e => { if (!submitting) e.currentTarget.style.backgroundColor = '#0D9488'; }}
- >
- {submitting ? <Loader2 className="w-5 h-5 animate-spin"/> : 'Submit Request'}
- </button>
- </div>
- </form>
- </div>
- )}
-
- {step === 'SUCCESS' && (
- <div className="rounded-3xl p-12 overflow-hidden shadow-2xl text-center" style={{ backgroundColor: 'rgba(28,26,23,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.05)' }}>
- <div className="flex justify-center mb-6">
- <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(13,148,136,0.15)' }}>
- <CheckCircle2 className="w-10 h-10" style={{ color: '#0D9488' }} />
- </div>
- </div>
- <h2 className="text-4xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif' }}>Request Sent</h2>
- <p className="text-lg mb-8 leading-relaxed" style={{ color: 'rgba(240,238,232,0.7)' }}>
- We have successfully received your consultation request. An ADA professional will review your details and reach out within 24 hours to schedule the meeting.
- </p>
- <button
- onClick={() => window.location.href = '/dashboard'}
- className="py-3 px-8 rounded-xl font-medium transition-all hover:bg-opacity-80"
- style={{ backgroundColor: 'rgba(240,238,232,0.1)', color: '#F0EEE8', border: '1px solid rgba(240,238,232,0.15)' }}
- >
- Return to Dashboard
- </button>
- </div>
- )}
- </div>
- </div>
- );
+      {/* Trust Strip */}
+      <div className="flex flex-wrap gap-6">
+        {TRUST_ITEMS.map(({ icon: Icon, label }) => (
+          <div key={label} className="flex items-center gap-2">
+            <Icon className="w-4 h-4 text-primary-500" />
+            <span className="text-sm text-text-muted">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-// ─── Payment Step Component ─────────────────────────────────────────────────────
+// ── Shared Right Column Pieces ───────────────────────────────────────────────
 
-function PaymentStep({ onSuccess, onBack }: { onSuccess: (piId: string) => void, onBack: () => void }) {
- const stripe = useStripe();
- const elements = useElements();
- const [clientSecret, setClientSecret] = useState<string | null>(null);
- const [status, setStatus] = useState<'loading' | 'ready' | 'processing' | 'error'>('loading');
- const [errorMsg, setErrorMsg] = useState<string | null>(null);
+function LoadingCard() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading"
+      className="bg-surface border border-border rounded-xl shadow-sm p-6 flex items-center justify-center min-h-[300px]"
+    >
+      <Loader2 className="w-6 h-6 animate-spin text-primary-500" aria-hidden="true" />
+    </div>
+  );
+}
 
- useEffect(() => {
- const createIntent = async () => {
- try {
- const res = await apiFetchJSON<{ clientSecret: string }>('/api/consultation/create-payment-intent', { method: 'POST' });
- setClientSecret(res.clientSecret);
- setStatus('ready');
- } catch (err: any) {
- setErrorMsg(err.message ?? 'Failed to initialize payment.');
- setStatus('error');
- }
- };
- createIntent();
- }, []);
+function SuccessCard() {
+  const router = useRouter();
+  const [navigating, setNavigating] = useState(false);
+  return (
+    <div className="bg-surface border border-border rounded-xl shadow-sm p-6 flex flex-col items-center gap-4 py-10 text-center">
+      <CheckCircle2 className="w-12 h-12 text-primary-500" aria-hidden="true" />
+      <h2 className="font-display text-2xl text-text-primary">Request Received</h2>
+      <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
+        We've received your request and will be in touch within 24 hours to confirm your session time.
+      </p>
+      <button
+        onClick={() => { setNavigating(true); router.push('/dashboard'); }}
+        disabled={navigating}
+        className="btn-secondary mt-2"
+      >
+        Return to Dashboard
+      </button>
+    </div>
+  );
+}
 
- const handlePay = async (e: React.FormEvent) => {
- e.preventDefault();
- if (!stripe || !elements || !clientSecret) return;
+function CardHeader({ isEnterprise }: { isEnterprise: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="text-lg font-semibold text-text-primary">Request a Consultation</h2>
+      {isEnterprise ? (
+        <span className="flex items-center gap-1 bg-success/10 text-success rounded-full px-3 py-0.5 text-xs font-medium shrink-0">
+          <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+          Included with Enterprise
+        </span>
+      ) : (
+        <span className="bg-primary-50 text-primary-600 border border-primary-100 rounded-full px-3 py-0.5 text-xs font-medium shrink-0">
+          $50 · One-time
+        </span>
+      )}
+    </div>
+  );
+}
 
- setStatus('processing');
- setErrorMsg(null);
+interface FormValues {
+  name: string;
+  phoneNumber: string;
+  availability: string;
+  description: string;
+}
 
- const card = elements.getElement(CardElement);
- if (!card) return;
+function FormFields({
+  values,
+  onChange,
+  disabled,
+  idPrefix = 'consult',
+}: {
+  values: FormValues;
+  onChange: (field: keyof FormValues, value: string) => void;
+  disabled?: boolean;
+  idPrefix?: string;
+}) {
+  return (
+    <>
+      <div>
+        <label htmlFor={`${idPrefix}-name`} className="form-label flex items-center gap-1.5">
+          <User className="w-3.5 h-3.5" aria-hidden="true" /> Full Name
+        </label>
+        <input
+          id={`${idPrefix}-name`}
+          type="text"
+          required
+          autoComplete="name"
+          className="form-input"
+          placeholder="Jane Doe"
+          value={values.name}
+          onChange={(e) => onChange('name', e.target.value)}
+          disabled={disabled}
+        />
+      </div>
+      <div>
+        <label htmlFor={`${idPrefix}-phone`} className="form-label flex items-center gap-1.5">
+          <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Phone Number
+        </label>
+        <input
+          id={`${idPrefix}-phone`}
+          type="tel"
+          required
+          autoComplete="tel"
+          className="form-input"
+          placeholder="(555) 123-4567"
+          value={values.phoneNumber}
+          onChange={(e) => onChange('phoneNumber', e.target.value)}
+          disabled={disabled}
+        />
+      </div>
+      <div>
+        <label htmlFor={`${idPrefix}-availability`} className="form-label flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5" aria-hidden="true" /> Typical Availability
+        </label>
+        <input
+          id={`${idPrefix}-availability`}
+          type="text"
+          required
+          className="form-input"
+          placeholder="e.g., Tuesdays & Thursdays, 1–4pm EST"
+          value={values.availability}
+          onChange={(e) => onChange('availability', e.target.value)}
+          disabled={disabled}
+        />
+      </div>
+      <div>
+        <label htmlFor={`${idPrefix}-description`} className="form-label flex items-center gap-1.5">
+          <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" /> Issue Description
+        </label>
+        <textarea
+          id={`${idPrefix}-description`}
+          required
+          rows={4}
+          className="form-input resize-none"
+          placeholder="What accommodation challenges are you currently facing?"
+          value={values.description}
+          onChange={(e) => onChange('description', e.target.value)}
+          disabled={disabled}
+        />
+      </div>
+    </>
+  );
+}
 
- const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
- payment_method: { card },
- });
+function EnterpriseCard({ onSuccess }: { onSuccess: () => void }) {
+  const [values, setValues] = useState<FormValues>({
+    name: '',
+    phoneNumber: '',
+    availability: '',
+    description: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
- if (stripeError) {
- setErrorMsg(stripeError.message ?? 'Payment failed. Please try again.');
- setStatus('ready');
- return;
- }
+  const handleChange = (field: keyof FormValues, value: string) =>
+    setValues((v) => ({ ...v, [field]: value }));
 
- if (paymentIntent?.status === 'succeeded') {
- onSuccess(paymentIntent.id);
- }
- };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setErrorMsg(null);
+    try {
+      await apiFetchJSON('/api/consultation/submit', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+      onSuccess();
+    } catch (err: any) {
+      setErrorMsg(err.message ?? 'An error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
- return (
- <div className="rounded-3xl p-8 overflow-hidden shadow-2xl transition-all duration-500" style={{ backgroundColor: 'rgba(28,26,23,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.05)' }}>
- <button onClick={onBack} className="text-sm font-medium mb-6 hover:underline" style={{ color: 'rgba(240,238,232,0.5)' }}>
- &larr; Back
- </button>
- <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif' }}>Payment Details</h2>
- <p className="text-sm mb-6" style={{ color: 'rgba(240,238,232,0.6)' }}>Enter your card information to securely process the $50 consultation fee.</p>
+  return (
+    <div className="bg-surface border border-border rounded-xl shadow-sm p-6 flex flex-col gap-5">
+      <CardHeader isEnterprise />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <FormFields
+          values={values}
+          onChange={handleChange}
+          disabled={submitting}
+          idPrefix="enterprise"
+        />
+        {errorMsg && (
+          <div role="alert" className="bg-danger/10 text-danger border border-danger/20 rounded-lg p-3 text-sm">
+            {errorMsg}
+          </div>
+        )}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-primary w-full flex items-center justify-center gap-2"
+        >
+          {submitting ? (
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
+          )}
+          {submitting ? 'Submitting…' : 'Request Consultation'}
+        </button>
+        <p className="text-xs text-text-muted text-center flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+          Your data is confidential
+        </p>
+      </form>
+    </div>
+  );
+}
+function PaymentCard({ onSuccess }: { onSuccess: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [values, setValues] = useState<FormValues>({
+    name: '',
+    phoneNumber: '',
+    availability: '',
+    description: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
- <form onSubmit={handlePay} className="space-y-6">
- <div>
- <label className="block text-sm font-medium mb-3" style={{ color: 'rgba(240,238,232,0.8)' }}>Card Information</label>
- <div
- className="rounded-xl px-4 py-4 transition-colors"
- style={{ backgroundColor: 'rgba(240,238,232,0.05)', border: '1px solid rgba(240,238,232,0.12)' }}
- >
- {status === 'loading' ? (
- <div className="flex justify-center py-1">
- <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'rgba(240,238,232,0.4)' }} />
- </div>
- ) : (
- <CardElement options={CARD_ELEMENT_OPTIONS} />
- )}
- </div>
- </div>
+  useEffect(() => {
+    apiFetchJSON<{ clientSecret: string }>('/api/consultation/create-payment-intent', {
+      method: 'POST',
+    })
+      .then((res) => setClientSecret(res.clientSecret))
+      .catch((err: any) => setInitError(err.message ?? 'Failed to initialize payment.'));
+  }, []);
 
- {errorMsg && (
- <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: 'rgba(248,113,113,0.1)', color: '#F87171', border: '1px solid rgba(248,113,113,0.2)' }}>
- {errorMsg}
- </div>
- )}
+  const handleChange = (field: keyof FormValues, value: string) =>
+    setValues((v) => ({ ...v, [field]: value }));
 
- <button
- type="submit"
- disabled={!stripe || status === 'loading' || status === 'processing'}
- className="w-full py-4 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
- style={{ background: '#0D9488', color: '#FFF' }}
- onMouseEnter={e => { if (status === 'ready') e.currentTarget.style.backgroundColor = '#0F766E'; }}
- onMouseLeave={e => { if (status === 'ready') e.currentTarget.style.backgroundColor = '#0D9488'; }}
- >
- {status === 'processing' ? <><Loader2 className="w-5 h-5 animate-spin"/> Processing...</> : <><Lock className="w-4 h-4"/> Pay $50.00</>}
- </button>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements || !clientSecret) return;
 
- <div className="flex items-center justify-center gap-2 pt-2 text-xs" style={{ color: 'rgba(240,238,232,0.4)' }}>
- <ShieldCheck className="w-4 h-4" /> Secured via Stripe
- </div>
- </form>
- </div>
- );
+    setSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      const card = elements.getElement(CardElement);
+      if (!card) throw new Error('Card element not found.');
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card,
+          billing_details: { name: values.name, phone: values.phoneNumber },
+        },
+      });
+
+      if (error) throw new Error(error.message ?? 'Payment failed. Please try again.');
+      if (paymentIntent?.status !== 'succeeded') throw new Error('Payment was not completed.');
+
+      await apiFetchJSON('/api/consultation/submit', {
+        method: 'POST',
+        body: JSON.stringify({ ...values, paymentIntentId: paymentIntent.id }),
+      });
+
+      onSuccess();
+    } catch (err: any) {
+      setErrorMsg(err.message ?? 'An error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-surface border border-border rounded-xl shadow-sm p-6 flex flex-col gap-5">
+      <CardHeader isEnterprise={false} />
+
+      {initError ? (
+  <div role="alert" className="bg-danger/10 text-danger border border-danger/20 rounded-lg p-3 text-sm">
+    {initError}
+  </div>
+) : (
+  <div>
+    <label htmlFor="payment-card" className="form-label block mb-2">
+      Card Information
+    </label>
+    <div className="bg-surface-raised border border-border rounded-lg px-4 py-3">
+      {!clientSecret ? (
+        <div className="flex justify-center py-1" role="status" aria-label="Loading card fields">
+          <Loader2 className="w-4 h-4 animate-spin text-text-muted" aria-hidden="true" />
+        </div>
+      ) : (
+        <CardElement id="payment-card" options={CARD_ELEMENT_OPTIONS} />
+      )}
+    </div>
+  </div>
+)}
+
+      <div className="border-t border-border" />
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <FormFields
+          values={values}
+          onChange={handleChange}
+          disabled={submitting}
+          idPrefix="payment"
+        />
+        {errorMsg && (
+          <div role="alert" className="bg-danger/10 text-danger border border-danger/20 rounded-lg p-3 text-sm">
+            {errorMsg}
+          </div>
+        )}
+        <button
+          type="submit"
+          disabled={!stripe || !clientSecret || submitting}
+          className="btn-primary w-full flex items-center justify-center gap-2"
+        >
+          {submitting ? (
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Lock className="w-4 h-4" aria-hidden="true" />
+          )}
+          {submitting ? 'Processing…' : 'Book Consultation · $50.00'}
+        </button>
+        <p className="text-xs text-text-muted text-center flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+          Payment secured by Stripe · Your data is confidential
+        </p>
+      </form>
+    </div>
+  );
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
+export default function ConsultationPage() {
+  const [status, setStatus] = useState<'loading' | 'ready' | 'success'>('loading');
+  const [isEnterprise, setIsEnterprise] = useState(false);
+
+  useEffect(() => {
+    apiFetchJSON<{ isEnterprise: boolean }>('/api/consultation/check-eligibility')
+      .then((data) => {
+        setIsEnterprise(data.isEnterprise);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('ready'));
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background p-6 md:p-8">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-8 md:gap-12 items-start">
+        <LeftColumn />
+        <div>
+          {status === 'loading' && <LoadingCard />}
+          {status === 'success' && <SuccessCard />}
+          {status === 'ready' && (
+            isEnterprise
+              ? <EnterpriseCard onSuccess={() => setStatus('success')} />
+              : (
+                <Elements stripe={stripePromise}>
+                  <PaymentCard onSuccess={() => setStatus('success')} />
+                </Elements>
+              )
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

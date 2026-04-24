@@ -37,29 +37,29 @@ export default function VerifyIdentityModal({ isOpen, onClose, claimantNumber, o
 
  return (
  <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-sm overflow-hidden">
- <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- <Shield className="w-4 h-4 text-[#0D9488]" />
+ <div className="modal-container w-full max-w-sm overflow-hidden">
+ <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+ <Shield className="w-4 h-4 text-primary-500" />
  Verify Identity
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
  <div className="p-6">
  {success ? (
  <div className="text-center py-4">
- <div className="w-16 h-16 bg-[#0D9488]/10 rounded-full flex items-center justify-center mx-auto mb-4">
- <CheckCircle className="w-8 h-8 text-[#0D9488]" />
+ <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+ <CheckCircle className="w-8 h-8 text-primary-500" />
  </div>
- <h3 className="text-base font-semibold text-[#1C1A17]">Verified!</h3>
- <p className="text-sm text-[#8C8880] mt-1">Identity confirmed successfully.</p>
+ <h3 className="text-base font-semibold text-text-primary">Verified!</h3>
+ <p className="text-sm text-text-muted mt-1">Identity confirmed successfully.</p>
  </div>
  ) : (
  <form onSubmit={handleVerify} className="space-y-4">
- <p className="text-sm text-[#5C5850]">Enter the claimant's PIN or passphrase to verify their identity.</p>
+ <p className="text-sm text-text-secondary">Enter the claimant's PIN or passphrase to verify their identity.</p>
 
  {error && (
  <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg flex items-center gap-2">
@@ -69,14 +69,14 @@ export default function VerifyIdentityModal({ isOpen, onClose, claimantNumber, o
 
  <input
  type="password"
- className="w-full px-4 py-3 text-center text-lg tracking-widest rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors placeholder:text-sm placeholder:tracking-normal"
+ className="w-full px-4 py-3 text-center text-lg tracking-widest rounded-lg border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors placeholder:text-sm placeholder:tracking-normal"
  placeholder="Enter Credential"
  value={credential}
  onChange={(e) => setCredential(e.target.value)}
  autoFocus
  />
 
- <button type="submit" disabled={isVerifying || !credential} className="w-full py-2.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
+ <button type="submit" disabled={isVerifying || !credential} className="w-full py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
  {isVerifying ? <><Loader2 className="w-4 h-4 animate-spin" /> Verifying…</> : 'Verify'}
  </button>
  </form>

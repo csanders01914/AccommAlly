@@ -8,8 +8,8 @@ interface EditUserModalProps {
  user: { id: string; name: string; email: string; role: 'ADMIN' | 'AUDITOR' | 'COORDINATOR'; } | null;
 }
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function EditUserModal({ isOpen, onClose, onSuccess, user }: EditUserModalProps) {
  const [name, setName] = useState('');
@@ -37,11 +37,11 @@ export function EditUserModal({ isOpen, onClose, onSuccess, user }: EditUserModa
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] max-w-md w-full overflow-hidden">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17]">Edit User</h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <div className="modal-container max-w-md w-full overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary">Edit User</h2>
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -64,10 +64,10 @@ export function EditUserModal({ isOpen, onClose, onSuccess, user }: EditUserModa
  </select>
  </div>
  <div className="flex justify-end gap-3 pt-2">
- <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
+ <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">
  Cancel
  </button>
- <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition-colors disabled:opacity-50">
+ <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors disabled:opacity-50">
  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
  Save Changes
  </button>

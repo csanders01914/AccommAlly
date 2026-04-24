@@ -28,10 +28,10 @@ const ProductImages = ({ product }: { product: any }) => {
 
  if (!product.images || product.images.length === 0) {
  return (
- <div className="aspect-[4/3] bg-[#FAF6EE] flex items-center justify-center relative overflow-hidden border-b border-[#E5E2DB]">
- <Package className="w-12 h-12 text-[#C8C4BB]" />
+ <div className="aspect-[4/3] bg-background flex items-center justify-center relative overflow-hidden border-b border-border">
+ <Package className="w-12 h-12 text-border-strong" />
  {product.category && (
- <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-[#0D9488] text-[11px] font-bold uppercase tracking-wider rounded border border-[#0D9488]/20 shadow-sm z-10">
+ <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-primary-500 text-[11px] font-bold uppercase tracking-wider rounded border border-primary-500/20 shadow-sm z-10">
  {product.category}
  </span>
  )}
@@ -40,9 +40,9 @@ const ProductImages = ({ product }: { product: any }) => {
  }
 
  return (
- <div className="aspect-[4/3] relative border-b border-[#E5E2DB] bg-[#FAF6EE]">
+ <div className="aspect-[4/3] relative border-b border-border bg-background">
  {product.category && (
- <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-[#0D9488] text-[11px] font-bold uppercase tracking-wider rounded border border-[#0D9488]/20 shadow-sm z-10 pointer-events-none">
+ <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-primary-500 text-[11px] font-bold uppercase tracking-wider rounded border border-primary-500/20 shadow-sm z-10 pointer-events-none">
  {product.category}
  </span>
  )}
@@ -67,14 +67,14 @@ const ProductImages = ({ product }: { product: any }) => {
  <button 
  onClick={(e) => scrollTo(e, Math.max(0, currentIndex - 1))}
  disabled={currentIndex === 0}
- className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-50 text-gray-900 rounded-full shadow-md border border-gray-200 disabled:opacity-0 transition-all z-20 group-hover:opacity-100"
+ className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-surface-raised text-text-primary rounded-full shadow-md border border-border disabled:opacity-0 transition-all z-20 group-hover:opacity-100"
  >
  <ChevronLeft size={24} />
  </button>
  <button 
  onClick={(e) => scrollTo(e, Math.min(product.images.length - 1, currentIndex + 1))}
  disabled={currentIndex === product.images.length - 1}
- className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-50 text-gray-900 rounded-full shadow-md border border-gray-200 disabled:opacity-0 transition-all z-20 group-hover:opacity-100"
+ className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white hover:bg-surface-raised text-text-primary rounded-full shadow-md border border-border disabled:opacity-0 transition-all z-20 group-hover:opacity-100"
  >
  <ChevronRight size={24} />
  </button>
@@ -83,7 +83,7 @@ const ProductImages = ({ product }: { product: any }) => {
  <button 
  key={i} 
  onClick={(e) => scrollTo(e, i)}
- className={`h-2.5 transition-all shadow-sm ${i === currentIndex ? 'w-8 bg-[#0D9488] rounded-full' : 'w-2.5 bg-gray-400 hover:bg-gray-600 rounded-full'}`} 
+ className={`h-2.5 transition-all shadow-sm ${i === currentIndex ? 'w-8 bg-primary-500 rounded-full' : 'w-2.5 bg-border-strong hover:bg-text-muted rounded-full'}`} 
  />
  ))}
  </div>
@@ -154,20 +154,20 @@ export default function EquipmentPage() {
 
  if (loading && !currentUser) {
  return (
- <div className="min-h-screen bg-[#FAF6EE] flex items-center justify-center">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <div className="min-h-screen bg-background flex items-center justify-center">
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }
 
  return (
- <div className="flex h-screen overflow-hidden bg-[#1C1A17]">
+ <div className="flex h-screen overflow-hidden bg-background">
  {currentUser && (
  <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />
  )}
 
  <div
- className="flex-1 h-full overflow-y-auto transition-all duration-300 bg-[#FAF6EE]"
+ className="flex-1 h-full overflow-y-auto transition-all duration-300 bg-background"
  style={{ marginLeft: sidebarCollapsed ? 64 : 256 }}
  >
  {/* Header Band */}
@@ -192,7 +192,7 @@ export default function EquipmentPage() {
 
  <div className="relative z-10 max-w-[1440px] mx-auto flex items-end justify-between gap-8 flex-wrap">
  <div style={{ flex: '1 1 420px', minWidth: 0 }}>
- <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0D9488] flex items-center gap-2 mb-3">
+ <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-500 flex items-center gap-2 mb-3">
  <Package className="w-4 h-4" /> Recommended Tools
  </p>
  <h1
@@ -211,30 +211,30 @@ export default function EquipmentPage() {
  <div className="max-w-[1440px] mx-auto px-12 py-8">
  {loading ? (
  <div className="flex justify-center p-12">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  ) : products.length === 0 ? (
- <div className="bg-white rounded-2xl border border-[#E5E2DB] p-12 text-center shadow-sm">
- <div className="w-16 h-16 bg-[#FAF6EE] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E2DB]">
- <Package className="w-8 h-8 text-[#8C8880]" />
+ <div className="bg-white rounded-2xl border border-border p-12 text-center shadow-sm">
+ <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4 border border-border">
+ <Package className="w-8 h-8 text-text-muted" />
  </div>
- <h3 className="text-xl font-semibold text-[#1C1A17] mb-2">No equipment available</h3>
- <p className="text-[#5C5850]">There is no suggested equipment listed at this time. Please check back later.</p>
+ <h3 className="text-xl font-semibold text-text-primary mb-2">No equipment available</h3>
+ <p className="text-text-secondary">There is no suggested equipment listed at this time. Please check back later.</p>
  </div>
  ) : (
  <div className="flex flex-col gap-8">
  {/* Search and Filter UI */}
- <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white p-4 rounded-2xl border border-[#E5E2DB] shadow-sm">
+ <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white p-4 rounded-2xl border border-border shadow-sm">
  <div className="relative w-full md:w-96">
  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
- <Search className="h-5 w-5 text-gray-400" />
+ <Search className="h-5 w-5 text-text-muted" />
  </div>
  <input
  type="text"
  placeholder="Search by title or description..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] sm:text-sm transition-colors"
+ className="block w-full pl-10 pr-3 py-2.5 border border-border-strong rounded-xl leading-5 bg-surface-raised placeholder-gray-500 focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-1 focus:ring-[#0D9488] sm:text-sm transition-colors"
  />
  </div>
  <div className="flex w-full md:w-auto overflow-x-auto snap-x hide-scrollbar gap-2 pb-2 md:pb-0">
@@ -242,8 +242,8 @@ export default function EquipmentPage() {
  onClick={() => setActiveCategory(null)}
  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
  activeCategory === null 
- ? 'bg-[#0D9488] text-white shadow-md' 
- : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+ ? 'bg-primary-500 text-white shadow-md' 
+ : 'bg-surface-raised text-text-secondary hover:bg-surface-raised'
  }`}
  >
  All Items
@@ -254,8 +254,8 @@ export default function EquipmentPage() {
  onClick={() => setActiveCategory(category)}
  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
  activeCategory === category 
- ? 'bg-[#0D9488] text-white shadow-md' 
- : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+ ? 'bg-primary-500 text-white shadow-md' 
+ : 'bg-surface-raised text-text-secondary hover:bg-surface-raised'
  }`}
  >
  {category}
@@ -266,15 +266,15 @@ export default function EquipmentPage() {
  
  {/* Grid or Empty Results */}
  {filteredProducts.length === 0 ? (
- <div className="bg-white rounded-2xl border border-[#E5E2DB] p-12 text-center shadow-sm">
- <div className="w-16 h-16 bg-[#FAF6EE] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E2DB]">
- <Filter className="w-8 h-8 text-[#8C8880]" />
+ <div className="bg-white rounded-2xl border border-border p-12 text-center shadow-sm">
+ <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4 border border-border">
+ <Filter className="w-8 h-8 text-text-muted" />
  </div>
- <h3 className="text-xl font-semibold text-[#1C1A17] mb-2">No matching equipment</h3>
- <p className="text-[#5C5850]">Try adjusting your search query or category filters.</p>
+ <h3 className="text-xl font-semibold text-text-primary mb-2">No matching equipment</h3>
+ <p className="text-text-secondary">Try adjusting your search query or category filters.</p>
  <button 
  onClick={() => { setSearchQuery(''); setActiveCategory(null); }}
- className="mt-6 px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors"
+ className="mt-6 px-6 py-2 bg-surface-raised hover:bg-surface-raised text-text-primary font-medium rounded-lg transition-colors"
  >
  Clear Filters
  </button>
@@ -282,17 +282,17 @@ export default function EquipmentPage() {
  ) : (
  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
  {filteredProducts.map((product) => (
- <div key={product.id} onClick={() => setSelectedProduct(product)} className="bg-white rounded-2xl border border-[#E5E2DB] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group cursor-pointer hover:-translate-y-1">
+ <div key={product.id} onClick={() => setSelectedProduct(product)} className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group cursor-pointer hover:-translate-y-1">
  <ProductImages product={product} />
  
  <div className="p-5 flex-1 flex flex-col">
  <h3 className="font-bold text-base text-white mb-1 line-clamp-2">{product.title}</h3>
- <p className="text-[#5C5850] text-sm flex-1 line-clamp-3 mb-6">
+ <p className="text-text-secondary text-sm flex-1 line-clamp-3 mb-6">
  {product.description || 'No description available.'}
  </p>
  
- <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#F3F1EC]">
- <div className="text-xl font-bold tracking-tight text-[#1C1A17]">
+ <div className="flex items-center justify-between mt-auto pt-4 border-t border-surface-raised">
+ <div className="text-xl font-bold tracking-tight text-text-primary">
  {product.price !== null && product.price !== undefined ? `$${Number(product.price).toFixed(2)}` : ''}
  </div>
  <a 
@@ -300,7 +300,7 @@ export default function EquipmentPage() {
  target="_blank" 
  rel="noopener noreferrer"
  onClick={(e) => e.stopPropagation()}
- className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+ className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
  style={{ color: '#ffffff' }}
  >
  <ShoppingCart className="w-4 h-4 text-white" />
@@ -323,12 +323,12 @@ export default function EquipmentPage() {
  <div className="bg-white rounded-3xl w-full max-w-5xl max-h-full overflow-hidden flex flex-col md:flex-row shadow-2xl relative shadow-black/50 animate-in zoom-in-95 duration-200">
  <button 
  onClick={() => setSelectedProduct(null)}
- className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-[#1C1A17] hover:bg-white transition-colors border border-[#E5E2DB] shadow-sm"
+ className="absolute top-4 right-4 z-20 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center text-text-primary hover:bg-white transition-colors border border-border shadow-sm"
  >
  <X className="w-5 h-5" />
  </button>
  
- <div className="md:w-1/2 bg-[#FAF6EE] border-b md:border-b-0 md:border-r border-[#E5E2DB] flex flex-col justify-center relative min-h-[300px]">
+ <div className="md:w-1/2 bg-background border-b md:border-b-0 md:border-r border-border flex flex-col justify-center relative min-h-[300px]">
  <ProductImages product={selectedProduct} />
  </div>
 
@@ -337,21 +337,21 @@ export default function EquipmentPage() {
  style={{ backgroundColor: '#ffffff' }}
  >
  {selectedProduct.category && (
- <span className="inline-block px-3 py-1 bg-[#EEF2F6] text-[#0D9488] text-xs font-bold uppercase tracking-wider rounded-md border border-[#0D9488]/20 mb-4 w-fit">
+ <span className="inline-block px-3 py-1 bg-[#EEF2F6] text-primary-500 text-xs font-bold uppercase tracking-wider rounded-md border border-primary-500/20 mb-4 w-fit">
  {selectedProduct.category}
  </span>
  )}
- <h2 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">{selectedProduct.title}</h2>
+ <h2 className="text-3xl font-bold text-text-primary mb-4 leading-tight">{selectedProduct.title}</h2>
  
- <div className="text-3xl font-bold tracking-tight text-gray-900 mb-8">
+ <div className="text-3xl font-bold tracking-tight text-text-primary mb-8">
  {selectedProduct.price !== null && selectedProduct.price !== undefined ? `$${Number(selectedProduct.price).toFixed(2)}` : ''}
  </div>
  
- <div className="prose prose-sm text-gray-600 max-w-none flex-1 mb-8 whitespace-pre-wrap leading-relaxed">
+ <div className="prose prose-sm text-text-secondary max-w-none flex-1 mb-8 whitespace-pre-wrap leading-relaxed">
  {selectedProduct.description || 'No description available.'}
  </div>
 
- <div className="pt-8 border-t border-gray-100 mt-auto">
+ <div className="pt-8 border-t border-border mt-auto">
  <a 
  href={selectedProduct.productUrl} 
  target="_blank" 

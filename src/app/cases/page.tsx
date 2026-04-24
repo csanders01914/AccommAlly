@@ -30,10 +30,10 @@ import {
 // ── Status badges ──────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<string, string> = {
- OPEN: 'bg-emerald-50 text-emerald-800 border-emerald-200',
- IN_PROGRESS: 'bg-blue-50 text-blue-800 border-blue-200',
- PENDING_REVIEW: 'bg-purple-50 text-purple-800 border-purple-200',
- CLOSED: 'bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]',
+ OPEN: 'bg-success/10 text-success border-success/20',
+ IN_PROGRESS: 'bg-primary-50 text-primary-600 border-primary-100',
+ PENDING_REVIEW: 'bg-warning/10 text-warning border-warning/20',
+ CLOSED: 'bg-surface-raised text-text-secondary border-border',
  APPEAL: 'bg-orange-50 text-orange-800 border-orange-200',
 };
 
@@ -240,18 +240,18 @@ export default function CasesPage() {
  };
 
  // ── Shared input class ─────────────────────────────────────────────────
- const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+ const inputCls = 'form-input';
 
  if (loading && !currentUser) {
  return (
- <div className="min-h-screen bg-[#FAF6EE] flex items-center justify-center">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <div className="min-h-screen bg-background flex items-center justify-center">
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }
 
  return (
- <div className="flex h-screen overflow-hidden bg-[#1C1A17]">
+ <div className="flex h-screen overflow-hidden bg-background">
  {currentUser && (
  <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />
  )}
@@ -284,7 +284,7 @@ export default function CasesPage() {
 
  <div className="relative z-10 max-w-[1440px] mx-auto flex items-end justify-between gap-8 flex-wrap">
  <div style={{ flex: '1 1 420px', minWidth: 0 }}>
- <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0D9488]">
+ <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-500">
  Case Management
  </p>
  <h1
@@ -307,7 +307,7 @@ export default function CasesPage() {
  <StatChip label="Pending Review" value={stats.pending} tone="neutral" />
  <button
  onClick={() => router.push('/cases/new')}
- className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-[#1C1A17] bg-[#0D9488] hover:bg-[#0F766E] transition-colors ml-2"
+ className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-text-primary bg-primary-500 hover:bg-primary-600 transition-colors ml-2"
  >
  <Plus className="w-4 h-4" />
  New Case
@@ -319,28 +319,28 @@ export default function CasesPage() {
  {/* ── Working surface ── */}
  <div className="px-12 py-8">
  <div
- className="max-w-[1440px] mx-auto bg-[#ffffff] border border-[#E5E2DB] rounded-xl shadow-[0_1px_2px_rgba(28,26,23,0.04)] overflow-hidden"
+ className="max-w-[1440px] mx-auto bg-surface border border-border rounded-xl shadow-[0_1px_2px_rgba(28,26,23,0.04)] overflow-hidden"
  >
  {/* ── Filter section ── */}
- <div className="border-b border-[#E5E2DB]">
+ <div className="border-b border-border">
  <button
- className="w-full flex items-center justify-between px-6 py-4 hover:bg-[#FAF6EE] transition-colors text-left"
+ className="w-full flex items-center justify-between px-6 py-4 hover:bg-background transition-colors text-left"
  onClick={() => setFilterOpen(v => !v)}
  >
  <div className="flex items-center gap-2">
- <span className="text-sm font-semibold text-[#1C1A17]">Search & Filters</span>
+ <span className="text-sm font-semibold text-text-primary">Search & Filters</span>
  {hasActiveFilters && (
- <span className="text-[11px] font-semibold px-2 py-0.5 bg-[#0D9488] text-[#ffffff] rounded-full">Active</span>
+ <span className="text-[11px] font-semibold px-2 py-0.5 bg-primary-500 text-white rounded-full">Active</span>
  )}
  </div>
- <ChevronDown className={cn('w-4 h-4 text-[#8C8880] transition-transform', filterOpen && 'rotate-180')} />
+ <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform', filterOpen && 'rotate-180')} />
  </button>
 
  {filterOpen && (
- <div className="px-6 pb-6 pt-2 border-t border-[#F3F1EC]">
+ <div className="px-6 pb-6 pt-2 border-t border-surface-raised">
  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Search</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Search</label>
  <input
  type="text"
  placeholder="Name, case number…"
@@ -350,7 +350,7 @@ export default function CasesPage() {
  />
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Status</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Status</label>
  <select
  value={statusFilter}
  onChange={e => setStatusFilter(e.target.value)}
@@ -364,7 +364,7 @@ export default function CasesPage() {
  </select>
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Assigned To</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Assigned To</label>
  <select
  value={filters.assignedTo}
  onChange={e => setFilters(p => ({ ...p, assignedTo: e.target.value }))}
@@ -377,7 +377,7 @@ export default function CasesPage() {
  </select>
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Client</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Client</label>
  <select
  value={filters.clientId}
  onChange={e => setFilters(p => ({ ...p, clientId: e.target.value }))}
@@ -390,7 +390,7 @@ export default function CasesPage() {
  </select>
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Program</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Program</label>
  <input
  type="text"
  placeholder="e.g. Wellness"
@@ -400,7 +400,7 @@ export default function CasesPage() {
  />
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Opened (from)</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Opened (from)</label>
  <input
  type="date"
  className={inputCls}
@@ -409,7 +409,7 @@ export default function CasesPage() {
  />
  </div>
  <div className="space-y-1.5">
- <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Opened (to)</label>
+ <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Opened (to)</label>
  <input
  type="date"
  className={inputCls}
@@ -418,7 +418,7 @@ export default function CasesPage() {
  />
  </div>
  </div>
- <div className="flex justify-end pt-3 border-t border-[#F3F1EC]">
+ <div className="flex justify-end pt-3 border-t border-surface-raised">
  <button
  onClick={resetFilters}
  className="text-sm font-medium text-red-600 hover:text-red-700 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors"
@@ -432,10 +432,10 @@ export default function CasesPage() {
 
  {/* ── Table toolbar ── */}
  {hasColumnChanges && (
- <div className="flex justify-end px-5 py-2.5 border-b border-[#F3F1EC] bg-[#FAF6EE]">
+ <div className="flex justify-end px-5 py-2.5 border-b border-surface-raised bg-background">
  <button
  onClick={handleSaveColumnPreferences}
- className="px-3 py-1 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-xs font-semibold rounded-lg transition-colors"
+ className="px-3 py-1 bg-primary-500 hover:bg-primary-600 text-white text-xs font-semibold rounded-lg transition-colors"
  >
  Save View Layout
  </button>
@@ -453,8 +453,8 @@ export default function CasesPage() {
  className="w-full text-left border-collapse"
  style={{ tableLayout: 'fixed', minWidth: 1000 }}
  >
- <thead className="bg-[#FAF6EE]">
- <tr className="border-b border-[#E5E2DB]">
+ <thead className="bg-background">
+ <tr className="border-b border-border">
  <SortableContext
  items={columns.map(c => c.id)}
  strategy={horizontalListSortingStrategy}
@@ -472,7 +472,7 @@ export default function CasesPage() {
  </SortableHeader>
  ))}
  </SortableContext>
- <th className="w-12 px-4 py-3 bg-[#FAF6EE]" />
+ <th className="w-12 px-4 py-3 bg-background" />
  </tr>
  </thead>
 
@@ -481,13 +481,13 @@ export default function CasesPage() {
  <tr>
  <td colSpan={columns.length + 1} className="h-64 text-center">
  <div className="flex justify-center">
- <Loader2 className="w-7 h-7 animate-spin text-[#0D9488]" />
+ <Loader2 className="w-7 h-7 animate-spin text-primary-500" />
  </div>
  </td>
  </tr>
  ) : filteredCases.length === 0 ? (
  <tr>
- <td colSpan={columns.length + 1} className="h-64 text-center text-[#8C8880] text-sm">
+ <td colSpan={columns.length + 1} className="h-64 text-center text-text-muted text-sm">
  No cases found matching criteria.
  </td>
  </tr>
@@ -496,21 +496,21 @@ export default function CasesPage() {
  <tr
  key={c.id}
  onClick={() => router.push(`/cases/${c.id}`)}
- className="group bg-[#ffffff] hover:bg-[#FAF6EE] border-b border-[#F3F1EC] last:border-b-0 cursor-pointer transition-colors"
+ className="group bg-surface hover:bg-background border-b border-surface-raised last:border-b-0 cursor-pointer transition-colors"
  >
  {columns.map(col => {
  let content: React.ReactNode = null;
  switch (col.id) {
  case 'caseNumber':
  content = (
- <code className="font-mono text-sm font-medium text-[#0D9488]">
+ <code className="font-mono text-sm font-medium text-primary-500">
  {c.caseNumber}
  </code>
  );
  break;
  case 'clientName':
  content = (
- <span className="text-sm font-medium text-[#1C1A17]">
+ <span className="text-sm font-medium text-text-primary">
  {c.clientName}
  </span>
  );
@@ -527,23 +527,23 @@ export default function CasesPage() {
  break;
  case 'program':
  content = (
- <span className="text-sm text-[#5C5850]">
+ <span className="text-sm text-text-secondary">
  {c.program || '—'}
  </span>
  );
  break;
  case 'createdAt':
  content = (
- <div className="flex items-center gap-1.5 text-sm text-[#5C5850]">
- <Calendar className="w-3.5 h-3.5 text-[#8C8880]" />
+ <div className="flex items-center gap-1.5 text-sm text-text-secondary">
+ <Calendar className="w-3.5 h-3.5 text-text-muted" />
  {format(new Date(c.createdAt), 'MMM d, yyyy')}
  </div>
  );
  break;
  case 'assignedTo':
  content = (
- <div className="flex items-center gap-1.5 text-sm text-[#5C5850]">
- <User className="w-3.5 h-3.5 text-[#8C8880]" />
+ <div className="flex items-center gap-1.5 text-sm text-text-secondary">
+ <User className="w-3.5 h-3.5 text-text-muted" />
  {getActiveAssignee(c)}
  </div>
  );
@@ -559,7 +559,7 @@ export default function CasesPage() {
  );
  })}
  <td className="px-4 py-3.5 text-right">
- <ChevronRight className="w-4 h-4 text-[#C8C4BB] group-hover:text-[#0D9488] transition-colors inline-block" />
+ <ChevronRight className="w-4 h-4 text-border-strong group-hover:text-primary-500 transition-colors inline-block" />
  </td>
  </tr>
  ))
@@ -570,15 +570,15 @@ export default function CasesPage() {
  </div>
 
  {/* ── Footer ── */}
- <div className="flex items-center justify-between px-5 py-3 border-t border-[#E5E2DB] bg-[#FAF6EE]">
- <p className="text-xs text-[#8C8880]">
- Showing <span className="font-semibold text-[#1C1A17]">{filteredCases.length}</span> case{filteredCases.length !== 1 ? 's' : ''}
- {hasActiveFilters && <span className="text-[#0D9488]"> (filtered)</span>}
+ <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-background">
+ <p className="text-xs text-text-muted">
+ Showing <span className="font-semibold text-text-primary">{filteredCases.length}</span> case{filteredCases.length !== 1 ? 's' : ''}
+ {hasActiveFilters && <span className="text-primary-500"> (filtered)</span>}
  </p>
  {hasActiveFilters && (
  <button
  onClick={resetFilters}
- className="text-xs font-medium text-[#0D9488] hover:text-[#0F766E] transition-colors"
+ className="text-xs font-medium text-primary-500 hover:text-primary-600 transition-colors"
  >
  Clear filters
  </button>

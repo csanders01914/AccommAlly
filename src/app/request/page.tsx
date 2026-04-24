@@ -148,7 +148,7 @@ export default function AccommodationRequestPage() {
  switch (currentStep) {
  case 1: return (
  <div className="space-y-6">
- <h2 className="text-xl font-semibold text-[#1C1A17] mb-4">Let's start with your contact details</h2>
+ <h2 className="text-xl font-semibold text-text-primary mb-4">Let's start with your contact details</h2>
  <div className="space-y-4">
  <Input label="Full Name" name="fullName" value={formData.fullName} error={errors.fullName} onChange={handleChange} required />
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -181,9 +181,9 @@ export default function AccommodationRequestPage() {
  ]} />
 
  {/* PIN/Passphrase Section */}
- <div className="pt-4 border-t border-[#E5E2DB]">
- <h3 className="text-lg font-medium text-[#1C1A17] mb-3">Identity Verification Setup</h3>
- <p className="text-[#5C5850] text-sm mb-4">
+ <div className="pt-4 border-t border-border">
+ <h3 className="text-lg font-medium text-text-primary mb-3">Identity Verification Setup</h3>
+ <p className="text-text-secondary text-sm mb-4">
  Create a PIN or passphrase to verify your identity when calling about your claim.
  </p>
 
@@ -191,8 +191,8 @@ export default function AccommodationRequestPage() {
  <label className={cn(
  "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all",
  formData.credentialType === 'PIN'
- ? "border-[#0D9488] bg-[#0D9488]/10 text-[#0D9488]"
- : "border-[#E5E2DB] text-[#5C5850] hover:bg-[#ffffff]"
+ ? "border-primary-500 bg-primary-500/10 text-primary-500"
+ : "border-border text-text-secondary hover:bg-surface"
  )}>
  <input
  type="radio"
@@ -208,8 +208,8 @@ export default function AccommodationRequestPage() {
  <label className={cn(
  "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border cursor-pointer transition-all",
  formData.credentialType === 'PASSPHRASE'
- ? "border-[#0D9488] bg-[#0D9488]/10 text-[#0D9488]"
- : "border-[#E5E2DB] text-[#5C5850] hover:bg-[#ffffff]"
+ ? "border-primary-500 bg-primary-500/10 text-primary-500"
+ : "border-border text-text-secondary hover:bg-surface"
  )}>
  <input
  type="radio"
@@ -257,7 +257,7 @@ export default function AccommodationRequestPage() {
  );
  case 2: return (
  <div className="space-y-6">
- <h2 className="text-xl font-semibold text-[#1C1A17] mb-4">Describe your accommodation needs</h2>
+ <h2 className="text-xl font-semibold text-text-primary mb-4">Describe your accommodation needs</h2>
  <Select label="Type of Accommodation" name="accommodationType" value={formData.accommodationType} error={errors.accommodationType} onChange={handleChange} required options={[
  { value: 'equipment', label: 'Equipment Modification' },
  { value: 'schedule', label: 'Schedule Modification' },
@@ -272,7 +272,7 @@ export default function AccommodationRequestPage() {
  );
  case 3: return (
  <div className="space-y-6">
- <h2 className="text-xl font-semibold text-[#1C1A17] mb-4">Additional Details</h2>
+ <h2 className="text-xl font-semibold text-text-primary mb-4">Additional Details</h2>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <Input label="Program (Optional)" name="program" value={formData.program} onChange={handleChange} />
  <Input label="Venue (Optional)" name="venue" value={formData.venue} onChange={handleChange} />
@@ -280,8 +280,8 @@ export default function AccommodationRequestPage() {
  <Input label="Preferred Start Date (Optional)" name="preferredStartDate" type="date" value={formData.preferredStartDate} onChange={handleChange} />
 
  <div className="pt-4">
- <label className="block text-sm font-medium text-[#1C1A17] mb-2">Supporting Documents</label>
- <div className="border-2 border-dashed border-[#E5E2DB] rounded-xl p-8 text-center hover:bg-[#ffffff] focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-slate-900 transition-all cursor-pointer relative">
+ <label className="block text-sm font-medium text-text-primary mb-2">Supporting Documents</label>
+ <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-surface focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:ring-offset-slate-900 transition-all cursor-pointer relative">
  <input
  type="file"
  onChange={handleFile}
@@ -289,17 +289,17 @@ export default function AccommodationRequestPage() {
  accept=".pdf,.doc,.docx,.jpg,.png"
  aria-label="Upload supporting documents"
  />
- <Upload className="w-8 h-8 text-[#0D9488] mx-auto mb-2" aria-hidden="true" />
- <p className="text-[#1C1A17]">{formData.supportingDocument ? formData.supportingDocument.name : "Click to upload file"}</p>
- <p className="text-[#8C8880] text-xs mt-1">PDF, DOC, JPG (Max 10MB)</p>
+ <Upload className="w-8 h-8 text-primary-500 mx-auto mb-2" aria-hidden="true" />
+ <p className="text-text-primary">{formData.supportingDocument ? formData.supportingDocument.name : "Click to upload file"}</p>
+ <p className="text-text-muted text-xs mt-1">PDF, DOC, JPG (Max 10MB)</p>
  </div>
  </div>
  </div>
  );
  case 4: return (
  <div className="space-y-6">
- <h2 className="text-xl font-semibold text-[#1C1A17] mb-4">Review your request</h2>
- <div className="bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-xl p-6 space-y-4">
+ <h2 className="text-xl font-semibold text-text-primary mb-4">Review your request</h2>
+ <div className="bg-surface border border-border shadow-sm rounded-xl p-6 space-y-4">
  <ReviewRow label="Name" value={formData.fullName} />
  <ReviewRow label="Email" value={formData.email} />
  <ReviewRow label="Phone" value={formData.phone} />
@@ -309,7 +309,7 @@ export default function AccommodationRequestPage() {
  <ReviewRow label="Document" value={formData.supportingDocument?.name || 'None'} />
  <ReviewRow label="Verification" value={formData.credentialType === 'PIN' ? 'PIN Set' : 'Passphrase Set'} />
  </div>
- <p className="text-[#5C5850] text-sm">By submitting, you acknowledge that this information is accurate.</p>
+ <p className="text-text-secondary text-sm">By submitting, you acknowledge that this information is accurate.</p>
  </div>
  );
  }
@@ -346,33 +346,33 @@ export default function AccommodationRequestPage() {
 
  if (isSubmitted) {
  return (
- <div className="min-h-screen bg-[#FAF6EE] flex items-center justify-center p-4">
- <div className="max-w-md w-full bg-[#ffffff] border border-[#E5E2DB] shadow-sm rounded-2xl p-8 text-center">
+ <div className="min-h-screen bg-background flex items-center justify-center p-4">
+ <div className="max-w-md w-full bg-surface border border-border shadow-sm rounded-2xl p-8 text-center">
  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
  <CheckCircle className="w-8 h-8 text-green-600" />
  </div>
- <h1 className="text-2xl font-bold text-[#1C1A17] mb-2">Request Submitted!</h1>
+ <h1 className="text-2xl font-bold text-text-primary mb-2">Request Submitted!</h1>
 
  <div className="space-y-4 mb-6">
  <div>
- <p className="text-[#5C5850] text-sm">Claim Number</p>
- <div className="bg-[#FAF6EE] rounded-lg p-3 border border-[#E5E2DB]">
- <code className="text-xl font-bold text-[#1C1A17] tracking-widest">{claimNumber}</code>
+ <p className="text-text-secondary text-sm">Claim Number</p>
+ <div className="bg-background rounded-lg p-3 border border-border">
+ <code className="text-xl font-bold text-text-primary tracking-widest">{claimNumber}</code>
  </div>
  </div>
 
  {claimantNumber && (
  <div>
- <p className="text-[#5C5850] text-sm">Claimant ID</p>
- <div className="bg-[#0D9488]/10 rounded-lg p-3 border border-[#0D9488]/20">
- <code className="text-xl font-bold text-[#0D9488] tracking-widest">{claimantNumber}</code>
+ <p className="text-text-secondary text-sm">Claimant ID</p>
+ <div className="bg-primary-500/10 rounded-lg p-3 border border-primary-500/20">
+ <code className="text-xl font-bold text-primary-500 tracking-widest">{claimantNumber}</code>
  </div>
  </div>
  )}
  </div>
 
- <div className="bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg p-4 text-left">
- <p className="text-sm text-[#5C5850]">
+ <div className="bg-background border border-border rounded-lg p-4 text-left">
+ <p className="text-sm text-text-secondary">
  {isNewClaimant ? (
  <><strong>Important:</strong> Save your Claimant ID and PIN/passphrase. You\'ll need them to verify your identity when calling about your claim.</>
  ) : (
@@ -386,15 +386,15 @@ export default function AccommodationRequestPage() {
  }
 
  return (
- <div className="min-h-screen bg-[#FAF6EE] py-12 px-4 font-sans">
+ <div className="min-h-screen bg-background py-12 px-4 font-sans">
  <div className="max-w-3xl mx-auto">
  {/* Header */}
  <div className="mb-10 text-center">
- <div className="inline-flex p-3 rounded-2xl bg-[#0D9488]/10 mb-4 ring-1 ring-[#0D9488]/30">
- <Shield className="w-8 h-8 text-[#0D9488]" />
+ <div className="inline-flex p-3 rounded-2xl bg-primary-500/10 mb-4 ring-1 ring-[#0D9488]/30">
+ <Shield className="w-8 h-8 text-primary-500" />
  </div>
- <h1 className="text-3xl font-bold text-[#1C1A17] mb-2">AccommAlly</h1>
- <p className="text-[#5C5850]">Accommodation Request Service</p>
+ <h1 className="text-3xl font-bold text-text-primary mb-2">AccommAlly</h1>
+ <p className="text-text-secondary">Accommodation Request Service</p>
  </div>
 
  {/* Progress Steps */}
@@ -403,11 +403,11 @@ export default function AccommodationRequestPage() {
  {STEPS.map((s) => (
  <div
  key={s.number}
- className={cn("flex flex-col items-center gap-2 relative z-10", currentStep >= s.number ? "text-[#0D9488]" : "text-[#8C8880]")}
+ className={cn("flex flex-col items-center gap-2 relative z-10", currentStep >= s.number ? "text-primary-500" : "text-text-muted")}
  aria-current={currentStep === s.number ? 'step' : undefined}
  >
- <div className={cn("w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors bg-[#FAF6EE]",
- currentStep >= s.number ? "border-[#0D9488] bg-[#0D9488]/10 text-[#0D9488]" : "border-[#E5E2DB] text-[#8C8880]")}>
+ <div className={cn("w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors bg-background",
+ currentStep >= s.number ? "border-primary-500 bg-primary-500/10 text-primary-500" : "border-border text-text-muted")}>
  <s.icon className="w-5 h-5" aria-hidden="true" />
  </div>
  <span className="text-xs font-medium hidden sm:block">{s.title}</span>
@@ -416,19 +416,19 @@ export default function AccommodationRequestPage() {
  </nav>
 
  {/* Form Card */}
- <div className="bg-[#ffffff] border border-[#E5E2DB] rounded-3xl p-8 shadow-xl">
+ <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl">
  {renderStepContent()}
 
  {/* Navigation Buttons */}
- <div className="flex justify-between mt-8 pt-8 border-t border-[#E5E2DB]">
+ <div className="flex justify-between mt-8 pt-8 border-t border-border">
  {currentStep > 1 ? (
- <button onClick={handleBack} className="flex items-center gap-2 px-6 py-2.5 rounded-xl hover:bg-[#F3F1EC] text-[#5C5850] transition-colors">
+ <button onClick={handleBack} className="flex items-center gap-2 px-6 py-2.5 rounded-xl hover:bg-surface-raised text-text-secondary transition-colors">
  <ArrowLeft className="w-4 h-4" /> Back
  </button>
  ) : <div />}
 
  {currentStep < 4 ? (
- <button onClick={handleNext} className="flex items-center gap-2 px-8 py-2.5 bg-[#0D9488] hover:bg-[#0F766E] text-white rounded-xl font-medium transition-colors shadow-md">
+ <button onClick={handleNext} className="flex items-center gap-2 px-8 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-medium transition-colors shadow-md">
  Next Step <ArrowRight className="w-4 h-4" />
  </button>
  ) : (
@@ -456,13 +456,13 @@ function Input({ label, error, icon, ...props }: InputProps) {
  const id = useId();
  return (
  <div>
- <label htmlFor={id} className="block text-sm font-medium text-[#1C1A17] mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
+ <label htmlFor={id} className="block text-sm font-medium text-text-primary mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
  <div className="relative">
  {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true">{icon}</div>}
  <input
  id={id}
- className={cn("w-full bg-[#ffffff] border rounded-xl px-4 py-3 text-[#1C1A17] focus:ring-2 focus:ring-[#0D9488] outline-none transition-all placeholder:text-[#8C8880]",
- error ? "border-red-500" : "border-[#E5E2DB]",
+ className={cn("w-full bg-surface border rounded-xl px-4 py-3 text-text-primary focus:ring-2 focus:ring-[#0D9488] outline-none transition-all placeholder:text-text-muted",
+ error ? "border-red-500" : "border-border",
  icon && "pl-10"
  )}
  aria-invalid={!!error}
@@ -483,12 +483,12 @@ function TextArea({ label, error, ...props }: TextAreaProps) {
  const id = useId();
  return (
  <div>
- <label htmlFor={id} className="block text-sm font-medium text-[#1C1A17] mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
+ <label htmlFor={id} className="block text-sm font-medium text-text-primary mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
  <textarea
  id={id}
  rows={4}
- className={cn("w-full bg-[#ffffff] border rounded-xl px-4 py-3 text-[#1C1A17] focus:ring-2 focus:ring-[#0D9488] outline-none transition-all resize-none placeholder:text-[#8C8880]",
- error ? "border-red-500" : "border-[#E5E2DB]"
+ className={cn("w-full bg-surface border rounded-xl px-4 py-3 text-text-primary focus:ring-2 focus:ring-[#0D9488] outline-none transition-all resize-none placeholder:text-text-muted",
+ error ? "border-red-500" : "border-border"
  )}
  aria-invalid={!!error}
  {...props}
@@ -513,11 +513,11 @@ function Select({ label, options, error, ...props }: SelectProps) {
  const id = useId();
  return (
  <div>
- <label htmlFor={id} className="block text-sm font-medium text-[#1C1A17] mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
+ <label htmlFor={id} className="block text-sm font-medium text-text-primary mb-1.5">{label} {props.required && <span className="text-red-500">*</span>}</label>
  <select
  id={id}
- className={cn("w-full bg-[#ffffff] border rounded-xl px-4 py-3 text-[#1C1A17] focus:ring-2 focus:ring-[#0D9488] outline-none transition-all appearance-none cursor-pointer",
- error ? "border-red-500" : "border-[#E5E2DB]"
+ className={cn("w-full bg-surface border rounded-xl px-4 py-3 text-text-primary focus:ring-2 focus:ring-[#0D9488] outline-none transition-all appearance-none cursor-pointer",
+ error ? "border-red-500" : "border-border"
  )}
  aria-invalid={!!error}
  {...props}
@@ -537,9 +537,9 @@ interface ReviewRowProps {
 
 function ReviewRow({ label, value }: ReviewRowProps) {
  return (
- <div className="flex justify-between border-b border-[#E5E2DB] pb-2">
- <span className="text-[#5C5850] text-sm">{label}</span>
- <span className="text-[#1C1A17] font-medium text-right">{value || '-'}</span>
+ <div className="flex justify-between border-b border-border pb-2">
+ <span className="text-text-secondary text-sm">{label}</span>
+ <span className="text-text-primary font-medium text-right">{value || '-'}</span>
  </div>
  );
 }

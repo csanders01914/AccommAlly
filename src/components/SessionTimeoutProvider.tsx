@@ -111,7 +111,7 @@ export default function SessionTimeoutProvider({ children }: { children: React.R
  <>
  {children}
  {showModal && (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 ">
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
  <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
  <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-zinc-100">
  Session Expiring
@@ -129,7 +129,7 @@ export default function SessionTimeoutProvider({ children }: { children: React.R
  </button>
  <button
  onClick={resetTimer}
- className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium shadow-sm"
+ className="px-4 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors font-medium shadow-sm"
  >
  Refresh Session
  </button>

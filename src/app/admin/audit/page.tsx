@@ -209,13 +209,13 @@ export default function AuditLogPage() {
  <div className="flex items-center gap-4">
  <button
  onClick={() => router.back()}
- className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors"
+ className="p-2 hover:bg-surface-raised rounded-lg transition-colors"
  >
- <ArrowLeft className="w-5 h-5 text-[#5C5850]" />
+ <ArrowLeft className="w-5 h-5 text-text-secondary" />
  </button>
  <div>
- <h1 className="text-2xl font-bold text-[#1C1A17]">System Audit Logs</h1>
- <p className="text-[#8C8880]">Track all system activities and changes</p>
+ <h1 className="text-2xl font-bold text-text-primary">System Audit Logs</h1>
+ <p className="text-text-muted">Track all system activities and changes</p>
  </div>
  </div>
  <div className="flex gap-2">
@@ -228,7 +228,7 @@ export default function AuditLogPage() {
  </button>
  <button
  onClick={handleExportPDF}
- className="flex items-center gap-2 px-4 py-2 bg-[#ffffff] border border-[#E5E2DB] text-[#5C5850] hover:bg-[#FAF6EE] rounded-lg shadow-sm transition-colors font-medium text-sm"
+ className="flex items-center gap-2 px-4 py-2 bg-surface border border-border text-text-secondary hover:bg-background rounded-lg shadow-sm transition-colors font-medium text-sm"
  >
  <Download className="w-4 h-4" />
  Export PDF
@@ -237,14 +237,14 @@ export default function AuditLogPage() {
  </div>
 
  {/* Filters */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-4">
+ <div className="bg-surface rounded-xl border border-border p-4">
  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
  <div className="relative">
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">User</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">User</label>
  <div className="relative">
- <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
+ <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
  <select
- className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors appearance-none"
+ className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors appearance-none"
  value={selectedUser}
  onChange={(e) => setSelectedUser(e.target.value)}
  >
@@ -257,12 +257,12 @@ export default function AuditLogPage() {
  </div>
 
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Start Date</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">Start Date</label>
  <div className="relative">
- <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
+ <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
  <input
  type="date"
- className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  value={startDate}
  onChange={(e) => setStartDate(e.target.value)}
  />
@@ -270,12 +270,12 @@ export default function AuditLogPage() {
  </div>
 
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">End Date</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">End Date</label>
  <div className="relative">
- <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
+ <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
  <input
  type="date"
- className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  value={endDate}
  onChange={(e) => setEndDate(e.target.value)}
  />
@@ -289,7 +289,7 @@ export default function AuditLogPage() {
  setStartDate('');
  setEndDate('');
  }}
- className="px-4 py-2 text-sm text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC] rounded-lg transition-colors w-full"
+ className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-raised rounded-lg transition-colors w-full"
  >
  Clear Filters
  </button>
@@ -298,53 +298,53 @@ export default function AuditLogPage() {
  </div>
 
  {/* Logs List */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden">
  {isLoading ? (
  <div className="flex justify-center py-12">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  ) : logs.length > 0 ? (
  <div className="overflow-x-auto">
  <table className="w-full text-left text-sm">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
+ <thead className="bg-background border-b border-border">
  <tr>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Timestamp</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Entity</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Details</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Timestamp</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">User</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Action</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Entity</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Details</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {logs.map((log) => (
- <tr key={log.id} className="hover:bg-[#FAF6EE] transition-colors">
- <td className="px-6 py-4 text-[#8C8880] whitespace-nowrap">
+ <tr key={log.id} className="hover:bg-background transition-colors">
+ <td className="px-6 py-4 text-text-muted whitespace-nowrap">
  {new Date(log.timestamp).toLocaleString()}
  </td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] flex items-center justify-center text-xs font-bold">
+ <div className="w-6 h-6 rounded-full bg-primary-500/10 text-primary-500 flex items-center justify-center text-xs font-bold">
  {log.user.name.charAt(0)}
  </div>
- <span className="font-medium text-[#1C1A17]">{log.user.name}</span>
+ <span className="font-medium text-text-primary">{log.user.name}</span>
  </div>
  </td>
  <td className="px-6 py-4">
  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${log.action === 'CREATE' ? 'bg-green-50 text-green-700 border-green-100' :
- log.action === 'UPDATE' ? 'bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20' :
+ log.action === 'UPDATE' ? 'bg-primary-500/8 text-primary-500 border-primary-500/20' :
  log.action === 'DELETE' ? 'bg-red-50 text-red-700 border-red-100' :
- 'bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]'
+ 'bg-surface-raised text-text-secondary border-border'
  }`}>
  {log.action}
  </span>
  </td>
  <td className="px-6 py-4">
- <span className="font-mono text-xs bg-[#F3F1EC] px-1.5 py-0.5 rounded text-[#5C5850]">
+ <span className="font-mono text-xs bg-surface-raised px-1.5 py-0.5 rounded text-text-secondary">
  {log.entityType}
  </span>
  </td>
  <td className="px-6 py-4">
- <div className="max-w-xs text-[#5C5850] text-xs font-mono break-all">
+ <div className="max-w-xs text-text-secondary text-xs font-mono break-all">
  {formatDetails(log)}
  </div>
  </td>
@@ -354,7 +354,7 @@ export default function AuditLogPage() {
  </table>
  </div>
  ) : (
- <div className="text-center py-12 text-[#8C8880]">
+ <div className="text-center py-12 text-text-muted">
  <FileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
  <p>No audit logs found</p>
  </div>

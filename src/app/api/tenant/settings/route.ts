@@ -66,16 +66,12 @@ export async function PATCH(request: NextRequest) {
  const body = await request.json();
  const { settings } = body;
 
- // Merge existing settings with new settings
  const currentSettings = (user.tenant.settings as Record<string, any>) || {};
  const updatedSettings = {
  ...currentSettings,
- ...settings,
- // Ensure branding is carefully merged if sent partially
  branding: {
- ...(currentSettings.branding || {}),
- ...(settings.branding || {})
- }
+ logo: settings.branding?.logo ?? (currentSettings.branding?.logo ?? null),
+ },
  };
 
  const updatedTenant = await prisma.tenant.update({

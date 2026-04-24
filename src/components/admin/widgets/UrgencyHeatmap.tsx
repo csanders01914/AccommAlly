@@ -15,11 +15,11 @@ interface UrgencyHeatmapProps {
 
 export function UrgencyHeatmap({ data, isLoading }: UrgencyHeatmapProps) {
  if (isLoading) {
- return <div className="h-64 flex items-center justify-center"><Loader2 className="animate-spin text-gray-400" /></div>;
+ return <div className="h-64 flex items-center justify-center"><Loader2 className="animate-spin text-text-muted" /></div>;
  }
 
  if (!data || data.length === 0) {
- return <div className="h-64 flex items-center justify-center text-gray-500">No active case data</div>;
+ return <div className="h-64 flex items-center justify-center text-text-muted">No active case data</div>;
  }
 
  return (

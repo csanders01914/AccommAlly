@@ -60,10 +60,8 @@ export async function PATCH(request: NextRequest) {
  const currentSettings = (tenant.settings as Record<string, any>) || {};
  const updatedSettings = {
  ...currentSettings,
- ...settings,
  branding: {
- ...(currentSettings.branding || {}),
- ...(settings.branding || {}),
+ logo: settings.branding?.logo ?? (currentSettings.branding?.logo ?? null),
  },
  };
 

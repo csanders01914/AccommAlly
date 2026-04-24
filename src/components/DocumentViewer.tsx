@@ -251,7 +251,7 @@ export function DocumentViewer({
  <div className="flex items-center gap-4">
  <h2 className="font-medium truncate max-w-md">{fileName}</h2>
  {isPdf && numPages > 0 && (
- <span className="text-sm text-gray-400">Page {currentPage} of {numPages}</span>
+ <span className="text-sm text-text-muted">Page {currentPage} of {numPages}</span>
  )}
  </div>
 
@@ -259,7 +259,7 @@ export function DocumentViewer({
  {/* Add Note button */}
  <button
  onClick={() => { setShowNewNotePanel(true); setOpenThreadId(null); }}
- className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm hover:bg-gray-700 text-gray-300"
+ className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm hover:bg-gray-700 text-text-muted"
  title="Add document note"
  >
  <StickyNote className="w-4 h-4" />
@@ -270,7 +270,7 @@ export function DocumentViewer({
  {isPdf && (
  <button
  onClick={() => setIsHighlightMode(!isHighlightMode)}
- className={`p-2 rounded-lg transition-colors ${isHighlightMode ? 'bg-yellow-500 text-black' : 'hover:bg-gray-700 text-gray-300'}`}
+ className={`p-2 rounded-lg transition-colors ${isHighlightMode ? 'bg-yellow-500 text-black' : 'hover:bg-gray-700 text-text-muted'}`}
  title="Toggle Highlight Mode"
  >
  <Highlighter className="w-5 h-5" />
@@ -296,11 +296,11 @@ export function DocumentViewer({
  {isPdf && (
  <>
  <div className="w-px h-6 bg-gray-700 mx-2" />
- <button onClick={zoomOut} className="p-2 hover:bg-gray-700 rounded-lg text-gray-300" title="Zoom Out">
+ <button onClick={zoomOut} className="p-2 hover:bg-gray-700 rounded-lg text-text-muted" title="Zoom Out">
  <ZoomOut className="w-5 h-5" />
  </button>
- <span className="text-sm text-gray-400 min-w-[60px] text-center">{Math.round(scale * 100)}%</span>
- <button onClick={zoomIn} className="p-2 hover:bg-gray-700 rounded-lg text-gray-300" title="Zoom In">
+ <span className="text-sm text-text-muted min-w-[60px] text-center">{Math.round(scale * 100)}%</span>
+ <button onClick={zoomIn} className="p-2 hover:bg-gray-700 rounded-lg text-text-muted" title="Zoom In">
  <ZoomIn className="w-5 h-5" />
  </button>
  </>
@@ -310,17 +310,17 @@ export function DocumentViewer({
  {isPdf && numPages > 1 && (
  <>
  <div className="w-px h-6 bg-gray-700 mx-2" />
- <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1} className="p-2 hover:bg-gray-700 rounded-lg text-gray-300 disabled:opacity-40">
+ <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1} className="p-2 hover:bg-gray-700 rounded-lg text-text-muted disabled:opacity-40">
  <ChevronLeft className="w-5 h-5" />
  </button>
- <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= numPages} className="p-2 hover:bg-gray-700 rounded-lg text-gray-300 disabled:opacity-40">
+ <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= numPages} className="p-2 hover:bg-gray-700 rounded-lg text-text-muted disabled:opacity-40">
  <ChevronRight className="w-5 h-5" />
  </button>
  </>
  )}
 
  <div className="w-px h-6 bg-gray-700 mx-2" />
- <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg text-gray-300" title="Close">
+ <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg text-text-muted" title="Close">
  <X className="w-5 h-5" />
  </button>
  </div>
@@ -339,7 +339,7 @@ export function DocumentViewer({
  className={`w-full mb-2 p-1 rounded transition-all ${currentPage === page ? 'ring-2 ring-blue-500 bg-gray-800' : 'hover:bg-gray-800'}`}
  >
  <Page pageNumber={page} width={100} renderTextLayer={false} renderAnnotationLayer={false} />
- <span className="text-xs text-gray-400 mt-1 block">{page}</span>
+ <span className="text-xs text-text-muted mt-1 block">{page}</span>
  </button>
  ))}
  </Document>
@@ -349,7 +349,7 @@ export function DocumentViewer({
  {/* Document Area */}
  <main className="flex-1 overflow-auto flex items-start justify-center p-4">
  {isLoading && (
- <div className="flex items-center gap-2 text-gray-400 mt-20">
+ <div className="flex items-center gap-2 text-text-muted mt-20">
  <Loader2 className="w-6 h-6 animate-spin" />
  Loading document...
  </div>
@@ -426,15 +426,15 @@ export function DocumentViewer({
  {/* Post-draw comment popover */}
  {pendingHighlight && (
  <div
- className="absolute z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 w-64"
+ className="absolute z-30 bg-surface border border-border rounded-lg shadow-xl p-3 w-64"
  style={{ left: `${Math.min(pendingHighlight.x, 60)}%`, top: `${pendingHighlight.y + pendingHighlight.height + 1}%` }}
  >
- <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Add comment (optional)</p>
+ <p className="text-xs font-medium text-text-secondary mb-2">Add comment (optional)</p>
  <textarea
  value={pendingComment}
  onChange={e => setPendingComment(e.target.value)}
  placeholder="What does this highlight mean?"
- className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
+ className="w-full text-sm border border-border-strong rounded px-2 py-1 bg-white text-text-primary resize-none focus:outline-none focus:ring-1 focus:ring-primary-500"
  rows={3}
  autoFocus
  />
@@ -442,13 +442,13 @@ export function DocumentViewer({
  <button
  onClick={saveHighlight}
  disabled={isSavingHighlight}
- className="flex-1 text-xs px-2 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50"
+ className="flex-1 text-xs px-2 py-1.5 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50"
  >
  {isSavingHighlight ? 'Saving...' : 'Save'}
  </button>
  <button
  onClick={() => { setPendingHighlight(null); setPendingComment(''); }}
- className="flex-1 text-xs px-2 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300"
+ className="flex-1 text-xs px-2 py-1.5 bg-gray-200 text-text-secondary rounded hover:bg-gray-300"
  >
  Cancel
  </button>

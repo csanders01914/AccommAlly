@@ -17,8 +17,8 @@ interface AddAccommodationModalProps {
  onSubmit: (data: AddAccommodationData) => void;
 }
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function AddAccommodationModal({ isOpen, onClose, onSubmit }: AddAccommodationModalProps) {
  const [formData, setFormData] = useState<Partial<AddAccommodationData>>({
@@ -39,11 +39,11 @@ export function AddAccommodationModal({ isOpen, onClose, onSubmit }: AddAccommod
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
- <div className="bg-[#ffffff] rounded-xl max-w-md w-full shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB]">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17]">Add Accommodation</h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <div className="bg-surface rounded-xl max-w-md w-full shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-border">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary">Add Accommodation</h2>
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -76,7 +76,7 @@ export function AddAccommodationModal({ isOpen, onClose, onSubmit }: AddAccommod
  <input type="date" required className={inputCls} onChange={e => setFormData({ ...formData, startDate: new Date(e.target.value) })} />
  </div>
  <div>
- <label className={labelCls}>End Date <span className="normal-case font-normal text-[#8C8880]">(optional)</span></label>
+ <label className={labelCls}>End Date <span className="normal-case font-normal text-text-muted">(optional)</span></label>
  <input type="date" className={inputCls} onChange={e => setFormData({ ...formData, endDate: e.target.value ? new Date(e.target.value) : undefined })} />
  </div>
  </div>
@@ -87,10 +87,10 @@ export function AddAccommodationModal({ isOpen, onClose, onSubmit }: AddAccommod
  </div>
 
  <div className="flex justify-end gap-3 pt-2">
- <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
+ <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">
  Cancel
  </button>
- <button type="submit" className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors">
+ <button type="submit" className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors">
  Add Accommodation
  </button>
  </div>

@@ -529,23 +529,23 @@ function MessagesContent() {
  return (
  <div className="flex min-h-screen app-background">
  {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
- <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+ <div className={`flex-1 flex flex-col transition-all duration-300 bg-background ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
  {/* Header */}
- <div className="bg-[#ffffff] border border-[#E5E2DB] p-4 rounded-xl mx-6 mt-6 mb-2 shadow-sm flex items-center justify-between">
- <h1 className="text-lg font-semibold text-[#1C1A17] flex items-center gap-2">
- <Mail className="w-5 h-5 text-[#0D9488]" />
+ <div className="bg-surface border border-border p-4 rounded-xl mx-6 mt-6 mb-2 shadow-sm flex items-center justify-between">
+ <h1 className="text-lg font-semibold text-text-primary flex items-center gap-2">
+ <Mail className="w-5 h-5 text-primary-500" />
  Secure Messages
  </h1>
  <div className="flex items-center gap-2">
  <button
  onClick={() => setShowSettingsModal(true)}
- className="px-3 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors"
+ className="px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors"
  >
  Settings
  </button>
  <button
  onClick={handleNewMessage}
- className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+ className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
  >
  <Plus className="w-4 h-4" />
  New Message
@@ -554,9 +554,9 @@ function MessagesContent() {
  </div>
 
  {/* Main Content Area */}
- <div className="flex flex-1 overflow-hidden mx-6 mb-6 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm">
+ <div className="flex flex-1 overflow-hidden mx-6 mb-6 bg-surface rounded-xl border border-border shadow-sm">
  {/* Sidebar (Folders) */}
- <div className="w-56 bg-[#FAF6EE] border-r border-[#E5E2DB] flex flex-col">
+ <div className="w-56 bg-background border-r border-border flex flex-col">
  <div className="p-3 space-y-1">
  <SidebarButton
  icon={Inbox}
@@ -639,12 +639,12 @@ function MessagesContent() {
  </div>
 
  {/* Custom Folders Section */}
- <div className="flex-1 border-t border-[#E5E2DB]">
+ <div className="flex-1 border-t border-border">
  <div className="p-3 pb-1 flex items-center justify-between">
- <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Folders</span>
+ <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Folders</span>
  <button
  onClick={() => setShowCreateFolderModal(true)}
- className="p-1 hover:bg-[#F3F1EC] rounded text-[#8C8880] hover:text-[#5C5850] transition-colors"
+ className="p-1 hover:bg-surface-raised rounded text-text-muted hover:text-text-secondary transition-colors"
  title="Create folder"
  >
  <FolderPlus className="w-4 h-4" />
@@ -652,7 +652,7 @@ function MessagesContent() {
  </div>
  <div className="px-3 space-y-1 pb-3">
  {folders.length === 0 ? (
- <p className="text-xs text-[#8C8880] py-2 text-center">No custom folders</p>
+ <p className="text-xs text-text-muted py-2 text-center">No custom folders</p>
  ) : (
  folders.map(folder => (
  <button
@@ -676,15 +676,15 @@ function MessagesContent() {
  className={cn(
  "w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm border border-transparent",
  activeBox === 'folder' && activeFolderId === folder.id
- ? "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20"
- : "text-[#5C5850] hover:bg-[#F3F1EC]",
- dragOverFolderId === folder.id && "bg-[#0D9488]/5 border-[#0D9488]/20"
+ ? "bg-primary-500/10 text-primary-500 border-primary-500/20"
+ : "text-text-secondary hover:bg-surface-raised",
+ dragOverFolderId === folder.id && "bg-primary-500/5 border-primary-500/20"
  )}
  >
  <Folder className="w-4 h-4" style={{ color: folder.color }} />
  <span className="truncate flex-1">{folder.name}</span>
  {(folder._count?.messages ?? 0) > 0 && (
- <span className="text-xs bg-[#E5E2DB] text-[#5C5850] px-1.5 py-0.5 rounded-full">
+ <span className="text-xs bg-border text-text-secondary px-1.5 py-0.5 rounded-full">
  {folder._count?.messages}
  </span>
  )}
@@ -696,17 +696,17 @@ function MessagesContent() {
  </div>
 
  {/* Message List */}
- <div className="w-80 border-r border-[#E5E2DB] bg-[#ffffff] flex flex-col">
+ <div className="w-80 border-r border-border bg-surface flex flex-col">
  {/* Search */}
- <div className="p-3 border-b border-[#E5E2DB]">
+ <div className="p-3 border-b border-border">
  <div className="relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C8880]" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
  <input
  type="text"
  placeholder="Search messages…"
  value={searchQuery}
  onChange={e => setSearchQuery(e.target.value)}
- className="w-full pl-10 pr-4 py-2 bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg text-sm text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
  </div>
@@ -714,9 +714,9 @@ function MessagesContent() {
  {/* Messages */}
  <div className="flex-1 overflow-y-auto">
  {isLoading ? (
- <div className="p-8 text-center text-[#8C8880]">Loading…</div>
+ <div className="p-8 text-center text-text-muted">Loading…</div>
  ) : filteredMessages.length === 0 ? (
- <div className="p-8 text-center text-[#8C8880] font-medium">No messages</div>
+ <div className="p-8 text-center text-text-muted font-medium">No messages</div>
  ) : (
  <ul className="divide-y divide-[#F3F1EC]">
  {filteredMessages.map(msg => (
@@ -735,7 +735,7 @@ function MessagesContent() {
  </div>
 
  {/* Reading Pane */}
- <div className="flex-1 bg-[#FAF6EE] overflow-y-auto">
+ <div className="flex-1 bg-background overflow-y-auto">
  {isComposeOpen ? (
  <ComposeView
  mode={composeMode}
@@ -765,10 +765,10 @@ function MessagesContent() {
  />
  ) : (
  <div className="h-full flex items-center justify-center">
- <div className="text-center p-8 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm">
- <Mail className="w-12 h-12 mx-auto mb-3 text-[#C8C4BB]" />
- <p className="text-base font-semibold text-[#1C1A17]">Select a message to read</p>
- <p className="text-sm text-[#8C8880] mt-1">Click on a message from the list to view details</p>
+ <div className="text-center p-8 bg-surface rounded-xl border border-border shadow-sm">
+ <Mail className="w-12 h-12 mx-auto mb-3 text-border-strong" />
+ <p className="text-base font-semibold text-text-primary">Select a message to read</p>
+ <p className="text-sm text-text-muted mt-1">Click on a message from the list to view details</p>
  </div>
  </div>
  )}
@@ -1042,7 +1042,7 @@ function MessageDetail({
  <div className="relative min-h-full flex">
  <div className="flex-1 p-6">
  <div className="max-w-4xl mx-auto">
- <div className="bg-[#ffffff] rounded-xl shadow-sm border border-[#E5E2DB] overflow-hidden">
+ <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
  {/* External Email Warning Banner */}
  {isExternalInbound && (
  <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
@@ -1065,24 +1065,24 @@ function MessageDetail({
  )}
 
  {/* Toolbar */}
- <div className="p-3 border-b border-[#E5E2DB] flex items-center gap-2 bg-[#FAF6EE]">
- <button onClick={onReply} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Reply">
+ <div className="p-3 border-b border-border flex items-center gap-2 bg-background">
+ <button onClick={onReply} className="p-2 hover:bg-surface-raised rounded-lg transition-colors text-text-secondary" title="Reply">
  <Reply className="w-4 h-4" />
  </button>
- <button onClick={onForward} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Forward">
+ <button onClick={onForward} className="p-2 hover:bg-surface-raised rounded-lg transition-colors text-text-secondary" title="Forward">
  <Forward className="w-4 h-4" />
  </button>
- <div className="w-px h-5 bg-[#E5E2DB] mx-1" />
- <button onClick={onStar} className={cn("p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors", message.starred ? "text-amber-500" : "text-[#8C8880]")} title="Star">
+ <div className="w-px h-5 bg-border mx-1" />
+ <button onClick={onStar} className={cn("p-2 hover:bg-surface-raised rounded-lg transition-colors", message.starred ? "text-amber-500" : "text-text-muted")} title="Star">
  <Star className={cn("w-4 h-4", message.starred && "fill-current")} />
  </button>
- <button onClick={onArchive} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title={message.archived ? "Unarchive" : "Archive"}>
+ <button onClick={onArchive} className="p-2 hover:bg-surface-raised rounded-lg transition-colors text-text-secondary" title={message.archived ? "Unarchive" : "Archive"}>
  <Archive className="w-4 h-4" />
  </button>
- <button onClick={onAddToCalendar} className="p-2 hover:bg-[#F3F1EC] rounded-lg transition-colors text-[#5C5850]" title="Add to Calendar">
+ <button onClick={onAddToCalendar} className="p-2 hover:bg-surface-raised rounded-lg transition-colors text-text-secondary" title="Add to Calendar">
  <Calendar className="w-4 h-4" />
  </button>
- <div className="w-px h-5 bg-[#E5E2DB] mx-1" />
+ <div className="w-px h-5 bg-border mx-1" />
  <button
  onClick={handleSaveToCase}
  disabled={!message.case?.id || savingToCase}
@@ -1090,12 +1090,12 @@ function MessageDetail({
  className={cn(
  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
  message.case?.id
- ? "bg-[#0D9488]/10 text-[#0D9488] hover:bg-[#0D9488]/20"
- : "text-[#C8C4BB] cursor-not-allowed"
+ ? "bg-primary-500/10 text-primary-500 hover:bg-primary-500/20"
+ : "text-border-strong cursor-not-allowed"
  )}
  >
  {savingToCase ? (
- <div className="w-3.5 h-3.5 border-2 border-[#0D9488]/30 border-t-[#0D9488] rounded-full animate-spin" />
+ <div className="w-3.5 h-3.5 border-2 border-primary-500/30 border-t-[#0D9488] rounded-full animate-spin" />
  ) : (
  <FolderDown className="w-3.5 h-3.5" />
  )}
@@ -1138,8 +1138,8 @@ function MessageDetail({
  )}
 
  {/* Header */}
- <div className="p-6 border-b border-[#E5E2DB]">
- <h2 className="text-lg font-semibold text-[#1C1A17] mb-4">
+ <div className="p-6 border-b border-border">
+ <h2 className="text-lg font-semibold text-text-primary mb-4">
  {message.subject || '(No Subject)'}
  </h2>
  <div className="flex items-start gap-4">
@@ -1147,12 +1147,12 @@ function MessageDetail({
  "w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm",
  message.isExternal
  ? "bg-amber-50 text-amber-700"
- : "bg-[#F3F1EC] text-[#5C5850]"
+ : "bg-surface-raised text-text-secondary"
  )}>
  {message.isExternal ? <Globe className="w-5 h-5" /> : displayInitial}
  </div>
  <div className="flex-1">
- <p className="text-sm font-medium text-[#1C1A17] flex items-center gap-2">
+ <p className="text-sm font-medium text-text-primary flex items-center gap-2">
  {activeBox === 'sent' ? `To: ${getRecipientDisplayName()}` : `From: ${getSenderDisplayName()}`}
  {message.isExternal && (
  <span className="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-semibold">
@@ -1161,9 +1161,9 @@ function MessageDetail({
  )}
  </p>
  {message.isExternal && message.externalEmail && (
- <p className="text-xs text-[#8C8880]">{message.externalEmail}</p>
+ <p className="text-xs text-text-muted">{message.externalEmail}</p>
  )}
- <p className="text-xs text-[#8C8880]">
+ <p className="text-xs text-text-muted">
  {format(new Date(message.createdAt), 'PPPP \'at\' p')}
  </p>
  {message.case && (
@@ -1171,14 +1171,14 @@ function MessageDetail({
  href={`/cases/${message.case.id}`}
  target="_blank"
  rel="noopener noreferrer"
- className="text-xs text-[#0D9488] mt-1 font-medium hover:underline block"
+ className="text-xs text-primary-500 mt-1 font-medium hover:underline block"
  >
  Case: {message.case.caseNumber} — {message.case.clientName}
  </Link>
  )}
  <button
  onClick={() => { setShowEmailNotePanel(true); setOpenEmailThreadId(null); }}
- className="flex items-center gap-1 text-xs text-[#0D9488] hover:text-[#0F766E] mt-1 font-medium transition-colors"
+ className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-600 mt-1 font-medium transition-colors"
  >
  <StickyNote className="w-3.5 h-3.5" /> Add Note
  </button>
@@ -1191,7 +1191,7 @@ function MessageDetail({
  <div className="relative">
  {selectionToolbar && (
  <div
- className="absolute z-20 flex items-center gap-1 bg-[#1C1A17] rounded-lg px-2 py-1 shadow-lg"
+ className="absolute z-20 flex items-center gap-1 bg-sidebar rounded-lg px-2 py-1 shadow-lg"
  style={{ top: selectionToolbar.top, left: selectionToolbar.left }}
  >
  {['#FFFF00', '#00FF00', '#0096FF', '#FF6496', '#FFA500'].map(hex => (
@@ -1204,18 +1204,18 @@ function MessageDetail({
  ))}
  <button
  onClick={saveEmailHighlight}
- className="ml-1 text-xs px-2 py-0.5 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E]"
+ className="ml-1 text-xs px-2 py-0.5 bg-primary-500 text-white rounded hover:bg-primary-600"
  >
  Highlight
  </button>
- <button onClick={() => setSelectionToolbar(null)} className="text-[#8C8880] hover:text-[#ffffff] ml-1">
+ <button onClick={() => setSelectionToolbar(null)} className="text-text-muted hover:text-white ml-1">
  <X className="w-3 h-3" />
  </button>
  </div>
  )}
  <div
  ref={emailBodyRef}
- className="prose max-w-none text-[#5C5850] text-sm leading-relaxed"
+ className="prose max-w-none text-text-secondary text-sm leading-relaxed"
  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.body) }}
  onMouseUp={handleEmailMouseUp}
  />
@@ -1225,18 +1225,18 @@ function MessageDetail({
  {/* Attachments */}
  {message.attachments && message.attachments.length > 0 && (
  <div className="px-6 pb-4">
- <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-2">Attachments</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-2">Attachments</p>
  <div className="space-y-1">
  {message.attachments.map(att => (
  <a
  key={att.id}
  href={`/api/messages/${message.id}/attachments/${att.id}`}
  download={att.filename}
- className="flex items-center gap-2 px-3 py-2 bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg hover:bg-[#F3F1EC] transition-colors text-sm"
+ className="flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg hover:bg-surface-raised transition-colors text-sm"
  >
- <Paperclip className="w-4 h-4 text-[#8C8880] flex-shrink-0" />
- <span className="text-[#5C5850] truncate">{att.filename}</span>
- <span className="text-[#8C8880] text-xs ml-auto flex-shrink-0">
+ <Paperclip className="w-4 h-4 text-text-muted flex-shrink-0" />
+ <span className="text-text-secondary truncate">{att.filename}</span>
+ <span className="text-text-muted text-xs ml-auto flex-shrink-0">
  {att.size < 1024 * 1024
  ? `${(att.size / 1024).toFixed(0)} KB`
  : `${(att.size / (1024 * 1024)).toFixed(1)} MB`}
@@ -1248,10 +1248,10 @@ function MessageDetail({
  )}
 
  {/* Quick Reply */}
- <div className="p-4 border-t border-[#E5E2DB] bg-[#FAF6EE]">
+ <div className="p-4 border-t border-border bg-background">
  <button
  onClick={onReply}
- className="w-full text-left p-3 border border-[#E5E2DB] rounded-lg text-[#8C8880] hover:border-[#0D9488]/40 hover:bg-[#ffffff] transition-colors text-sm"
+ className="w-full text-left p-3 border border-border rounded-lg text-text-muted hover:border-primary-500/40 hover:bg-surface transition-colors text-sm"
  >
  {message.isExternal ? 'Click to reply (will send external email)...' : 'Click to reply...'}
  </button>
@@ -1323,25 +1323,25 @@ function ComposeView({
  }
 
  return (
- <div className="h-full flex flex-col bg-[#ffffff]">
- <div className="p-4 border-b border-[#E5E2DB] flex justify-between items-center bg-[#FAF6EE]">
- <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- {mode === 'reply' && <Reply className="w-4 h-4 text-[#0D9488]" />}
- {mode === 'forward' && <Forward className="w-4 h-4 text-[#0D9488]" />}
- {mode === 'new' && <Mail className="w-4 h-4 text-[#0D9488]" />}
+ <div className="h-full flex flex-col bg-surface">
+ <div className="p-4 border-b border-border flex justify-between items-center bg-background">
+ <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+ {mode === 'reply' && <Reply className="w-4 h-4 text-primary-500" />}
+ {mode === 'forward' && <Forward className="w-4 h-4 text-primary-500" />}
+ {mode === 'new' && <Mail className="w-4 h-4 text-primary-500" />}
  {modalTitle}
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
  <div className="p-4 space-y-3 overflow-y-auto flex-1">
  <div>
  <div className="flex items-center justify-between mb-2">
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">To</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">To</label>
  <label className="flex items-center gap-2 cursor-pointer">
- <span className="text-xs text-[#8C8880]">External Email</span>
+ <span className="text-xs text-text-muted">External Email</span>
  <input
  type="checkbox"
  checked={data.isExternal || false}
@@ -1359,7 +1359,7 @@ function ComposeView({
  placeholder="Recipient Email"
  value={data.externalEmail || ''}
  onChange={e => onChange({ ...data, externalEmail: e.target.value })}
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors disabled:opacity-50"
  disabled={mode === 'reply'}
  />
  <input
@@ -1367,7 +1367,7 @@ function ComposeView({
  placeholder="Recipient Name"
  value={data.externalName || ''}
  onChange={e => onChange({ ...data, externalName: e.target.value })}
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors disabled:opacity-50"
  disabled={mode === 'reply'}
  />
  </div>
@@ -1375,7 +1375,7 @@ function ComposeView({
  <select
  value={data.recipientId}
  onChange={e => onChange({ ...data, recipientId: e.target.value })}
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors disabled:opacity-50"
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors disabled:opacity-50"
  disabled={mode === 'reply'}
  >
  <option value="">Select Recipient</option>
@@ -1387,22 +1387,22 @@ function ComposeView({
  </div>
 
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Subject</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">Subject</label>
  <input
  type="text"
  value={data.subject}
  onChange={e => onChange({ ...data, subject: e.target.value })}
  placeholder="Enter subject…"
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
 
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Related Case <span className="normal-case font-normal">(Optional)</span></label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">Related Case <span className="normal-case font-normal">(Optional)</span></label>
  <select
  value={data.caseId}
  onChange={e => onChange({ ...data, caseId: e.target.value })}
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  >
  <option value="">None</option>
  {cases.map((c) => (
@@ -1413,11 +1413,11 @@ function ComposeView({
 
  <div>
  <div className="flex items-center justify-between mb-1.5">
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880]">Message</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted">Message</label>
  <button
  type="button"
  onClick={() => setShowTemplateModal(true)}
- className="text-xs text-[#0D9488] hover:text-[#0F766E] flex items-center gap-1 transition-colors"
+ className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 transition-colors"
  >
  <FileText className="w-3 h-3" /> Load Template
  </button>
@@ -1434,15 +1434,15 @@ function ComposeView({
  {pendingAttachments.map(file => (
  <div
  key={file.name}
- className="flex items-center gap-1.5 px-2 py-1 bg-[#F3F1EC] rounded-full text-xs text-[#5C5850]"
+ className="flex items-center gap-1.5 px-2 py-1 bg-surface-raised rounded-full text-xs text-text-secondary"
  >
  <Paperclip className="w-3 h-3 flex-shrink-0" />
  <span className="max-w-[140px] truncate">{file.name}</span>
- <span className="text-gray-400">({(file.size / 1024).toFixed(0)} KB)</span>
+ <span className="text-text-muted">({(file.size / 1024).toFixed(0)} KB)</span>
  <button
  type="button"
  onClick={() => onRemoveAttachment(file.name)}
- className="text-gray-400 hover:text-red-500 ml-0.5"
+ className="text-text-muted hover:text-red-500 ml-0.5"
  title="Remove attachment"
  >
  <X className="w-3 h-3" />
@@ -1462,14 +1462,14 @@ function ComposeView({
  </div>
  </div>
 
- <div className="p-4 border-t border-[#E5E2DB] bg-[#FAF6EE] flex justify-end gap-3">
- <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
+ <div className="p-4 border-t border-border bg-background flex justify-end gap-3">
+ <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">
  Cancel
  </button>
  <button
  onClick={onSend}
  disabled={(!data.recipientId && !data.isExternal) || (data.isExternal && (!data.externalEmail || !data.externalName)) || !data.body}
- className="px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+ className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
  >
  <Send className="w-4 h-4" />
  Send
@@ -1481,7 +1481,7 @@ function ComposeView({
 
 export default function MessagesPage() {
  return (
- <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#FAF6EE]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D9488]"></div></div>}>
+ <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-background"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
  <MessagesContent />
  </Suspense>
  );
@@ -1516,14 +1516,14 @@ function SidebarButton({ icon: Icon, label, count, active, onClick, onDrop, onDr
  className={cn(
  "w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 font-medium transition-colors text-sm",
  active
- ? "bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20"
- : "text-[#5C5850] hover:bg-[#F3F1EC] border border-transparent"
+ ? "bg-primary-500/10 text-primary-500 border border-primary-500/20"
+ : "text-text-secondary hover:bg-surface-raised border border-transparent"
  )}
  >
  <Icon className="w-4 h-4" />
  {label}
  {count !== undefined && count > 0 && (
- <span className="ml-auto text-xs bg-[#0D9488]/10 text-[#0D9488] px-1.5 py-0.5 rounded-full font-semibold">
+ <span className="ml-auto text-xs bg-primary-500/10 text-primary-500 px-1.5 py-0.5 rounded-full font-semibold">
  {count}
  </span>
  )}
@@ -1570,8 +1570,8 @@ function MessageListItem({
  onDragStart={handleDragStart}
  className={cn(
  "p-3 cursor-pointer transition-colors relative group cursor-grab active:cursor-grabbing",
- isSelected ? "bg-[#0D9488]/8 border-l-2 border-[#0D9488]" : "hover:bg-[#FAF6EE] border-l-2 border-transparent",
- !message.isRead && activeBox !== 'sent' ? "bg-[#0D9488]/5" : ""
+ isSelected ? "bg-primary-500/8 border-l-2 border-primary-500" : "hover:bg-background border-l-2 border-transparent",
+ !message.isRead && activeBox !== 'sent' ? "bg-primary-500/5" : ""
  )}
  >
  <div className="flex items-start gap-2">
@@ -1579,7 +1579,7 @@ function MessageListItem({
  onClick={e => { e.stopPropagation(); onStar(); }}
  className={cn(
  "mt-0.5 flex-shrink-0 transition-colors",
- message.starred ? "text-amber-400" : "text-[#C8C4BB] hover:text-amber-400"
+ message.starred ? "text-amber-400" : "text-border-strong hover:text-amber-400"
  )}
  >
  <Star className={cn("w-4 h-4", message.starred && "fill-current")} />
@@ -1588,21 +1588,21 @@ function MessageListItem({
  <div className="flex justify-between items-center mb-0.5">
  <span className={cn(
  "text-sm truncate",
- !message.isRead && activeBox !== 'sent' ? "font-bold text-[#1C1A17]" : "font-medium text-[#5C5850]"
+ !message.isRead && activeBox !== 'sent' ? "font-bold text-text-primary" : "font-medium text-text-secondary"
  )}>
  {displayName}
  </span>
- <span className="text-[10px] text-[#8C8880] flex-shrink-0 ml-2">
+ <span className="text-[10px] text-text-muted flex-shrink-0 ml-2">
  {format(new Date(message.createdAt), 'MMM d')}
  </span>
  </div>
  <h4 className={cn(
  "text-xs mb-0.5 truncate",
- !message.isRead && activeBox !== 'sent' ? "font-semibold text-[#1C1A17]" : "text-[#5C5850]"
+ !message.isRead && activeBox !== 'sent' ? "font-semibold text-text-primary" : "text-text-secondary"
  )}>
  {message.subject || '(No Subject)'}
  </h4>
- <p className="text-xs text-[#8C8880] line-clamp-1">{message.body}</p>
+ <p className="text-xs text-text-muted line-clamp-1">{message.body}</p>
  </div>
  </div>
  </li>

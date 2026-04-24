@@ -226,7 +226,7 @@ export function SubscriptionPage({ currentUserId }: SubscriptionPageProps) {
 
  {/* Billing interval toggle */}
  <div className="flex items-center gap-3 mb-6">
- <div className="flex bg-white p-1 rounded-lg border border-[#E5E2DB]">
+ <div className="flex bg-white p-1 rounded-lg border border-border">
  <button
  onClick={() => setInterval_('monthly')}
  className="px-4 py-1.5 text-sm font-medium rounded-md transition-all"

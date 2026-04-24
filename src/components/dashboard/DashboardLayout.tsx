@@ -96,7 +96,7 @@ export function DashboardLayout({ children, onLayoutChange, savedOrder = [] }: D
  {/* Overlay for smooth dragging visual */}
  <DragOverlay>
  {activeId ? (
- <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl opacity-90 border-2 border-blue-500 h-full overflow-hidden">
+ <div className="bg-surface rounded-xl shadow-2xl opacity-90 border-2 border-blue-500 h-full overflow-hidden">
  {itemsMap[activeId]}
  </div>
  ) : null}

@@ -592,20 +592,20 @@ export function CaseDetailPage({
 
  if (isLoading) {
  return (
- <div className="flex items-center justify-center min-h-[400px] bg-[#FAF6EE]">
- <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0D9488]"></div>
+ <div className="flex items-center justify-center min-h-[400px] bg-background">
+ <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div>
  </div>
  );
  }
 
  if (error || !caseData) {
  return (
- <div className="flex flex-col items-center justify-center min-h-[400px] bg-[#FAF6EE]">
+ <div className="flex flex-col items-center justify-center min-h-[400px] bg-background">
  <AlertTriangle className="w-10 h-10 mb-4 text-red-500" />
- <p className="text-base font-medium text-[#1C1A17]">{error || 'Case not found'}</p>
+ <p className="text-base font-medium text-text-primary">{error || 'Case not found'}</p>
  <button
  onClick={fetchCaseData}
- className="mt-4 px-4 py-2 text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors text-sm"
+ className="mt-4 px-4 py-2 text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors text-sm"
  >
  Try Again
  </button>
@@ -618,9 +618,9 @@ export function CaseDetailPage({
  switch (status) {
  case 'REVIEW': return 'bg-yellow-100 text-yellow-800';
  case 'ACTIVE': return 'bg-green-100 text-green-800';
- case 'CLOSED': return 'bg-[#E5E2DB] text-[#5C5850]';
+ case 'CLOSED': return 'bg-border text-text-secondary';
  case 'APPEAL': return 'bg-red-100 text-red-800';
- default: return 'bg-[#0D9488]/15 text-[#0D9488]';
+ default: return 'bg-primary-500/15 text-primary-500';
  }
  };
 
@@ -630,9 +630,9 @@ export function CaseDetailPage({
 
  const taskStatusColors = {
  PENDING: 'text-yellow-700 bg-yellow-50',
- IN_PROGRESS: 'text-[#0D9488] bg-[#0D9488]/10',
+ IN_PROGRESS: 'text-primary-500 bg-primary-500/10',
  COMPLETED: 'text-green-700 bg-green-50',
- CANCELLED: 'text-[#8C8880] bg-[#F3F1EC]',
+ CANCELLED: 'text-text-muted bg-surface-raised',
  };
 
  const priorityColors = {
@@ -642,19 +642,19 @@ export function CaseDetailPage({
  };
 
  const documentCategoryColors = {
- MEDICAL: 'bg-emerald-100 text-emerald-800',
- LEGAL: 'bg-purple-100 text-purple-800',
+ MEDICAL: 'bg-success/10 text-success',
+ LEGAL: 'bg-primary-100 text-primary-700',
  HR: 'bg-orange-100 text-orange-800',
- CORRESPONDENCE: 'bg-[#0D9488]/10 text-[#0D9488]',
- OTHER: 'bg-[#F3F1EC] text-[#5C5850]',
+ CORRESPONDENCE: 'bg-primary-500/10 text-primary-500',
+ OTHER: 'bg-surface-raised text-text-secondary',
  };
 
  const contactTypeColors = {
- CLAIMANT: 'bg-indigo-100 text-indigo-800',
- ATTORNEY: 'bg-purple-100 text-purple-800',
- MEDICAL_PROVIDER: 'bg-emerald-100 text-emerald-800',
+ CLAIMANT: 'bg-primary-50 text-primary-600',
+ ATTORNEY: 'bg-primary-100 text-primary-700',
+ MEDICAL_PROVIDER: 'bg-success/10 text-success',
  EMPLOYER: 'bg-orange-100 text-orange-800',
- OTHER: 'bg-[#F3F1EC] text-[#5C5850]',
+ OTHER: 'bg-surface-raised text-text-secondary',
  };
 
  const isAdmin = currentUser.role === 'ADMIN';
@@ -707,7 +707,7 @@ export function CaseDetailPage({
  };
 
  return (
- <div className="min-h-screen bg-[#1C1A17]">
+ <div className="min-h-screen bg-sidebar">
  {/* Header / Ribbon — editorial charcoal band */}
  <div className="sticky top-0 z-30" style={{ background: '#1C1A17' }}>
  <div
@@ -723,23 +723,23 @@ export function CaseDetailPage({
  <div className="flex items-center gap-4">
  <button
  onClick={onBack}
- className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#0D9488] hover:text-[#2DD4BF] transition-colors"
+ className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-500 hover:text-primary-500 transition-colors"
  aria-label="Go Back"
  >
  <ArrowLeft className="w-3.5 h-3.5" />
  Cases
  </button>
- <div className="w-px h-5 bg-[#0D9488]/30" />
+ <div className="w-px h-5 bg-primary-500/30" />
  <div>
  <h1 className="flex items-center gap-2.5" style={{ fontFamily: 'var(--font-instrument-serif, Georgia, serif)', fontSize: 20, fontWeight: 400, color: '#F0EEE8', margin: 0 }}>
- <span className="font-mono text-[#0D9488] text-base">{caseData.caseNumber}</span>
+ <span className="font-mono text-primary-500 text-base">{caseData.caseNumber}</span>
  <span className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest rounded-full ${getStatusColor(caseData.status)}`}>
  {caseData.status}
  </span>
  {isAdmin && (
  <button
  onClick={() => setIsTransferModalOpen(true)}
- className="text-xs text-[#0D9488] hover:text-[#2DD4BF] transition-colors"
+ className="text-xs text-primary-500 hover:text-primary-500 transition-colors"
  >
  Transfer
  </button>
@@ -754,14 +754,14 @@ export function CaseDetailPage({
  <div className="flex items-center gap-2">
  <button
  onClick={() => setIsAddNoteModalOpen(true)}
- className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
  >
  <Plus className="w-4 h-4" />
  Add Note
  </button>
  <button
  onClick={() => setIsUploadModalOpen(true)}
- className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors border border-[#3A3830]"
+ className="p-2 text-text-muted hover:text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors border border-sidebar"
  title="Upload Document"
  aria-label="Upload Document"
  >
@@ -770,7 +770,7 @@ export function CaseDetailPage({
  <div className="relative">
  <button
  onClick={() => setUserMenuOpen(!userMenuOpen)}
- className="p-2 text-[#8C8880] hover:text-[#F0EEE8] hover:bg-[#2A2825] rounded-lg transition-colors border border-[#3A3830]"
+ className="p-2 text-text-muted hover:text-sidebar-fg hover:bg-sidebar rounded-lg transition-colors border border-sidebar"
  aria-label="More Options"
  aria-haspopup="true"
  aria-expanded={userMenuOpen}
@@ -784,20 +784,20 @@ export function CaseDetailPage({
  className="fixed inset-0 z-40"
  onClick={() => setUserMenuOpen(false)}
  />
- <div className="absolute right-0 mt-2 w-56 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-50 py-1">
+ <div className="absolute right-0 mt-2 w-56 bg-surface rounded-xl shadow-lg border border-border z-50 py-1">
  <button
  onClick={() => {
  setIsEditModalOpen(true);
  setUserMenuOpen(false);
  }}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
  <Edit2 className="w-4 h-4" />
  Edit Case Details
  </button>
 
  {(isAdmin || isAuditor) && (
- <div className="border-t border-[#E5E2DB] my-1 pt-1">
+ <div className="border-t border-border my-1 pt-1">
  <button
  onClick={async () => {
  if (confirm('Are you sure you want to delete this case? This action cannot be undone.')) {
@@ -834,43 +834,43 @@ export function CaseDetailPage({
  {/* Client Ribbon */}
  <div className="py-4 border-t grid grid-cols-1 md:grid-cols-5 gap-4 text-sm" style={{ borderColor: 'rgba(13,148,136,0.2)' }}>
  <div className="flex items-center gap-3">
- <div className="w-9 h-9 rounded-full bg-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base">
+ <div className="w-9 h-9 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-500 font-bold text-base">
  {caseData.clientName.charAt(0)}
  </div>
  <div>
  <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Client</p>
- <p className="font-medium text-[#F0EEE8]">{caseData.clientName}</p>
+ <p className="font-medium text-sidebar-fg">{caseData.clientName}</p>
  </div>
  </div>
  <div className="flex items-center gap-3">
- <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+ <div className="p-2 bg-primary-500/10 rounded-lg text-primary-500">
  <Phone className="w-4 h-4" />
  </div>
  <div>
  <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Phone</p>
- <p className="font-medium text-[#F0EEE8] font-mono text-sm">{caseData.clientPhone || 'N/A'}</p>
+ <p className="font-medium text-sidebar-fg font-mono text-sm">{caseData.clientPhone || 'N/A'}</p>
  </div>
  </div>
  <div className="flex items-center gap-3">
- <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+ <div className="p-2 bg-primary-500/10 rounded-lg text-primary-500">
  <Shield className="w-4 h-4" />
  </div>
  <div>
  <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Examiner</p>
- <p className="font-medium text-[#F0EEE8]">
+ <p className="font-medium text-sidebar-fg">
  {(caseData.tasks.find((t: ExtendedTask) => t.status !== 'COMPLETED') || caseData.tasks[0])?.assignee?.name || 'Unassigned'}
  </p>
  </div>
  </div>
  <div className="flex items-center gap-3">
- <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+ <div className="p-2 bg-primary-500/10 rounded-lg text-primary-500">
  <User className="w-4 h-4" />
  </div>
  <div>
  <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Claimant ID</p>
  <div className="flex items-center gap-2">
  {caseData.claimant ? (
- <a href={`/claimants/${caseData.claimant.claimantNumber}`} className="font-medium text-[#0D9488] font-mono hover:underline">
+ <a href={`/claimants/${caseData.claimant.claimantNumber}`} className="font-medium text-primary-500 font-mono hover:underline">
  #{caseData.claimant.claimantNumber}
  </a>
  ) : (
@@ -888,7 +888,7 @@ export function CaseDetailPage({
  ) : (
  <button
  onClick={() => setIsLinkClaimsModalOpen(true)}
- className="mt-1 flex items-center gap-1 text-[10px] text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 px-1.5 py-0.5 rounded-full transition-colors border border-dashed border-[#3A3830] hover:border-[#0D9488]/40"
+ className="mt-1 flex items-center gap-1 text-[10px] text-text-muted hover:text-primary-500 hover:bg-primary-500/10 px-1.5 py-0.5 rounded-full transition-colors border border-dashed border-sidebar hover:border-primary-500/40"
  >
  <Plus className="w-3 h-3" />
  Link Claims
@@ -897,12 +897,12 @@ export function CaseDetailPage({
  </div>
  </div>
  <div className="flex items-center gap-3">
- <div className="p-2 bg-[#0D9488]/10 rounded-lg text-[#0D9488]">
+ <div className="p-2 bg-primary-500/10 rounded-lg text-primary-500">
  <BookUser className="w-4 h-4" />
  </div>
  <div>
  <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'rgba(240,238,232,0.4)' }}>Program</p>
- <p className="font-medium text-[#F0EEE8]">{caseData.program || 'N/A'}</p>
+ <p className="font-medium text-sidebar-fg">{caseData.program || 'N/A'}</p>
  </div>
  </div>
  </div>
@@ -942,8 +942,8 @@ export function CaseDetailPage({
  className={`
  flex items-center gap-1.5 py-3.5 px-1 border-b-2 text-[11px] font-semibold uppercase tracking-[0.1em] whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0D9488]
  ${activeTab === tab.id
- ? 'border-[#0D9488] text-[#0D9488]'
- : 'border-transparent hover:border-[#0D9488]/30'
+ ? 'border-primary-500 text-primary-500'
+ : 'border-transparent hover:border-primary-500/30'
  }
  `}
  style={activeTab === tab.id ? {} : { color: 'rgba(240,238,232,0.45)' }}
@@ -951,7 +951,7 @@ export function CaseDetailPage({
  <tab.icon className="w-3.5 h-3.5" />
  {tab.label}
  {tab.id === 'tasks' && caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length > 0 && (
- <span className="ml-1 py-0.5 px-1.5 bg-[#0D9488]/20 text-[#0D9488] text-[10px] rounded-full">
+ <span className="ml-1 py-0.5 px-1.5 bg-primary-500/20 text-primary-500 text-[10px] rounded-full">
  {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length}
  </span>
  )}
@@ -964,7 +964,7 @@ export function CaseDetailPage({
  </div>
 
  {/* Main Content Area */}
- <div className="bg-[#FAF6EE] min-h-[calc(100vh-200px)]">
+ <div className="bg-background min-h-[calc(100vh-200px)]">
  <main className={cn(
  "mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300",
  ['decisioning', 'timeline', 'tasks', 'documents'].includes(activeTab) ? "max-w-full" : "max-w-7xl"
@@ -980,15 +980,15 @@ export function CaseDetailPage({
  {/* Left Column: Summary & Quick Actions */}
  <div className="lg:col-span-2 space-y-5">
  {/* Summary Card */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
- <h2 className="text-base font-semibold text-[#1C1A17] mb-4">Case Summary</h2>
+ <div className="bg-surface rounded-xl border border-border p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <h2 className="text-base font-semibold text-text-primary mb-4">Case Summary</h2>
  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Claim Number</dt>
- <dd className="mt-1 text-sm text-[#1C1A17] font-mono">{caseData.caseNumber}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Claim Number</dt>
+ <dd className="mt-1 text-sm text-text-primary font-mono">{caseData.caseNumber}</dd>
  </div>
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Status</dt>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Status</dt>
  <dd className="mt-1">
  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(caseData.status)}`}>
  {caseData.status}
@@ -999,8 +999,8 @@ export function CaseDetailPage({
  {/* Medical/Reason */}
  {caseData.medicalCondition && (
  <div className="sm:col-span-2">
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Medical Condition / Reason</dt>
- <dd className="mt-1 text-sm text-[#1C1A17] bg-red-50 p-2 rounded border border-red-100">
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Medical Condition / Reason</dt>
+ <dd className="mt-1 text-sm text-text-primary bg-red-50 p-2 rounded border border-red-100">
  {caseData.medicalCondition}
  </dd>
  </div>
@@ -1009,49 +1009,49 @@ export function CaseDetailPage({
  {/* Program & Venue */}
  {caseData.program && (
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Program</dt>
- <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.program}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Program</dt>
+ <dd className="mt-1 text-sm text-text-primary">{caseData.program}</dd>
  </div>
  )}
  {caseData.venue && (
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Venue</dt>
- <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.venue}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Venue</dt>
+ <dd className="mt-1 text-sm text-text-primary">{caseData.venue}</dd>
  </div>
  )}
 
  {/* Dates */}
  {caseData.preferredStartDate && (
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Preferred Start Date</dt>
- <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.preferredStartDate}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Preferred Start Date</dt>
+ <dd className="mt-1 text-sm text-text-primary">{caseData.preferredStartDate}</dd>
  </div>
  )}
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Medical Due Date</dt>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Medical Due Date</dt>
  <dd className="mt-1">
  <input
  type="date"
  value={medicalDueDate}
  onChange={e => saveMedicalDueDate(e.target.value)}
  disabled={savingMedDue}
- className="text-sm text-[#1C1A17] bg-transparent border border-[#E5E2DB] rounded px-2 py-0.5 disabled:opacity-50 focus:outline-none focus:border-[#0D9488]"
+ className="text-sm text-text-primary bg-transparent border border-border rounded px-2 py-0.5 disabled:opacity-50 focus:outline-none focus:border-primary-500"
  />
  </dd>
  </div>
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Projected Return</dt>
- <dd className="mt-1 text-sm text-[#1C1A17]">{formatDate(caseData.closedAt)}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Projected Return</dt>
+ <dd className="mt-1 text-sm text-text-primary">{formatDate(caseData.closedAt)}</dd>
  </div>
 
  <div>
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Category</dt>
- <dd className="mt-1 text-sm text-[#1C1A17]">{caseData.category || 'N/A'}</dd>
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Category</dt>
+ <dd className="mt-1 text-sm text-text-primary">{caseData.category || 'N/A'}</dd>
  </div>
 
  <div className="sm:col-span-2">
- <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Description</dt>
- <dd className="mt-1 text-sm text-[#1C1A17] bg-[#F3F1EC] p-3 rounded-lg border border-[#E5E2DB]">
+ <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Description</dt>
+ <dd className="mt-1 text-sm text-text-primary bg-surface-raised p-3 rounded-lg border border-border">
  {caseData.description || 'No description provided.'}
  </dd>
  </div>
@@ -1059,10 +1059,10 @@ export function CaseDetailPage({
  </div>
 
  {/* Recent Timeline */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <div className="bg-surface rounded-xl border border-border p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
  <div className="flex items-center justify-between mb-4">
- <h2 className="text-base font-semibold text-[#1C1A17]">Recent Activity</h2>
- <button onClick={() => setActiveTab('notes')} className="text-sm text-[#0D9488] hover:text-[#0F766E]">
+ <h2 className="text-base font-semibold text-text-primary">Recent Activity</h2>
+ <button onClick={() => setActiveTab('notes')} className="text-sm text-primary-500 hover:text-primary-600">
  View All
  </button>
  </div>
@@ -1072,24 +1072,24 @@ export function CaseDetailPage({
  <li key={note.id}>
  <div className="relative pb-8">
  {idx !== 2 && (
- <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-[#E5E2DB]" aria-hidden="true" />
+ <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-border" aria-hidden="true" />
  )}
  <div className="relative flex space-x-3">
- <div className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-[#ffffff] ${note.noteType === 'AUDIT' ? 'bg-amber-100' : 'bg-[#0D9488]/10'}`}>
+ <div className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-[#ffffff] ${note.noteType === 'AUDIT' ? 'bg-amber-100' : 'bg-primary-500/10'}`}>
  {note.noteType === 'AUDIT' ? (
  <Shield className="w-4 h-4 text-amber-600" />
  ) : (
- <FileText className="w-4 h-4 text-[#0D9488]" />
+ <FileText className="w-4 h-4 text-primary-500" />
  )}
  </div>
  <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
  <div>
- <p className="text-sm text-[#8C8880]">
- Note added by <span className="font-medium text-[#1C1A17]">{note.author.name}</span>
+ <p className="text-sm text-text-muted">
+ Note added by <span className="font-medium text-text-primary">{note.author.name}</span>
  </p>
- <p className="mt-1 text-sm text-[#1C1A17] line-clamp-2">{note.content}</p>
+ <p className="mt-1 text-sm text-text-primary line-clamp-2">{note.content}</p>
  </div>
- <div className="text-right text-sm whitespace-nowrap text-[#8C8880]">
+ <div className="text-right text-sm whitespace-nowrap text-text-muted">
  <time dateTime={new Date(note.createdAt).toISOString()}>{formatDate(note.createdAt)}</time>
  </div>
  </div>
@@ -1105,64 +1105,64 @@ export function CaseDetailPage({
  {/* Right Column: Tasks & Reminders */}
  <div className="space-y-5">
  {/* Urgent Tasks */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
- <h2 className="text-base font-semibold text-[#1C1A17] mb-4 flex items-center gap-2">
+ <div className="bg-surface rounded-xl border border-border p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <h2 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
  <AlertTriangle className="w-4 h-4 text-amber-500" />
  Priority Tasks
  </h2>
  <div className="space-y-2.5">
  {caseData.tasks.filter((t: ExtendedTask) => t.status !== 'COMPLETED').slice(0, 5).map((task: ExtendedTask) => (
- <div key={task.id} className="p-3 bg-[#F3F1EC] rounded-lg flex items-start gap-3">
+ <div key={task.id} className="p-3 bg-surface-raised rounded-lg flex items-start gap-3">
  <input
  type="checkbox"
- className="mt-1 rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
+ className="mt-1 rounded border-border-strong text-primary-500 focus:ring-[#0D9488]"
  aria-label={`Mark ${task.title} as complete`}
  onChange={() => handleTaskStatusChange(task.id, 'COMPLETED')}
  />
  <div className="flex-1">
- <p className="text-sm font-medium text-[#1C1A17]">{task.title}</p>
- <p className="text-xs text-[#8C8880] mt-0.5">Due {formatDate(task.dueDate)}</p>
+ <p className="text-sm font-medium text-text-primary">{task.title}</p>
+ <p className="text-xs text-text-muted mt-0.5">Due {formatDate(task.dueDate)}</p>
  </div>
- <span className={`px-2 py-0.5 text-xs rounded-full ${(priorityColors as any)[task.priority] || 'bg-gray-100'}`}>
+ <span className={`px-2 py-0.5 text-xs rounded-full ${(priorityColors as any)[task.priority] || 'bg-surface-raised'}`}>
  {task.priority}
  </span>
  </div>
  ))}
  {caseData.tasks.length === 0 && (
- <p className="text-sm text-[#8C8880] text-center py-4">No pending tasks</p>
+ <p className="text-sm text-text-muted text-center py-4">No pending tasks</p>
  )}
  </div>
  <button
  onClick={() => setIsAddTaskModalOpen(true)}
- className="w-full mt-4 py-2 border border-dashed border-[#C8C4BB] rounded-lg text-sm text-[#8C8880] hover:border-[#0D9488] hover:text-[#0D9488] transition-colors"
+ className="w-full mt-4 py-2 border border-dashed border-border-strong rounded-lg text-sm text-text-muted hover:border-primary-500 hover:text-primary-500 transition-colors"
  >
  + Add Quick Task
  </button>
  </div>
 
  {/* Client Contact Card */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
- <h3 className="font-semibold text-base text-[#1C1A17] mb-4">Contact Client</h3>
+ <div className="bg-surface rounded-xl border border-border p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <h3 className="font-semibold text-base text-text-primary mb-4">Contact Client</h3>
  <div className="space-y-3">
- <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
- <Phone className="w-4 h-4 text-[#8C8880]" />
+ <div className="flex items-center gap-3 p-3 bg-surface-raised rounded-lg">
+ <Phone className="w-4 h-4 text-text-muted" />
  <div>
- <p className="text-[11px] text-[#8C8880]">Phone</p>
- <p className="font-mono text-sm text-[#1C1A17]">{caseData.clientPhone || 'No number'}</p>
+ <p className="text-[11px] text-text-muted">Phone</p>
+ <p className="font-mono text-sm text-text-primary">{caseData.clientPhone || 'No number'}</p>
  </div>
  <button
  onClick={() => { setNoteModalDefaultType('PHONE_CALL'); setIsAddNoteModalOpen(true); }}
  title="Log a call"
- className="ml-auto p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-full transition-colors"
+ className="ml-auto p-2 text-text-muted hover:text-primary-500 hover:bg-primary-500/10 rounded-full transition-colors"
  >
  <Phone className="w-4 h-4" />
  </button>
  </div>
- <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
- <Mail className="w-4 h-4 text-[#8C8880]" />
+ <div className="flex items-center gap-3 p-3 bg-surface-raised rounded-lg">
+ <Mail className="w-4 h-4 text-text-muted" />
  <div>
- <p className="text-[11px] text-[#8C8880]">Email</p>
- <p className="truncate max-w-[150px] text-sm text-[#1C1A17]">{caseData.clientEmail || 'No email'}</p>
+ <p className="text-[11px] text-text-muted">Email</p>
+ <p className="truncate max-w-[150px] text-sm text-text-primary">{caseData.clientEmail || 'No email'}</p>
  </div>
  <button
  onClick={() => {
@@ -1177,7 +1177,7 @@ export function CaseDetailPage({
  }}
  disabled={!caseData.clientEmail}
  title="Send email"
- className="ml-auto p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="ml-auto p-2 text-text-muted hover:text-primary-500 hover:bg-primary-500/10 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  >
  <Send className="w-4 h-4" />
  </button>
@@ -1192,19 +1192,19 @@ export function CaseDetailPage({
  {activeTab === 'notes' && (
  <div className="max-w-4xl mx-auto">
  <div className="flex items-center justify-between mb-5">
- <h2 className="text-lg font-semibold text-[#1C1A17]">Case Notes</h2>
+ <h2 className="text-lg font-semibold text-text-primary">Case Notes</h2>
  <div className="flex gap-2.5">
  <div className="relative">
  <input
  type="text"
  placeholder="Search notes..."
- className="pl-9 pr-4 py-2 border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-sm text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488]"
+ className="pl-9 pr-4 py-2 border border-border rounded-lg bg-surface text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500"
  />
- <Search className="w-4 h-4 text-[#8C8880] absolute left-3 top-2.5" />
+ <Search className="w-4 h-4 text-text-muted absolute left-3 top-2.5" />
  </div>
  <button
  onClick={() => setIsAddNoteModalOpen(true)}
- className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
  >
  <Plus className="w-4 h-4" />
  Add Note
@@ -1214,12 +1214,12 @@ export function CaseDetailPage({
 
  <div className="space-y-3">
  {visibleNotes.length === 0 ? (
- <div className="text-center py-12 bg-[#ffffff] rounded-xl border border-[#E5E2DB]">
- <div className="w-16 h-16 bg-[#F3F1EC] rounded-full flex items-center justify-center mx-auto mb-4">
- <FileText className="w-8 h-8 text-[#C8C4BB]" />
+ <div className="text-center py-12 bg-surface rounded-xl border border-border">
+ <div className="w-16 h-16 bg-surface-raised rounded-full flex items-center justify-center mx-auto mb-4">
+ <FileText className="w-8 h-8 text-border-strong" />
  </div>
- <h3 className="text-base font-medium text-[#1C1A17]">No notes yet</h3>
- <p className="text-[#8C8880] mt-1 text-sm">Start by adding a new note to this case.</p>
+ <h3 className="text-base font-medium text-text-primary">No notes yet</h3>
+ <p className="text-text-muted mt-1 text-sm">Start by adding a new note to this case.</p>
  </div>
  ) : (
  visibleNotes.map((note: ExtendedNote) => {
@@ -1229,7 +1229,7 @@ export function CaseDetailPage({
  "rounded-xl border p-5 shadow-[0_1px_2px_rgba(28,26,23,0.04)]",
  isAuditNote
  ? "border-amber-300 bg-amber-50/60"
- : "bg-[#ffffff] border-[#E5E2DB]"
+ : "bg-surface border-border"
  )}>
  {isAuditNote && (
  <div className="flex items-center gap-2 mb-3 text-amber-600">
@@ -1242,19 +1242,19 @@ export function CaseDetailPage({
  <div className={cn(
  "p-1.5 rounded-lg",
  isAuditNote ? 'bg-amber-100 text-amber-700' :
- note.noteType === 'PHONE_CALL' ? 'bg-green-100 text-green-700' : 'bg-[#0D9488]/10 text-[#0D9488]'
+ note.noteType === 'PHONE_CALL' ? 'bg-green-100 text-green-700' : 'bg-primary-500/10 text-primary-500'
  )}>
  {isAuditNote ? <Shield className="w-3.5 h-3.5" /> :
  note.noteType === 'PHONE_CALL' ? <Phone className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
  </div>
- <span className="text-sm font-medium text-[#1C1A17] capitalize">
+ <span className="text-sm font-medium text-text-primary capitalize">
  {(note.noteType || 'NOTE').replace('_', ' ').toLowerCase()}
  </span>
  </div>
  <div className="relative">
  <button
  onClick={() => setNoteMenuOpen(noteMenuOpen === note.id ? null : note.id)}
- className="text-[#C8C4BB] hover:text-[#5C5850] p-1 rounded-lg hover:bg-[#F3F1EC] transition-colors"
+ className="text-border-strong hover:text-text-secondary p-1 rounded-lg hover:bg-surface-raised transition-colors"
  aria-label="Note options"
  >
  <MoreHorizontal className="w-5 h-5" />
@@ -1265,10 +1265,10 @@ export function CaseDetailPage({
  className="fixed inset-0 z-40"
  onClick={() => setNoteMenuOpen(null)}
  />
- <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-50 py-1">
+ <div className="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-border z-50 py-1">
  <button
  onClick={() => handleCopyNote(note.content)}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
  <Copy className="w-4 h-4" />
  Copy Note
@@ -1276,7 +1276,7 @@ export function CaseDetailPage({
  {isNoteEditable(note.createdAt) && (note.authorId === currentUser.id || isAdmin) && (
  <button
  onClick={() => handleEditNote(note)}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
  <Edit3 className="w-4 h-4" />
  Edit Note
@@ -1287,16 +1287,16 @@ export function CaseDetailPage({
  )}
  </div>
  </div>
- <p className="text-[#5C5850] whitespace-pre-wrap text-sm">{note.content}</p>
+ <p className="text-text-secondary whitespace-pre-wrap text-sm">{note.content}</p>
  {note.attachedDocument && (
- <div className="mt-3 p-3 bg-[#F3F1EC] rounded-lg flex items-center gap-3">
- <FileText className="w-4 h-4 text-[#8C8880]" />
- <span className="text-sm text-[#5C5850]">{note.attachedDocument.fileName}</span>
- <button className="ml-auto text-[#0D9488] hover:text-[#0F766E] text-sm">Download</button>
+ <div className="mt-3 p-3 bg-surface-raised rounded-lg flex items-center gap-3">
+ <FileText className="w-4 h-4 text-text-muted" />
+ <span className="text-sm text-text-secondary">{note.attachedDocument.fileName}</span>
+ <button className="ml-auto text-primary-500 hover:text-primary-600 text-sm">Download</button>
  </div>
  )}
- <div className="flex items-center gap-2 mt-3 text-xs text-[#8C8880]">
- <span className="font-medium text-[#5C5850]">{note.author.name}</span>
+ <div className="flex items-center gap-2 mt-3 text-xs text-text-muted">
+ <span className="font-medium text-text-secondary">{note.author.name}</span>
  <span>•</span>
  <span>{formatDateTime(note.createdAt)}</span>
  </div>
@@ -1312,12 +1312,12 @@ export function CaseDetailPage({
  {
  activeTab === 'timeline' && currentUser.role === 'ADMIN' && (
  <div className="max-w-3xl mx-auto">
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-8 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <div className="bg-surface rounded-xl border border-border p-8 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
  <div className="flex items-center gap-3 mb-8">
  <div className="relative inline-block text-left">
  <button
  onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
- className="px-3 py-1.5 text-sm font-semibold text-[#0D9488] bg-[#0D9488]/10 hover:bg-[#0D9488]/20 rounded-lg transition-colors border border-[#0D9488]/20 flex items-center gap-2"
+ className="px-3 py-1.5 text-sm font-semibold text-primary-500 bg-primary-500/10 hover:bg-primary-500/20 rounded-lg transition-colors border border-primary-500/20 flex items-center gap-2"
  >
  <Download className="w-4 h-4" />
  Export
@@ -1327,24 +1327,24 @@ export function CaseDetailPage({
  {isExportMenuOpen && (
  <>
  <div className="fixed inset-0 z-10" onClick={() => setIsExportMenuOpen(false)} />
- <div className="absolute left-0 mt-2 w-48 bg-[#ffffff] rounded-xl shadow-lg border border-[#E5E2DB] z-20 py-1 origin-top-left">
+ <div className="absolute left-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-border z-20 py-1 origin-top-left">
  <button
  onClick={() => handleExport('PDF')}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
  <File className="w-4 h-4 text-red-500" />
  Export as PDF
  </button>
  <button
  onClick={() => handleExport('WORD')}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
- <FileText className="w-4 h-4 text-[#0D9488]" />
+ <FileText className="w-4 h-4 text-primary-500" />
  Export as Word
  </button>
  <button
  onClick={() => handleExport('EXCEL')}
- className="w-full text-left px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] flex items-center gap-2"
+ className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-raised flex items-center gap-2"
  >
  <Table className="w-4 h-4 text-green-600" />
  Export as Excel
@@ -1353,7 +1353,7 @@ export function CaseDetailPage({
  </>
  )}
  </div>
- <h2 className="text-lg font-semibold text-[#1C1A17]">Case History & Audit Log</h2>
+ <h2 className="text-lg font-semibold text-text-primary">Case History & Audit Log</h2>
  </div>
  <TimelineView caseId={caseData.id} />
  </div>
@@ -1366,11 +1366,11 @@ export function CaseDetailPage({
  activeTab === 'tasks' && (
  <div className="space-y-5">
  <div className="flex items-center justify-between">
- <h2 className="text-lg font-semibold text-[#1C1A17]">Tasks</h2>
+ <h2 className="text-lg font-semibold text-text-primary">Tasks</h2>
  <div className="flex gap-2">
  <button
  onClick={() => setIsAddTaskModalOpen(true)}
- className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
  >
  <Plus className="w-4 h-4" />
  Add Task
@@ -1395,18 +1395,18 @@ export function CaseDetailPage({
  activeTab === 'documents' && (
  <div className="space-y-5">
  <div className="flex items-center justify-between">
- <h2 className="text-lg font-semibold text-[#1C1A17]">Documents</h2>
+ <h2 className="text-lg font-semibold text-text-primary">Documents</h2>
  <div className="flex items-center gap-2">
  <button
  onClick={openEmailUpload}
- className="flex items-center gap-2 px-4 py-2 bg-[#ffffff] border border-[#E5E2DB] hover:bg-[#F3F1EC] text-[#5C5850] text-sm font-medium rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-surface border border-border hover:bg-surface-raised text-text-secondary text-sm font-medium rounded-lg transition-colors"
  >
  <Mail className="w-4 h-4" />
  Upload Email
  </button>
  <button
  onClick={() => { setUploadEmailMode(false); setUploadCategory('OTHER'); setIsUploadModalOpen(true); }}
- className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
  >
  <Upload className="w-4 h-4" />
  Upload Document
@@ -1446,15 +1446,15 @@ export function CaseDetailPage({
  )}
 
  {caseData.documents.length === 0 ? (
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-12 text-center">
- <FolderOpen className="w-12 h-12 text-[#C8C4BB] mx-auto mb-4" />
- <p className="text-[#8C8880] text-sm">No documents uploaded yet</p>
+ <div className="bg-surface rounded-xl border border-border p-12 text-center">
+ <FolderOpen className="w-12 h-12 text-border-strong mx-auto mb-4" />
+ <p className="text-text-muted text-sm">No documents uploaded yet</p>
  </div>
  ) : (
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
  <table className="w-full">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
- <tr className="text-left text-[10px] font-semibold text-[#8C8880] uppercase tracking-[0.1em]">
+ <thead className="bg-background border-b border-border">
+ <tr className="text-left text-[10px] font-semibold text-text-muted uppercase tracking-[0.1em]">
  <th className="px-6 py-3">Document</th>
  <th className="px-6 py-3">DCN</th>
  <th className="px-6 py-3">Category</th>
@@ -1465,27 +1465,27 @@ export function CaseDetailPage({
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {caseData.documents.map((doc: ExtendedDocument) => (
- <tr key={doc.id} className="hover:bg-[#FAF6EE] transition-colors">
+ <tr key={doc.id} className="hover:bg-background transition-colors">
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
- <FileText className="w-4 h-4 text-[#C8C4BB]" />
- <span className="font-medium text-[#1C1A17] text-sm">{doc.fileName}</span>
+ <FileText className="w-4 h-4 text-border-strong" />
+ <span className="font-medium text-text-primary text-sm">{doc.fileName}</span>
  </div>
  </td>
  <td className="px-6 py-4">
- <code className="text-sm font-mono text-[#0D9488] bg-[#0D9488]/10 px-2 py-1 rounded">
+ <code className="text-sm font-mono text-primary-500 bg-primary-500/10 px-2 py-1 rounded">
  {doc.documentControlNumber}
  </code>
  </td>
  <td className="px-6 py-4">
- <span className={`px-2 py-1 text-xs font-medium rounded-full ${(documentCategoryColors as any)[doc.category] || 'bg-gray-100 text-gray-800'}`}>
+ <span className={`px-2 py-1 text-xs font-medium rounded-full ${(documentCategoryColors as any)[doc.category] || 'bg-surface-raised text-text-primary'}`}>
  {doc.category}
  </span>
  </td>
- <td className="px-6 py-4 text-sm text-[#8C8880]">
+ <td className="px-6 py-4 text-sm text-text-muted">
  {formatFileSize(doc.fileSize)}
  </td>
- <td className="px-6 py-4 text-sm text-[#8C8880]">
+ <td className="px-6 py-4 text-sm text-text-muted">
  <div>{formatDate(doc.createdAt)}</div>
  <div className="text-xs">by {doc.uploadedBy.name}</div>
  </td>
@@ -1500,7 +1500,7 @@ export function CaseDetailPage({
  <button
  onClick={() => setConfirmingDeleteId(null)}
  aria-label={`Cancel delete ${doc.fileName}`}
- className="px-2 py-1 text-xs text-[#5C5850] hover:text-[#1C1A17] border border-[#E5E2DB] rounded transition-colors"
+ className="px-2 py-1 text-xs text-text-secondary hover:text-text-primary border border-border rounded transition-colors"
  >
  Cancel
  </button>
@@ -1508,7 +1508,7 @@ export function CaseDetailPage({
  onClick={() => handleDeleteDocument(doc.id)}
  disabled={deletingDocumentId === doc.id}
  aria-label={`Confirm delete ${doc.fileName}`}
- className="px-2 py-1 text-xs text-[#ffffff] bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+ className="px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
  >
  {deletingDocumentId === doc.id ? 'Deleting…' : 'Delete'}
  </button>
@@ -1517,7 +1517,7 @@ export function CaseDetailPage({
  <div className="flex items-center gap-1">
  <button
  onClick={() => setViewingDocument(doc)}
- className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors"
+ className="p-2 text-text-muted hover:text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors"
  title="View"
  aria-label={`View ${doc.fileName}`}
  >
@@ -1525,7 +1525,7 @@ export function CaseDetailPage({
  </button>
  <button
  onClick={() => handleDownloadDocument(doc.id, doc.fileName, doc.fileType)}
- className="p-2 text-[#8C8880] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors"
+ className="p-2 text-text-muted hover:text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors"
  title="Download"
  aria-label={`Download ${doc.fileName}`}
  >
@@ -1533,7 +1533,7 @@ export function CaseDetailPage({
  </button>
  <button
  onClick={() => setConfirmingDeleteId(doc.id)}
- className="p-2 text-[#8C8880] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+ className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
  title="Delete"
  aria-label={`Delete ${doc.fileName}`}
  >
@@ -1557,14 +1557,14 @@ export function CaseDetailPage({
  activeTab === 'contacts' && (
  <div className="space-y-5">
  {/* Claimant Contact Info */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
- <h2 className="text-base font-semibold text-[#1C1A17] mb-4">Claimant Contact Info</h2>
+ <div className="bg-surface rounded-xl border border-border p-6 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <h2 className="text-base font-semibold text-text-primary mb-4">Claimant Contact Info</h2>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  {/* Phone */}
- <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
- <Phone className="w-4 h-4 text-[#8C8880] shrink-0" />
+ <div className="flex items-center gap-3 p-3 bg-surface-raised rounded-lg">
+ <Phone className="w-4 h-4 text-text-muted shrink-0" />
  <div className="flex-1 min-w-0">
- <p className="text-[11px] text-[#8C8880] mb-1">Phone</p>
+ <p className="text-[11px] text-text-muted mb-1">Phone</p>
  {editingContactField === 'phone' ? (
  <div className="flex items-center gap-2">
  <input
@@ -1572,17 +1572,17 @@ export function CaseDetailPage({
  value={editContactPhone}
  onChange={e => setEditContactPhone(e.target.value)}
  onKeyDown={e => { if (e.key === 'Enter') saveContactField('phone'); if (e.key === 'Escape') cancelEditContact(); }}
- className="flex-1 px-2 py-1 text-sm border border-[#0D9488] rounded bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30"
+ className="flex-1 px-2 py-1 text-sm border border-primary-500 rounded bg-surface focus:outline-none focus:ring-2 focus:ring-primary-500/30"
  autoFocus
  disabled={savingContactField}
  />
- <button onClick={() => saveContactField('phone')} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E] disabled:opacity-50 transition-colors">Save</button>
- <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#E5E2DB] text-[#5C5850] rounded hover:bg-[#C8C4BB] transition-colors">Cancel</button>
+ <button onClick={() => saveContactField('phone')} disabled={savingContactField} className="text-xs px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 transition-colors">Save</button>
+ <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-border text-text-secondary rounded hover:bg-border-strong transition-colors">Cancel</button>
  </div>
  ) : (
  <div className="flex items-center justify-between">
- <p className="font-mono text-sm text-[#1C1A17]">{caseData.clientPhone || <span className="text-[#C8C4BB] italic text-sm font-normal">Not set</span>}</p>
- <button onClick={() => startEditContact('phone')} className="ml-2 p-1 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded transition-colors">
+ <p className="font-mono text-sm text-text-primary">{caseData.clientPhone || <span className="text-border-strong italic text-sm font-normal">Not set</span>}</p>
+ <button onClick={() => startEditContact('phone')} className="ml-2 p-1 text-border-strong hover:text-primary-500 hover:bg-primary-500/10 rounded transition-colors">
  <Edit2 className="w-3.5 h-3.5" />
  </button>
  </div>
@@ -1590,10 +1590,10 @@ export function CaseDetailPage({
  </div>
  </div>
  {/* Email */}
- <div className="flex items-center gap-3 p-3 bg-[#F3F1EC] rounded-lg">
- <Mail className="w-4 h-4 text-[#8C8880] shrink-0" />
+ <div className="flex items-center gap-3 p-3 bg-surface-raised rounded-lg">
+ <Mail className="w-4 h-4 text-text-muted shrink-0" />
  <div className="flex-1 min-w-0">
- <p className="text-[11px] text-[#8C8880] mb-1">Email</p>
+ <p className="text-[11px] text-text-muted mb-1">Email</p>
  {editingContactField === 'email' ? (
  <div className="flex items-center gap-2">
  <input
@@ -1601,17 +1601,17 @@ export function CaseDetailPage({
  value={editContactEmail}
  onChange={e => setEditContactEmail(e.target.value)}
  onKeyDown={e => { if (e.key === 'Enter') saveContactField('email'); if (e.key === 'Escape') cancelEditContact(); }}
- className="flex-1 px-2 py-1 text-sm border border-[#0D9488] rounded bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30"
+ className="flex-1 px-2 py-1 text-sm border border-primary-500 rounded bg-surface focus:outline-none focus:ring-2 focus:ring-primary-500/30"
  autoFocus
  disabled={savingContactField}
  />
- <button onClick={() => saveContactField('email')} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#0D9488] text-[#ffffff] rounded hover:bg-[#0F766E] disabled:opacity-50 transition-colors">Save</button>
- <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-[#E5E2DB] text-[#5C5850] rounded hover:bg-[#C8C4BB] transition-colors">Cancel</button>
+ <button onClick={() => saveContactField('email')} disabled={savingContactField} className="text-xs px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 transition-colors">Save</button>
+ <button onClick={cancelEditContact} disabled={savingContactField} className="text-xs px-2 py-1 bg-border text-text-secondary rounded hover:bg-border-strong transition-colors">Cancel</button>
  </div>
  ) : (
  <div className="flex items-center justify-between">
- <p className="text-sm text-[#1C1A17] truncate">{caseData.clientEmail || <span className="text-[#C8C4BB] italic text-sm font-normal">Not set</span>}</p>
- <button onClick={() => startEditContact('email')} className="ml-2 p-1 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded transition-colors shrink-0">
+ <p className="text-sm text-text-primary truncate">{caseData.clientEmail || <span className="text-border-strong italic text-sm font-normal">Not set</span>}</p>
+ <button onClick={() => startEditContact('email')} className="ml-2 p-1 text-border-strong hover:text-primary-500 hover:bg-primary-500/10 rounded transition-colors shrink-0">
  <Edit2 className="w-3.5 h-3.5" />
  </button>
  </div>
@@ -1622,10 +1622,10 @@ export function CaseDetailPage({
  </div>
 
  <div className="flex items-center justify-between">
- <h2 className="text-lg font-semibold text-[#1C1A17]">Address Book</h2>
+ <h2 className="text-lg font-semibold text-text-primary">Address Book</h2>
  <button
  onClick={() => setIsAddContactModalOpen(true)}
- className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] text-sm font-semibold rounded-lg transition-colors"
+ className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg transition-colors"
  >
  <Plus className="w-4 h-4" />
  Add Contact
@@ -1633,41 +1633,41 @@ export function CaseDetailPage({
  </div>
 
  {caseData.contacts.length === 0 ? (
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-12 text-center">
- <BookUser className="w-12 h-12 text-[#C8C4BB] mx-auto mb-4" />
- <p className="text-[#8C8880] text-sm">No contacts added yet</p>
+ <div className="bg-surface rounded-xl border border-border p-12 text-center">
+ <BookUser className="w-12 h-12 text-border-strong mx-auto mb-4" />
+ <p className="text-text-muted text-sm">No contacts added yet</p>
  </div>
  ) : (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  {caseData.contacts.map((contact: Contact) => (
- <div key={contact.id} className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-5 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
+ <div key={contact.id} className="bg-surface rounded-xl border border-border p-5 shadow-[0_1px_2px_rgba(28,26,23,0.04)]">
  <div className="flex items-start justify-between">
  <div>
- <span className={`px-2 py-1 text-xs font-medium rounded-full ${(contactTypeColors as any)[contact.type] || 'bg-gray-100'}`}>
+ <span className={`px-2 py-1 text-xs font-medium rounded-full ${(contactTypeColors as any)[contact.type] || 'bg-surface-raised'}`}>
  {contact.type}
  </span>
- <h3 className="font-semibold text-[#1C1A17] mt-2">{contact.name}</h3>
+ <h3 className="font-semibold text-text-primary mt-2">{contact.name}</h3>
  </div>
- <button className="p-2 text-[#C8C4BB] hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-lg transition-colors">
+ <button className="p-2 text-border-strong hover:text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors">
  <Edit2 className="w-4 h-4" />
  </button>
  </div>
  <div className="space-y-2 mt-4 text-sm">
- <div className="flex items-center gap-2 text-[#5C5850]">
+ <div className="flex items-center gap-2 text-text-secondary">
  <Phone className="w-4 h-4" />
  <span>{contact.phone}</span>
  </div>
  {contact.email && (
- <div className="flex items-center gap-2 text-[#5C5850]">
+ <div className="flex items-center gap-2 text-text-secondary">
  <span className="w-4 h-4 text-center">@</span>
  <span>{contact.email}</span>
  </div>
  )}
  {contact.address && (
- <p className="text-[#8C8880] mt-2">{contact.address}</p>
+ <p className="text-text-muted mt-2">{contact.address}</p>
  )}
  {contact.notes && (
- <p className="text-[#8C8880] italic mt-2">{contact.notes}</p>
+ <p className="text-text-muted italic mt-2">{contact.notes}</p>
  )}
  </div>
  </div>
@@ -1693,8 +1693,8 @@ export function CaseDetailPage({
  activeTab === 'portal' && (
  <div className="max-w-4xl mx-auto">
  <div className="mb-5">
- <h2 className="text-lg font-semibold text-[#1C1A17] mb-1">Portal Messages</h2>
- <p className="text-sm text-[#8C8880]">
+ <h2 className="text-lg font-semibold text-text-primary mb-1">Portal Messages</h2>
+ <p className="text-sm text-text-muted">
  View and respond to messages from {caseData.clientName} via the claimant portal.
  </p>
  </div>
@@ -1706,7 +1706,7 @@ export function CaseDetailPage({
  )
  }
  </main>
- </div>{/* /bg-[#FAF6EE] */}
+ </div>{/* /bg-background */}
 
  {/* MODALS */}
  < AddNoteModal
@@ -1739,10 +1739,10 @@ export function CaseDetailPage({
  {
  isUploadModalOpen && (
  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
- <div className="bg-[#ffffff] rounded-xl p-6 w-full max-w-md shadow-lg border border-[#E5E2DB]">
+ <div className="bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border">
  <div className="flex items-center justify-between mb-4">
- <h3 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- {uploadEmailMode ? <><Mail className="w-4 h-4 text-[#0D9488]" /> Upload Received Email</> : 'Upload Document'}
+ <h3 className="text-base font-semibold text-text-primary flex items-center gap-2">
+ {uploadEmailMode ? <><Mail className="w-4 h-4 text-primary-500" /> Upload Received Email</> : 'Upload Document'}
  </h3>
  <button
  onClick={() => {
@@ -1750,14 +1750,14 @@ export function CaseDetailPage({
  setUploadEmailMode(false);
  setUploadError(null);
  }}
- className="p-2 text-[#8C8880] hover:text-[#1C1A17] rounded-lg transition-colors"
+ className="p-2 text-text-muted hover:text-text-primary rounded-lg transition-colors"
  >
  <X className="w-5 h-5" />
  </button>
  </div>
 
  {uploadEmailMode && (
- <p className="mb-4 text-sm text-[#8C8880]">
+ <p className="mb-4 text-sm text-text-muted">
  Upload a received email file (.eml or .msg). A DCN will be assigned automatically and shown after upload.
  </p>
  )}
@@ -1770,19 +1770,19 @@ export function CaseDetailPage({
 
  <div className="space-y-4">
  {uploadEmailMode ? (
- <div className="flex items-center gap-2 px-3 py-2 bg-[#0D9488]/10 border border-[#0D9488]/20 rounded-lg text-sm text-[#0D9488]">
+ <div className="flex items-center gap-2 px-3 py-2 bg-primary-500/10 border border-primary-500/20 rounded-lg text-sm text-primary-500">
  <Mail className="w-4 h-4 shrink-0" />
  Category: <span className="font-medium">Correspondence</span>
  </div>
  ) : (
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] mb-1.5">
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted mb-1.5">
  Category
  </label>
  <select
  value={uploadCategory}
  onChange={(e) => setUploadCategory(e.target.value)}
- className="w-full px-3 py-2 border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] text-sm"
+ className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 text-sm"
  >
  <option value="MEDICAL">Medical</option>
  <option value="LEGAL">Legal</option>
@@ -1794,19 +1794,14 @@ export function CaseDetailPage({
  )}
 
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] mb-1.5">
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted mb-1.5">
  {uploadEmailMode ? 'Select Email File (.eml or .msg)' : 'Select File'}
  </label>
  <input
  ref={fileInputRef}
  type="file"
  accept={uploadEmailMode ? '.eml,.msg' : undefined}
- className="w-full text-sm text-[#5C5850]
- file:mr-4 file:py-2 file:px-4
- file:rounded-lg file:border-0
- file:text-sm file:font-semibold
- file:bg-[#0D9488]/10 file:text-[#0D9488]
- hover:file:bg-[#0D9488]/20"
+ className="w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500/10 file:text-primary-500 hover:file:bg-primary-500/20"
  />
  </div>
  </div>
@@ -1818,7 +1813,7 @@ export function CaseDetailPage({
  setUploadEmailMode(false);
  setUploadError(null);
  }}
- className="flex-1 px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#F3F1EC] hover:bg-[#E5E2DB] rounded-lg transition-colors"
+ className="flex-1 px-4 py-2 text-sm font-medium text-text-secondary bg-surface-raised hover:bg-border rounded-lg transition-colors"
  >
  Cancel
  </button>
@@ -1832,7 +1827,7 @@ export function CaseDetailPage({
  }
  }}
  disabled={isUploading}
- className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] disabled:opacity-50 rounded-lg transition-colors"
+ className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 disabled:opacity-50 rounded-lg transition-colors"
  >
  {isUploading ? (
  <>

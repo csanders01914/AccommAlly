@@ -25,9 +25,9 @@ interface CalendarEvent {
 }
 
 const TYPE_COLORS = {
- meeting: 'bg-blue-500',
- task: 'bg-purple-500',
- call: 'bg-red-500',
+ meeting: 'bg-primary-500',
+ task: 'bg-success',
+ call: 'bg-warning',
 };
 
 export function MiniCalendarWidget() {
@@ -67,7 +67,6 @@ export function MiniCalendarWidget() {
  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 
- // Get events for a specific day, grouped by type
  const getEventsForDay = (day: Date) => {
  const dayEvents = events.filter(e => isSameDay(new Date(e.start), day));
  const types = new Set(dayEvents.map(e => e.type));
@@ -79,19 +78,19 @@ export function MiniCalendarWidget() {
 
  return (
  <div className="flex flex-col h-full">
- <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+ <div className="p-4 border-b border-border flex items-center justify-between">
  <h3
  onClick={() => router.push('/calendar')}
- className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-pointer hover:text-blue-500 transition-colors"
+ className="font-semibold text-text-primary flex items-center gap-2 cursor-pointer hover:text-primary-600 transition-colors"
  >
- <CalendarIcon className="w-4 h-4 text-blue-500" />
+ <CalendarIcon className="w-4 h-4 text-primary-500" />
  {format(currentMonth, 'MMMM yyyy')}
  </h3>
  <div className="flex gap-1">
- <button onClick={prevMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
+ <button onClick={prevMonth} className="p-1 hover:bg-surface-raised rounded text-text-secondary">
  <ChevronLeft className="w-4 h-4" />
  </button>
- <button onClick={nextMonth} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
+ <button onClick={nextMonth} className="p-1 hover:bg-surface-raised rounded text-text-secondary">
  <ChevronRight className="w-4 h-4" />
  </button>
  </div>
@@ -101,20 +100,20 @@ export function MiniCalendarWidget() {
  {/* Legend */}
  <div className="flex items-center justify-center gap-3 mb-3 text-[10px]">
  <div className="flex items-center gap-1">
- <div className="w-2 h-2 rounded-full bg-blue-500" />
- <span className="text-gray-500">Meeting</span>
+ <div className="w-2 h-2 rounded-full bg-primary-500" />
+ <span className="text-text-muted">Meeting</span>
  </div>
  <div className="flex items-center gap-1">
- <div className="w-2 h-2 rounded-full bg-purple-500" />
- <span className="text-gray-500">Task</span>
+ <div className="w-2 h-2 rounded-full bg-success" />
+ <span className="text-text-muted">Task</span>
  </div>
  <div className="flex items-center gap-1">
- <div className="w-2 h-2 rounded-full bg-red-500" />
- <span className="text-gray-500">Call</span>
+ <div className="w-2 h-2 rounded-full bg-warning" />
+ <span className="text-text-muted">Call</span>
  </div>
  </div>
 
- <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-gray-400 font-medium">
+ <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-text-muted font-medium">
  <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
  </div>
  <div className="grid grid-cols-7 gap-1 text-center text-sm">
@@ -129,9 +128,9 @@ export function MiniCalendarWidget() {
  onClick={() => router.push('/calendar')}
  className={cn(
  "p-1.5 rounded-lg relative transition-colors cursor-pointer",
- !isCurrentMonth && "text-gray-300 dark:text-gray-700",
- isCurrentMonth && "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800",
- isCurrentDay && "bg-blue-600 text-white hover:bg-blue-700 font-bold shadow-sm"
+ !isCurrentMonth && "text-text-muted/40",
+ isCurrentMonth && !isCurrentDay && "text-text-secondary hover:bg-surface-raised",
+ isCurrentDay && "bg-primary-500 text-white hover:bg-primary-600 font-bold shadow-sm"
  )}
  >
  <span className="relative z-10">{format(day, 'd')}</span>

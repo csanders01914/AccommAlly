@@ -46,25 +46,25 @@ export default function CalendarPage() {
 
  if (loading) {
  return (
- <div className="min-h-screen flex items-center justify-center bg-[#FAF6EE]">
- <Loader2 className="w-10 h-10 animate-spin text-[#0D9488]" />
+ <div className="min-h-screen flex items-center justify-center bg-background">
+ <Loader2 className="w-10 h-10 animate-spin text-primary-500" />
  </div>
  );
  }
 
  return (
  <div className="flex-1 flex flex-col h-full">
- <header className="px-6 py-4 flex justify-between items-center border-b border-[#E5E2DB] bg-[#ffffff] sticky top-0 z-10">
+ <header className="px-6 py-4 flex justify-between items-center border-b border-border bg-surface sticky top-0 z-10">
  <div>
- <h1 className="text-2xl font-bold text-[#1C1A17]">Calendar</h1>
- <p className="text-[#8C8880] text-sm mt-0.5">Manage meetings, tasks, and return calls</p>
+ <h1 className="text-2xl font-bold text-text-primary">Calendar</h1>
+ <p className="text-text-muted text-sm mt-0.5">Manage meetings, tasks, and return calls</p>
  </div>
  </header>
 
  <main className="flex-1 overflow-hidden p-6">
  <Suspense fallback={
  <div className="flex items-center justify-center h-full">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  }>
  <EnhancedCalendarView />

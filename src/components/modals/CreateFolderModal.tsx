@@ -13,8 +13,8 @@ interface CreateFolderModalProps {
 
 const FOLDER_COLORS = ['#6366f1','#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#a855f7','#ec4899','#64748b'];
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function CreateFolderModal({ isOpen, onClose, onSuccess }: CreateFolderModalProps) {
  const [name, setName] = useState('');
@@ -39,14 +39,14 @@ export function CreateFolderModal({ isOpen, onClose, onSuccess }: CreateFolderMo
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] max-w-md w-full overflow-hidden">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
+ <div className="modal-container max-w-md w-full overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
  <Folder className="w-4 h-4" style={{ color }} />
  Create Folder
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -67,10 +67,10 @@ export function CreateFolderModal({ isOpen, onClose, onSuccess }: CreateFolderMo
  </div>
  </div>
  <div className="flex justify-end gap-3 pt-2">
- <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
+ <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">
  Cancel
  </button>
- <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition-colors disabled:opacity-50">
+ <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors disabled:opacity-50">
  {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
  Create Folder
  </button>

@@ -13,8 +13,8 @@ interface TransferCaseModalProps {
  currentOwnerName?: string;
 }
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function TransferCaseModal({ isOpen, onClose, onSubmit, users, currentOwnerName }: TransferCaseModalProps) {
  const [selectedUserId, setSelectedUserId] = useState('');
@@ -38,21 +38,21 @@ export function TransferCaseModal({ isOpen, onClose, onSubmit, users, currentOwn
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-md overflow-hidden flex flex-col" role="dialog" aria-modal="true">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- <ArrowRightLeft className="w-4 h-4 text-[#0D9488]" />
+ <div className="modal-container w-full max-w-md overflow-hidden flex flex-col" role="dialog" aria-modal="true">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary flex items-center gap-2">
+ <ArrowRightLeft className="w-4 h-4 text-primary-500" />
  Transfer Case
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
  <div className="p-6 space-y-4">
- <p className="text-sm text-[#5C5850]">
- Transferring this case will reassign all <strong className="text-[#1C1A17]">pending tasks</strong> to the new owner.
- {currentOwnerName && <span> Currently assigned to: <strong className="text-[#1C1A17]">{currentOwnerName}</strong></span>}
+ <p className="text-sm text-text-secondary">
+ Transferring this case will reassign all <strong className="text-text-primary">pending tasks</strong> to the new owner.
+ {currentOwnerName && <span> Currently assigned to: <strong className="text-text-primary">{currentOwnerName}</strong></span>}
  </p>
  <div>
  <label className={labelCls}>New Owner</label>
@@ -63,11 +63,11 @@ export function TransferCaseModal({ isOpen, onClose, onSubmit, users, currentOwn
  </div>
  </div>
 
- <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E5E2DB] bg-[#FAF6EE]">
- <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#ffffff] border border-[#E5E2DB] rounded-lg hover:bg-[#F3F1EC] transition-colors">
+ <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-background">
+ <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface border border-border rounded-lg hover:bg-surface-raised transition-colors">
  Cancel
  </button>
- <button onClick={handleSubmit} disabled={!selectedUserId || isSubmitting} className="px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+ <button onClick={handleSubmit} disabled={!selectedUserId || isSubmitting} className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
  {isSubmitting ? 'Transferring…' : 'Transfer Case'}
  </button>
  </div>

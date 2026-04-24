@@ -154,14 +154,6 @@ export default function TenantDetailsPage() {
  {/* We could list admins here if the API returns them */}
  </div>
 
- {/* Branding Configuration */}
- <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6 md:col-span-2">
- <div className="flex items-center justify-between mb-4">
- <h2 className="text-lg font-semibold text-slate-900">Branding Configuration</h2>
- <BrandingEditor tenant={tenant} />
- </div>
- </div>
-
  {/* Letter Templates */}
  <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6 md:col-span-2">
  <div className="flex items-center justify-between">
@@ -187,86 +179,3 @@ export default function TenantDetailsPage() {
  );
 }
 
-function BrandingEditor({ tenant }: { tenant: Tenant }) {
- const [primaryColor, setPrimaryColor] = useState(tenant.settings?.branding?.primaryColor || '#6366f1');
- const [secondaryColor, setSecondaryColor] = useState(tenant.settings?.branding?.secondaryColor || '#a855f7');
- const [saving, setSaving] = useState(false);
- const [message, setMessage] = useState('');
-
- const handleSave = async () => {
- setSaving(true);
- setMessage('');
-
- try {
- const newSettings = {
- ...tenant.settings,
- branding: {
- primaryColor,
- secondaryColor
- }
- };
-
- const res = await fetch(`/api/super-admin/tenants/${tenant.id}`, {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ settings: newSettings })
- });
-
- if (!res.ok) throw new Error('Failed to update');
-
- setMessage('Saved!');
-
- // Clear message after 3s
- setTimeout(() => setMessage(''), 3000);
- } catch (e) {
- setMessage('Error saving');
- } finally {
- setSaving(false);
- }
- };
-
- return (
- <div className="flex items-center gap-6">
- <div className="flex items-center gap-2">
- <input
- type="color"
- value={primaryColor}
- onChange={(e) => setPrimaryColor(e.target.value)}
- className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
- title="Primary Color"
- />
- <div className="text-xs">
- <div className="text-slate-500">Primary</div>
- <div className="text-slate-600 font-mono">{primaryColor}</div>
- </div>
- </div>
-
- <div className="flex items-center gap-2">
- <input
- type="color"
- value={secondaryColor}
- onChange={(e) => setSecondaryColor(e.target.value)}
- className="h-8 w-8 rounded cursor-pointer bg-transparent border-none"
- title="Secondary Color"
- />
- <div className="text-xs">
- <div className="text-slate-500">Secondary</div>
- <div className="text-slate-600 font-mono">{secondaryColor}</div>
- </div>
- </div>
-
- <button
- onClick={handleSave}
- disabled={saving}
- className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-slate-900 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
- >
- {saving ? 'Saving...' : 'Save Branding'}
- </button>
- {message && (
- <span className={`text-sm ${message.includes('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
- {message}
- </span>
- )}
- </div>
- );
-}

@@ -8,7 +8,7 @@ export interface MessageProps {
  id: string;
  sender: string;
  content: string;
- time: string; // ISO string
+ time: string;
  unread: boolean;
 }
 
@@ -25,7 +25,6 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
  const now = new Date();
  const diff = now.getTime() - date.getTime();
 
- // Less than 24h
  if (diff < 1000 * 60 * 60 * 24) {
  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
  }
@@ -34,16 +33,16 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
 
  return (
  <div className="flex flex-col h-full">
- <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gradient-to-r from-purple-50/50 to-transparent dark:from-purple-900/10">
+ <div className="widget-header">
  <h3
  onClick={() => router.push('/messages')}
- className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-pointer hover:text-purple-600 transition-colors"
+ className="widget-header-title cursor-pointer hover:text-primary-600 transition-colors"
  >
- <MessageSquare className="w-4 h-4 text-purple-600" />
+ <MessageSquare className="w-4 h-4 text-primary-500" />
  Messages
  </h3>
  {unreadCount > 0 && (
- <span className="w-5 h-5 bg-purple-100 text-purple-600 rounded-full text-xs flex items-center justify-center font-bold">
+ <span className="w-5 h-5 bg-primary-100 text-primary-700 rounded-full text-xs flex items-center justify-center font-bold">
  {unreadCount}
  </span>
  )}
@@ -57,40 +56,39 @@ export function MessagesWidget({ messages }: MessagesWidgetProps) {
  className={cn(
  "p-3 rounded-lg cursor-pointer transition-colors border border-transparent",
  msg.unread
-
- ? "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100/50 dark:border-purple-800/30"
- : "hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
+ ? "bg-primary-50/50 border-primary-100/50"
+ : "hover:bg-surface-raised/50"
  )}
  >
  <div className="flex justify-between items-center mb-1">
  <span className={cn(
  "text-sm font-medium",
- msg.unread ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
+ msg.unread ? "text-text-primary" : "text-text-secondary"
  )}>
  {msg.sender}
  </span>
- <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
+ <span className="text-[10px] text-text-muted whitespace-nowrap ml-2">
  {formatTime(msg.time)}
  </span>
  </div>
  <p className={cn(
  "text-xs line-clamp-2",
- msg.unread ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"
+ msg.unread ? "text-text-secondary" : "text-text-muted"
  )}>
  {msg.content}
  </p>
  </div>
  )) : (
- <div className="text-center py-8 text-gray-600 dark:text-gray-400 font-medium text-sm">
+ <div className="text-center py-8 text-text-secondary font-medium text-sm">
  No new messages
  </div>
  )}
  </div>
 
- <div className="p-3 border-t border-gray-100 dark:border-gray-800 mt-auto">
+ <div className="widget-footer">
  <button
  onClick={() => router.push('/messages')}
- className="text-xs font-medium text-purple-600 hover:text-purple-700 w-full text-center flex items-center justify-center gap-1"
+ className="text-xs font-medium text-primary-600 hover:text-primary-700 w-full text-center flex items-center justify-center gap-1"
  >
  Inbox <ChevronRight className="w-3 h-3" />
  </button>

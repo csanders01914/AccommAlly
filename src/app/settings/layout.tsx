@@ -46,8 +46,8 @@ export default function SettingsLayout({
 
  if (isLoading) {
  return (
- <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
- <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+ <div className="flex items-center justify-center min-h-screen bg-background">
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }
@@ -55,7 +55,7 @@ export default function SettingsLayout({
  if (!currentUser) return null;
 
  return (
- <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+ <div className="flex min-h-screen bg-background">
  <Sidebar
  user={currentUser}
  unreadCount={unreadCount}

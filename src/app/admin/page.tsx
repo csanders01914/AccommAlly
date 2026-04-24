@@ -479,24 +479,24 @@ function AdminDashboardContent() {
  <div className="p-6 space-y-6 h-full flex flex-col">
  <div className="flex items-center justify-between flex-shrink-0">
  <div>
- <h1 className="text-2xl font-bold text-[#1C1A17] flex items-center gap-3">
- <Shield className="w-7 h-7 text-[#0D9488]" />
+ <h1 className="text-2xl font-bold text-text-primary flex items-center gap-3">
+ <Shield className="w-7 h-7 text-primary-500" />
  Admin Console
  </h1>
- <p className="text-[#8C8880] mt-1">System monitoring and user management</p>
+ <p className="text-text-muted mt-1">System monitoring and user management</p>
  </div>
  <div className="flex items-center gap-3">
  <button
  onClick={handleInitiateExportReport}
  disabled={isPaymentLoading}
- className="px-4 py-2 text-sm font-medium text-[#ffffff] bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
+ className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
  >
  {isPaymentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
  Export Grant Report
  </button>
  <button
  onClick={() => router.push('/dashboard/tasks')}
- className="px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#ffffff] border border-[#E5E2DB] rounded-lg hover:bg-[#FAF6EE] transition-colors"
+ className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface border border-border rounded-lg hover:bg-background transition-colors"
  >
  Back to Dashboard
  </button>
@@ -504,11 +504,11 @@ function AdminDashboardContent() {
  </div>
 
  {/* Main Container */}
- <div className="flex-1 bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-sm overflow-hidden flex flex-col">
+ <div className="flex-1 bg-surface rounded-xl border border-border shadow-sm overflow-hidden flex flex-col">
 
  {/* Tabs Header */}
- <div className="p-4 border-b border-[#E5E2DB]">
- <div className="flex space-x-1 bg-[#FAF6EE] p-1 rounded-lg border border-[#E5E2DB] w-fit">
+ <div className="p-4 border-b border-border">
+ <div className="flex space-x-1 bg-background p-1 rounded-lg border border-border w-fit">
  {[
  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
  { id: 'users', label: 'User Management', icon: Users },
@@ -526,8 +526,8 @@ function AdminDashboardContent() {
  className={cn(
  "px-4 py-2 text-sm font-medium rounded-md flex items-center gap-2 transition-all",
  activeTab === tab.id
- ? "bg-[#ffffff] text-[#0D9488] shadow-sm"
- : "text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]"
+ ? "bg-surface text-primary-500 shadow-sm"
+ : "text-text-secondary hover:text-text-primary hover:bg-surface-raised"
  )}
  >
  <tab.icon className="w-4 h-4" />
@@ -545,72 +545,72 @@ function AdminDashboardContent() {
  <div className="space-y-6">
  {/* Metrics */}
  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#FAF6EE]">
- <h3 className="text-sm font-semibold text-[#5C5850]">Total Cases</h3>
- <p className="text-3xl font-bold text-[#1C1A17] mt-2">{stats.totalCases}</p>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm transition-all hover:bg-background">
+ <h3 className="text-sm font-semibold text-text-secondary">Total Cases</h3>
+ <p className="text-3xl font-bold text-text-primary mt-2">{stats.totalCases}</p>
  </div>
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#FAF6EE]">
- <h3 className="text-sm font-semibold text-[#5C5850]">Active Cases</h3>
- <p className="text-3xl font-bold text-[#0D9488] mt-2">{stats.activeCases}</p>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm transition-all hover:bg-background">
+ <h3 className="text-sm font-semibold text-text-secondary">Active Cases</h3>
+ <p className="text-3xl font-bold text-primary-500 mt-2">{stats.activeCases}</p>
  </div>
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#FAF6EE]">
- <h3 className="text-sm font-semibold text-[#5C5850]">Total Users</h3>
- <p className="text-3xl font-bold text-[#0D9488] mt-2">{stats.totalUsers}</p>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm transition-all hover:bg-background">
+ <h3 className="text-sm font-semibold text-text-secondary">Total Users</h3>
+ <p className="text-3xl font-bold text-primary-500 mt-2">{stats.totalUsers}</p>
  </div>
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm transition-all hover:bg-[#FAF6EE]">
- <h3 className="text-sm font-semibold text-[#5C5850]">Documents</h3>
- <p className="text-3xl font-bold text-[#1C1A17] mt-2">{stats.totalDocuments}</p>
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm transition-all hover:bg-background">
+ <h3 className="text-sm font-semibold text-text-secondary">Documents</h3>
+ <p className="text-3xl font-bold text-text-primary mt-2">{stats.totalDocuments}</p>
  </div>
  </div>
 
  {/* Operational Intelligence (Phase 1) */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Urgency Heatmap */}
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
  <div className="mb-4">
- <h3 className="text-lg font-semibold text-[#1C1A17]">Case Urgency Heatmap</h3>
- <p className="text-xs text-[#8C8880]">Tracks active cases by days since last update</p>
+ <h3 className="text-lg font-semibold text-text-primary">Case Urgency Heatmap</h3>
+ <p className="text-xs text-text-muted">Tracks active cases by days since last update</p>
  </div>
  <UrgencyHeatmap data={intelligence?.urgencyStats ?? null} isLoading={isLoading} />
  </div>
 
  {/* Program Distribution */}
- <div className="bg-[#ffffff] p-6 rounded-xl border border-[#E5E2DB] shadow-sm">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
  <div className="mb-4">
- <h3 className="text-lg font-semibold text-[#1C1A17]">Program Distribution</h3>
- <p className="text-xs text-[#8C8880]">Active accommodations by program type</p>
+ <h3 className="text-lg font-semibold text-text-primary">Program Distribution</h3>
+ <p className="text-xs text-text-muted">Active accommodations by program type</p>
  </div>
  <ProgramDistribution data={intelligence?.programDistribution ?? null} isLoading={isLoading} />
  </div>
  </div>
 
  {/* Recent Audit Activity Table */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB]">
- <div className="p-6 border-b border-[#E5E2DB]">
- <h3 className="font-semibold text-[#1C1A17]">Recent System Activity</h3>
+ <div className="bg-surface rounded-xl border border-border">
+ <div className="p-6 border-b border-border">
+ <h3 className="font-semibold text-text-primary">Recent System Activity</h3>
  </div>
  <table className="w-full text-left font-sm">
- <thead className="bg-[#FAF6EE]">
+ <thead className="bg-background">
  <tr>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Time</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Entity</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Time</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">User</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Action</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Entity</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {recentLogs.map(log => (
- <tr key={log.id} className="hover:bg-[#FAF6EE] transition-colors">
- <td className="px-6 py-3 text-sm text-[#8C8880]">
+ <tr key={log.id} className="hover:bg-background transition-colors">
+ <td className="px-6 py-3 text-sm text-text-muted">
  {format(new Date(log.timestamp), 'MMM d, HH:mm')}
  </td>
- <td className="px-6 py-3 text-sm font-medium text-[#1C1A17]">
+ <td className="px-6 py-3 text-sm font-medium text-text-primary">
  {log.user?.name || log.userId || 'Unknown'}
  </td>
- <td className="px-6 py-3 text-sm text-[#5C5850]">
+ <td className="px-6 py-3 text-sm text-text-secondary">
  {log.action}
  </td>
- <td className="px-6 py-3 text-sm text-[#5C5850]">
+ <td className="px-6 py-3 text-sm text-text-secondary">
  {log.entityType}
  </td>
  </tr>
@@ -623,7 +623,7 @@ function AdminDashboardContent() {
 
  {/* CLIENTS TAB */}
  {activeTab === 'clients' && (
- <div className="bg-[#FAF6EE] rounded-xl border border-[#E5E2DB] p-6">
+ <div className="bg-background rounded-xl border border-border p-6">
  <ClientManagement />
  </div>
  )}
@@ -632,7 +632,7 @@ function AdminDashboardContent() {
  {activeTab === 'users' && (
  <div className="space-y-4">
  {/* Role Filter Tabs */}
- <div className="flex items-center gap-2 p-1 bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg w-fit">
+ <div className="flex items-center gap-2 p-1 bg-background border border-border rounded-lg w-fit">
  {[
  { id: 'ALL', label: 'All Users' },
  { id: 'COORDINATOR', label: 'Coordinators' },
@@ -645,8 +645,8 @@ function AdminDashboardContent() {
  className={cn(
  "px-4 py-2 text-sm font-medium rounded-md transition-all",
  userRoleFilter === role.id
- ? "bg-[#ffffff] text-[#1C1A17] shadow-sm"
- : "text-[#5C5850] hover:text-[#1C1A17] hover:bg-[#F3F1EC]"
+ ? "bg-surface text-text-primary shadow-sm"
+ : "text-text-secondary hover:text-text-primary hover:bg-surface-raised"
  )}
  >
  {role.label}
@@ -659,44 +659,44 @@ function AdminDashboardContent() {
  ))}
  </div>
 
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
- <div className="p-4 flex items-center justify-between border-b border-[#E5E2DB] bg-[#FAF6EE]">
- <h3 className="font-semibold text-[#1C1A17]">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden">
+ <div className="p-4 flex items-center justify-between border-b border-border bg-background">
+ <h3 className="font-semibold text-text-primary">
  {userRoleFilter === 'ALL' ? 'All Users' :
  userRoleFilter === 'ADMIN' ? 'Administrators' :
  userRoleFilter === 'AUDITOR' ? 'Auditors' : 'Coordinators'}
  </h3>
  <button
  onClick={() => setIsCreateUserOpen(true)}
- className="flex items-center gap-2 px-3 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-medium transition-colors"
+ className="flex items-center gap-2 px-3 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors"
  >
  <Users className="w-4 h-4" />
  Create User
  </button>
  </div>
  <table className="w-full text-left">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
+ <thead className="bg-background border-b border-border">
  <tr>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Role</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Status</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Last Login</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em] text-right">Actions</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">User</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Role</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Status</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Last Login</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em] text-right">Actions</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {users
  .filter(u => userRoleFilter === 'ALL' || u.role === userRoleFilter)
  .map(u => (
- <tr key={u.id} className="hover:bg-[#FAF6EE] transition-colors">
+ <tr key={u.id} className="hover:bg-background transition-colors">
  <td className="px-6 py-3">
  <div className="flex items-center gap-3">
- <div className="w-8 h-8 rounded-full bg-[#F3F1EC] flex items-center justify-center text-[#5C5850] font-medium text-sm">
+ <div className="w-8 h-8 rounded-full bg-surface-raised flex items-center justify-center text-text-secondary font-medium text-sm">
  {u.name.charAt(0)}
  </div>
  <div>
- <p className="font-medium text-[#1C1A17]">{u.name}</p>
- <p className="text-xs text-[#8C8880]">{u.email}</p>
+ <p className="font-medium text-text-primary">{u.name}</p>
+ <p className="text-xs text-text-muted">{u.email}</p>
  </div>
  </div>
  </td>
@@ -704,10 +704,10 @@ function AdminDashboardContent() {
  <span className={cn(
  "px-2 py-0.5 rounded text-xs font-medium border",
  u.role === 'ADMIN'
- ? "bg-purple-50 text-purple-700 border-purple-200"
+ ? "bg-primary-50 text-primary-600 border-primary-100"
  : u.role === 'AUDITOR'
  ? "bg-amber-50 text-amber-700 border-amber-200"
- : "bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20"
+ : "bg-primary-500/8 text-primary-500 border-primary-500/20"
  )}>
  {u.role}
  </span>
@@ -721,7 +721,7 @@ function AdminDashboardContent() {
  <span className="text-green-600 text-sm font-medium">Active</span>
  )}
  </td>
- <td className="px-6 py-3 text-sm text-[#8C8880]">
+ <td className="px-6 py-3 text-sm text-text-muted">
  {u.lastLogin ? format(new Date(u.lastLogin), 'MMM d, yyyy') : 'Never'}
  </td>
  <td className="px-6 py-3 text-right">
@@ -731,7 +731,7 @@ function AdminDashboardContent() {
  setEditingUser(u);
  setIsEditUserOpen(true);
  }}
- className="p-1 text-[#8C8880] hover:text-[#0D9488] transition-colors"
+ className="p-1 text-text-muted hover:text-primary-500 transition-colors"
  title="Edit"
  >
  <Edit2 className="w-4 h-4" />
@@ -740,7 +740,7 @@ function AdminDashboardContent() {
  {u.lockedUntil && new Date(u.lockedUntil) > new Date() ? (
  <button
  onClick={() => handleUserAction(u.id, 'unlock')}
- className="p-1 text-[#8C8880] hover:text-green-600 transition-colors"
+ className="p-1 text-text-muted hover:text-green-600 transition-colors"
  title="Unlock"
  >
  <Unlock className="w-4 h-4" />
@@ -748,7 +748,7 @@ function AdminDashboardContent() {
  ) : (
  <button
  onClick={() => handleUserAction(u.id, 'lock')}
- className="p-1 text-[#8C8880] hover:text-orange-600 transition-colors"
+ className="p-1 text-text-muted hover:text-orange-600 transition-colors"
  title="Lock"
  >
  <Lock className="w-4 h-4" />
@@ -757,7 +757,7 @@ function AdminDashboardContent() {
 
  <button
  onClick={() => handleDeleteUser(u.id)}
- className="p-1 text-[#8C8880] hover:text-red-600 transition-colors"
+ className="p-1 text-text-muted hover:text-red-600 transition-colors"
  title="Delete"
  >
  <Trash2 className="w-4 h-4" />
@@ -768,7 +768,7 @@ function AdminDashboardContent() {
  ))}
  {users.filter(u => userRoleFilter === 'ALL' || u.role === userRoleFilter).length === 0 && (
  <tr>
- <td colSpan={5} className="px-6 py-12 text-center text-[#8C8880]">
+ <td colSpan={5} className="px-6 py-12 text-center text-text-muted">
  No users found in this category.
  </td>
  </tr>
@@ -783,63 +783,63 @@ function AdminDashboardContent() {
  {activeTab === 'resources' && (
  <div className="space-y-6">
  <div className="flex justify-between items-center">
- <h2 className="text-xl font-bold text-[#1C1A17]">Asset Inventory</h2>
+ <h2 className="text-xl font-bold text-text-primary">Asset Inventory</h2>
  <button
  onClick={() => setIsAddInventoryOpen(true)}
- className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] font-medium flex items-center gap-2 shadow-sm transition-all"
+ className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 font-medium flex items-center gap-2 shadow-sm transition-all"
  >
  <Plus className="w-4 h-4" />
  Add Asset
  </button>
  </div>
 
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden">
  <table className="w-full text-left text-sm">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
+ <thead className="bg-background border-b border-border">
  <tr>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Asset Tag</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Name</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Category</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Status</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Assigned To</th>
- <th className="px-6 py-4 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Added</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Asset Tag</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Name</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Category</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Status</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Assigned To</th>
+ <th className="px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Added</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {inventory.length === 0 ? (
  <tr>
- <td colSpan={6} className="px-6 py-12 text-center text-[#8C8880]">
- <Box className="w-12 h-12 mx-auto mb-3 text-[#E5E2DB]" />
+ <td colSpan={6} className="px-6 py-12 text-center text-text-muted">
+ <Box className="w-12 h-12 mx-auto mb-3 text-border" />
  No assets found
  </td>
  </tr>
  ) : (
  inventory.map((item: any) => (
- <tr key={item.id} className="hover:bg-[#FAF6EE] transition-colors">
- <td className="px-6 py-4 font-mono text-xs font-bold text-[#8C8880]">{item.assetTag}</td>
- <td className="px-6 py-4 font-medium text-[#1C1A17]">{item.name}</td>
- <td className="px-6 py-4 text-[#5C5850]">{item.category}</td>
+ <tr key={item.id} className="hover:bg-background transition-colors">
+ <td className="px-6 py-4 font-mono text-xs font-bold text-text-muted">{item.assetTag}</td>
+ <td className="px-6 py-4 font-medium text-text-primary">{item.name}</td>
+ <td className="px-6 py-4 text-text-secondary">{item.category}</td>
  <td className="px-6 py-4">
  <span className={cn(
  "px-2 py-1 rounded-full text-xs font-semibold border",
  item.status === 'AVAILABLE' ? "bg-green-50 text-green-700 border-green-100" :
- item.status === 'ASSIGNED' ? "bg-[#0D9488]/8 text-[#0D9488] border-[#0D9488]/20" :
- "bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]"
+ item.status === 'ASSIGNED' ? "bg-primary-500/8 text-primary-500 border-primary-500/20" :
+ "bg-surface-raised text-text-secondary border-border"
  )}>
  {item.status}
  </span>
  </td>
- <td className="px-6 py-4 text-[#5C5850]">
+ <td className="px-6 py-4 text-text-secondary">
  {item.assignedToUser ? (
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-full bg-[#0D9488]/10 flex items-center justify-center text-[#0D9488] text-xs font-bold">
+ <div className="w-6 h-6 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-500 text-xs font-bold">
  {item.assignedToUser.name[0]}
  </div>
  {item.assignedToUser.name}
  </div>
  ) : '-'}
  </td>
- <td className="px-6 py-4 text-[#8C8880] text-xs">
+ <td className="px-6 py-4 text-text-muted text-xs">
  {format(new Date(item.createdAt), 'MMM d, yyyy')}
  </td>
  </tr>
@@ -855,12 +855,12 @@ function AdminDashboardContent() {
  {activeTab === 'audit' && (
  <div className="space-y-4">
  {/* Filters & Actions */}
- <div className="bg-[#ffffff] p-4 rounded-xl border border-[#E5E2DB] flex flex-col md:flex-row gap-4 items-end">
+ <div className="bg-surface p-4 rounded-xl border border-border flex flex-col md:flex-row gap-4 items-end">
  <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">User</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">User</label>
  <select
- className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full p-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  value={auditUser}
  onChange={e => setAuditUser(e.target.value)}
  >
@@ -869,19 +869,19 @@ function AdminDashboardContent() {
  </select>
  </div>
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Start Date</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">Start Date</label>
  <input
  type="date"
- className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full p-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  value={auditStartDate}
  onChange={e => setAuditStartDate(e.target.value)}
  />
  </div>
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">End Date</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">End Date</label>
  <input
  type="date"
- className="w-full p-2 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full p-2 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  value={auditEndDate}
  onChange={e => setAuditEndDate(e.target.value)}
  />
@@ -904,42 +904,42 @@ function AdminDashboardContent() {
  </div>
 
  {/* Table */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden">
  <table className="w-full text-left">
- <thead className="bg-[#FAF6EE]">
+ <thead className="bg-background">
  <tr>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Timestamp</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">User</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Action</th>
- <th className="px-6 py-3 text-xs font-semibold text-[#8C8880] uppercase tracking-[0.08em]">Details</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Timestamp</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">User</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Action</th>
+ <th className="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-[0.08em]">Details</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-[#F3F1EC]">
  {auditLogs.length > 0 ? auditLogs.map(log => (
- <tr key={log.id} className="hover:bg-[#FAF6EE] transition-colors">
- <td className="px-6 py-3 text-sm text-[#8C8880] whitespace-nowrap">
+ <tr key={log.id} className="hover:bg-background transition-colors">
+ <td className="px-6 py-3 text-sm text-text-muted whitespace-nowrap">
  {format(new Date(log.timestamp), 'MMM d, HH:mm:ss')}
  </td>
- <td className="px-6 py-3 text-sm font-medium text-[#1C1A17]">
+ <td className="px-6 py-3 text-sm font-medium text-text-primary">
  {log.user?.name || log.userId || 'Unknown'}
  </td>
  <td className="px-6 py-3">
  <span className={cn("px-2 py-0.5 rounded text-xs font-mono border",
  log.action.includes('DELETE') ? "bg-red-50 text-red-600 border-red-100" :
  log.action.includes('CREATE') ? "bg-green-50 text-green-600 border-green-100" :
- "bg-[#F3F1EC] text-[#5C5850] border-[#E5E2DB]"
+ "bg-surface-raised text-text-secondary border-border"
  )}>
  {log.action}
  </span>
- {log.entityType && <span className="ml-2 text-xs text-[#8C8880]">{log.entityType}</span>}
+ {log.entityType && <span className="ml-2 text-xs text-text-muted">{log.entityType}</span>}
  </td>
- <td className="px-6 py-4 text-sm text-[#5C5850] max-w-xs break-all">
+ <td className="px-6 py-4 text-sm text-text-secondary max-w-xs break-all">
  {formatAuditDetails(log)}
  </td>
  </tr>
  )) : (
  <tr>
- <td colSpan={4} className="px-6 py-12 text-center text-[#8C8880]">
+ <td colSpan={4} className="px-6 py-12 text-center text-text-muted">
  No audit logs found for the selected filters.
  </td>
  </tr>
@@ -977,13 +977,13 @@ function AdminDashboardContent() {
  {activeTab === 'tools' && (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Time Decoder Widget */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6">
+ <div className="bg-surface rounded-xl border border-border p-6">
  <div className="mb-6">
- <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
- <Clock className="w-5 h-5 text-[#0D9488]" />
+ <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+ <Clock className="w-5 h-5 text-primary-500" />
  Timestamp Decoder
  </h3>
- <p className="text-sm text-[#8C8880] mt-1">
+ <p className="text-sm text-text-muted mt-1">
  Enter a Claim Number (e.g., AA...) or DCN to decode its exact creation timestamp.
  </p>
  </div>
@@ -994,12 +994,12 @@ function AdminDashboardContent() {
  value={lookupQuery}
  onChange={(e) => setLookupQuery(e.target.value)}
  placeholder="Enter Claim # or DCN..."
- className="flex-1 px-4 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="flex-1 px-4 py-2 border border-border bg-surface text-text-primary placeholder-text-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  <button
  type="submit"
  disabled={isLookingUp || !lookupQuery.trim()}
- className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2 transition-colors"
+ className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2 transition-colors"
  >
  {isLookingUp ? (
  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -1020,25 +1020,25 @@ function AdminDashboardContent() {
  {lookupResult.success ? (
  <div className="space-y-3">
  <div className="flex items-center justify-between">
- <span className="text-sm font-medium text-[#8C8880]">Type</span>
- <span className="text-sm font-bold text-[#1C1A17] uppercase">
+ <span className="text-sm font-medium text-text-muted">Type</span>
+ <span className="text-sm font-bold text-text-primary uppercase">
  {lookupResult.type.replace('_', ' ')}
  </span>
  </div>
  <div className="flex items-center justify-between">
- <span className="text-sm font-medium text-[#8C8880]">Creation Time</span>
- <span className="text-sm font-bold text-[#0D9488]">
+ <span className="text-sm font-medium text-text-muted">Creation Time</span>
+ <span className="text-sm font-bold text-primary-500">
  {lookupResult.localTime}
  </span>
  </div>
  {lookupResult.details && (
- <div className="pt-3 border-t border-[#E5E2DB]">
- <p className="text-xs font-medium text-[#8C8880] mb-2">Details:</p>
+ <div className="pt-3 border-t border-border">
+ <p className="text-xs font-medium text-text-muted mb-2">Details:</p>
  <div className="grid grid-cols-2 gap-2 text-xs">
  {Object.entries(lookupResult.details).map(([k, v]) => (
  <div key={k}>
- <span className="text-[#8C8880] capitalize">{k}: </span>
- <span className="font-mono text-[#5C5850]">{String(v)}</span>
+ <span className="text-text-muted capitalize">{k}: </span>
+ <span className="font-mono text-text-secondary">{String(v)}</span>
  </div>
  ))}
  </div>
@@ -1058,21 +1058,21 @@ function AdminDashboardContent() {
  </div>
 
  {/* System Health Widget */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6">
+ <div className="bg-surface rounded-xl border border-border p-6">
  <div className="mb-6 flex items-center justify-between">
  <div>
- <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
+ <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
  <Activity className="w-5 h-5 text-green-600" />
  System Health
  </h3>
- <p className="text-sm text-[#8C8880] mt-1">
+ <p className="text-sm text-text-muted mt-1">
  Monitor database connectivity and system status.
  </p>
  </div>
  <button
  onClick={handleHealthCheck}
  disabled={isHealthLoading}
- className="p-2 text-[#8C8880] hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+ className="p-2 text-text-muted hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
  >
  <Activity className={cn("w-5 h-5", isHealthLoading && "animate-spin")} />
  </button>
@@ -1081,8 +1081,8 @@ function AdminDashboardContent() {
  {healthData ? (
  <div className="space-y-4">
  <div className="grid grid-cols-2 gap-4">
- <div className="p-3 bg-[#FAF6EE] rounded-lg border border-[#E5E2DB]">
- <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Status</div>
+ <div className="p-3 bg-background rounded-lg border border-border">
+ <div className="text-xs text-text-muted uppercase font-medium mb-1">Status</div>
  <div className={cn(
  "font-bold",
  healthData.status === 'healthy' ? "text-green-600" : "text-red-600"
@@ -1090,44 +1090,44 @@ function AdminDashboardContent() {
  {healthData.status.toUpperCase()}
  </div>
  </div>
- <div className="p-3 bg-[#FAF6EE] rounded-lg border border-[#E5E2DB]">
- <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">DB Latency</div>
- <div className="font-mono text-[#1C1A17]">
+ <div className="p-3 bg-background rounded-lg border border-border">
+ <div className="text-xs text-text-muted uppercase font-medium mb-1">DB Latency</div>
+ <div className="font-mono text-text-primary">
  {healthData.database?.latency || 'N/A'}
  </div>
  </div>
- <div className="p-3 bg-[#FAF6EE] rounded-lg border border-[#E5E2DB]">
- <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Uptime</div>
- <div className="font-mono text-[#1C1A17]">
+ <div className="p-3 bg-background rounded-lg border border-border">
+ <div className="text-xs text-text-muted uppercase font-medium mb-1">Uptime</div>
+ <div className="font-mono text-text-primary">
  {(healthData.system?.uptime / 3600).toFixed(2)}h
  </div>
  </div>
- <div className="p-3 bg-[#FAF6EE] rounded-lg border border-[#E5E2DB]">
- <div className="text-xs text-[#8C8880] uppercase font-medium mb-1">Memory</div>
- <div className="font-mono text-[#1C1A17]">
+ <div className="p-3 bg-background rounded-lg border border-border">
+ <div className="text-xs text-text-muted uppercase font-medium mb-1">Memory</div>
+ <div className="font-mono text-text-primary">
  {healthData.system?.memory?.rss || 'N/A'}
  </div>
  </div>
  </div>
- <div className="text-xs text-[#8C8880] text-center pt-2 border-t border-[#E5E2DB]">
+ <div className="text-xs text-text-muted text-center pt-2 border-t border-border">
  Last checked: {new Date(healthData.timestamp).toLocaleTimeString()}
  </div>
  </div>
  ) : (
- <div className="text-center py-8 text-[#8C8880]">
+ <div className="text-center py-8 text-text-muted">
  Click icon to run system check
  </div>
  )}
  </div>
 
  {/* Encryption Tool Widget */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] p-6 md:col-span-2">
+ <div className="bg-surface rounded-xl border border-border p-6 md:col-span-2">
  <div className="mb-6">
- <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
- <Lock className="w-5 h-5 text-[#0D9488]" />
+ <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+ <Lock className="w-5 h-5 text-primary-500" />
  Encryption Helper
  </h3>
- <p className="text-sm text-[#8C8880] mt-1">
+ <p className="text-sm text-text-muted mt-1">
  Encrypt or decrypt sensitive data using system keys. Use with caution.
  </p>
  </div>
@@ -1140,18 +1140,18 @@ function AdminDashboardContent() {
  value={cryptoInput}
  onChange={(e) => setCryptoInput(e.target.value)}
  placeholder="Enter text to process..."
- className="w-full px-4 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="w-full px-4 py-2 border border-border bg-surface text-text-primary placeholder-text-muted rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
- <div className="flex bg-[#FAF6EE] border border-[#E5E2DB] rounded-lg p-1">
+ <div className="flex bg-background border border-border rounded-lg p-1">
  <button
  type="button"
  onClick={() => setCryptoMode('encrypt')}
  className={cn(
  "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
  cryptoMode === 'encrypt'
- ? "bg-[#ffffff] shadow-sm text-[#0D9488]"
- : "text-[#5C5850] hover:text-[#1C1A17]"
+ ? "bg-surface shadow-sm text-primary-500"
+ : "text-text-secondary hover:text-text-primary"
  )}
  >
  Encrypt
@@ -1162,8 +1162,8 @@ function AdminDashboardContent() {
  className={cn(
  "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
  cryptoMode === 'decrypt'
- ? "bg-[#ffffff] shadow-sm text-[#0D9488]"
- : "text-[#5C5850] hover:text-[#1C1A17]"
+ ? "bg-surface shadow-sm text-primary-500"
+ : "text-text-secondary hover:text-text-primary"
  )}
  >
  Decrypt
@@ -1172,14 +1172,14 @@ function AdminDashboardContent() {
  <button
  type="submit"
  disabled={isCryptoLoading || !cryptoInput.trim()}
- className="px-6 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] disabled:opacity-50 font-medium transition-colors"
+ className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 font-medium transition-colors"
  >
  {isCryptoLoading ? 'Processing...' : 'Process'}
  </button>
  </div>
 
  {cryptoOutput && (
- <div className="mt-4 p-4 bg-[#FAF6EE] rounded-lg font-mono text-sm break-all text-[#1C1A17] border border-[#E5E2DB]">
+ <div className="mt-4 p-4 bg-background rounded-lg font-mono text-sm break-all text-text-primary border border-border">
  {cryptoOutput}
  </div>
  )}
@@ -1187,14 +1187,14 @@ function AdminDashboardContent() {
  </div>
 
  {/* Data Retention Widget */}
- <div className="bg-[#ffffff] rounded-xl border border-red-200 p-6 md:col-span-2">
+ <div className="bg-surface rounded-xl border border-red-200 p-6 md:col-span-2">
  <div className="flex items-start justify-between">
  <div>
- <h3 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
+ <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
  <Trash2 className="w-5 h-5 text-red-600" />
  Data Retention Policy
  </h3>
- <p className="text-sm text-[#8C8880] mt-1">
+ <p className="text-sm text-text-muted mt-1">
  Manage automated data cleanup tasks.
  </p>
  </div>
@@ -1203,11 +1203,11 @@ function AdminDashboardContent() {
  </span>
  </div>
 
- <div className="mt-6 p-4 bg-[#FAF6EE] rounded-lg border border-[#E5E2DB]">
+ <div className="mt-6 p-4 bg-background rounded-lg border border-border">
  <div className="flex items-center justify-between">
  <div>
- <h4 className="font-semibold text-[#1C1A17]">5-Year Message Retention</h4>
- <p className="text-sm text-[#8C8880] mt-1 max-w-xl">
+ <h4 className="font-semibold text-text-primary">5-Year Message Retention</h4>
+ <p className="text-sm text-text-muted mt-1 max-w-xl">
  Enforce the 5-year retention policy by permanently deleting all messages and associated metadata
  created more than 5 years ago from the current timestamp.
  </p>
@@ -1254,11 +1254,11 @@ function AdminDashboardContent() {
 const COLORS = ['#0D9488', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 function UrgencyHeatmap({ data, isLoading }: { data: any; isLoading?: boolean }) {
- if (isLoading) return <div className="p-4 bg-[#F3F1EC] rounded animate-pulse h-64" />;
- if (!data || data.length === 0) return <div className="p-4 text-[#8C8880] text-center bg-[#FAF6EE] rounded h-64 flex items-center justify-center">No data available</div>;
+ if (isLoading) return <div className="p-4 bg-surface-raised rounded animate-pulse h-64" />;
+ if (!data || data.length === 0) return <div className="p-4 text-text-muted text-center bg-background rounded h-64 flex items-center justify-center">No data available</div>;
 
  return (
- <div className="h-64 w-full bg-[#FAF6EE] rounded-xl p-2 border border-[#E5E2DB]">
+ <div className="h-64 w-full bg-background rounded-xl p-2 border border-border">
  <ResponsiveContainer width="100%" height="100%">
  <RechartsBarChart data={data}>
  <CartesianGrid strokeDasharray="3 3" stroke="#E5E2DB" opacity={0.6} />
@@ -1283,11 +1283,11 @@ function UrgencyHeatmap({ data, isLoading }: { data: any; isLoading?: boolean })
 }
 
 function ProgramDistribution({ data, isLoading }: { data: any; isLoading?: boolean }) {
- if (isLoading) return <div className="p-4 bg-[#F3F1EC] rounded animate-pulse h-64" />;
- if (!data || data.length === 0) return <div className="p-4 text-[#8C8880] text-center bg-[#FAF6EE] rounded h-64 flex items-center justify-center">No data available</div>;
+ if (isLoading) return <div className="p-4 bg-surface-raised rounded animate-pulse h-64" />;
+ if (!data || data.length === 0) return <div className="p-4 text-text-muted text-center bg-background rounded h-64 flex items-center justify-center">No data available</div>;
 
  return (
- <div className="h-64 w-full bg-[#FAF6EE] rounded-xl p-2 border border-[#E5E2DB]">
+ <div className="h-64 w-full bg-background rounded-xl p-2 border border-border">
  <ResponsiveContainer width="100%" height="100%">
  <PieChart>
  <Pie
@@ -1321,13 +1321,13 @@ function ProgramDistribution({ data, isLoading }: { data: any; isLoading?: boole
 function AddInventoryModal({ isOpen, onClose, onSuccess }: any) {
  if (!isOpen) return null;
  return (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 ">
- <div className="bg-[#ffffff] border border-[#E5E2DB] p-6 rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] max-w-md w-full">
- <h2 className="text-xl font-bold mb-4 text-[#1C1A17]">Add Inventory</h2>
- <p className="text-[#8C8880] mb-4">Inventory form goes here.</p>
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+ <div className="bg-surface border border-border p-6 rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] max-w-md w-full">
+ <h2 className="text-xl font-bold mb-4 text-text-primary">Add Inventory</h2>
+ <p className="text-text-muted mb-4">Inventory form goes here.</p>
  <div className="flex justify-end gap-2">
- <button onClick={onClose} className="px-4 py-2 bg-[#FAF6EE] hover:bg-[#F3F1EC] border border-[#E5E2DB] rounded-lg text-sm font-medium text-[#5C5850] transition-colors">Close</button>
- <button onClick={() => { onSuccess(); onClose(); }} className="px-4 py-2 bg-[#0D9488] text-[#ffffff] rounded-lg hover:bg-[#0F766E] text-sm font-medium transition-colors shadow-sm">Save (Stub)</button>
+ <button onClick={onClose} className="px-4 py-2 bg-background hover:bg-surface-raised border border-border rounded-lg text-sm font-medium text-text-secondary transition-colors">Close</button>
+ <button onClick={() => { onSuccess(); onClose(); }} className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium transition-colors shadow-sm">Save (Stub)</button>
  </div>
  </div>
  </div>
@@ -1336,7 +1336,7 @@ function AddInventoryModal({ isOpen, onClose, onSuccess }: any) {
 
 export default function AdminDashboard() {
  return (
- <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[#FAF6EE]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0D9488]"></div></div>}>
+ <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-background"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div></div>}>
  <AdminDashboardContent />
  </Suspense>
  );

@@ -24,8 +24,8 @@ interface AddTaskModalProps {
  users?: UserOption[];
 }
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function AddTaskModal({ isOpen, onClose, onSubmit, users = [] }: AddTaskModalProps) {
  const [title, setTitle] = useState('');
@@ -71,14 +71,14 @@ export function AddTaskModal({ isOpen, onClose, onSubmit, users = [] }: AddTaskM
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-lg overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="add-task-title">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 id="add-task-title" className="text-base font-semibold text-[#1C1A17] flex items-center gap-2">
- <CheckSquare className="w-4 h-4 text-[#0D9488]" />
+ <div className="modal-container w-full max-w-lg overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-labelledby="add-task-title">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 id="add-task-title" className="text-base font-semibold text-text-primary flex items-center gap-2">
+ <CheckSquare className="w-4 h-4 text-primary-500" />
  Add New Task
  </h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -128,11 +128,11 @@ export function AddTaskModal({ isOpen, onClose, onSubmit, users = [] }: AddTaskM
  </div>
  </div>
 
- <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E5E2DB] bg-[#FAF6EE]">
- <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-[#5C5850] bg-[#ffffff] border border-[#E5E2DB] rounded-lg hover:bg-[#F3F1EC] transition-colors">
+ <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-background">
+ <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-text-secondary bg-surface border border-border rounded-lg hover:bg-surface-raised transition-colors">
  Cancel
  </button>
- <button onClick={handleSubmit} disabled={!title.trim() || !dueDate || isSubmitting} className="px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+ <button onClick={handleSubmit} disabled={!title.trim() || !dueDate || isSubmitting} className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
  {isSubmitting ? 'Creating…' : 'Create Task'}
  </button>
  </div>

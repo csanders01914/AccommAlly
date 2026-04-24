@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { Loader2 } from 'lucide-react';
-import { TenantThemeProvider } from '@/components/providers/TenantThemeProvider';
 export default function CalendarLayout({
  children,
 }: {
@@ -47,7 +46,7 @@ export default function CalendarLayout({
  if (isLoading) {
  return (
  <div className="flex items-center justify-center min-h-screen bg-gray-900">
- <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }
@@ -55,8 +54,7 @@ export default function CalendarLayout({
  if (!currentUser) return null;
 
  return (
- <TenantThemeProvider settings={currentUser.tenant?.settings}>
- <div className="flex min-h-screen app-background text-foreground">
+ <div className="flex min-h-screen bg-background text-foreground">
  <Sidebar
  user={currentUser}
  unreadCount={unreadCount}
@@ -64,11 +62,10 @@ export default function CalendarLayout({
  onToggle={(collapsed) => setIsSidebarCollapsed(collapsed)}
  />
  <div
- className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}
+ className={`flex-1 flex flex-col transition-all duration-300 bg-background ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}
  >
  {children}
  </div>
  </div>
- </TenantThemeProvider>
  );
 }

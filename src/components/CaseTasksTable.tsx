@@ -42,7 +42,7 @@ interface CaseTasksTableProps {
  onEdit: (task: ExtendedTask) => void;
 }
 
-const selectCls = 'border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#1C1A17] bg-[#ffffff] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const selectCls = 'form-input py-1.5';
 
 export function CaseTasksTable({
  tasks,
@@ -171,15 +171,15 @@ export function CaseTasksTable({
  const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
  const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
 
- let primaryColor = 'text-[#1C1A17]';
- let secondaryColor = 'text-[#5C5850]';
+ let primaryColor = 'text-text-primary';
+ let secondaryColor = 'text-text-secondary';
 
  if (isOverdue) {
  primaryColor = 'text-red-600 font-medium';
  secondaryColor = 'text-red-500';
  } else if (isDueToday) {
- primaryColor = 'text-[#0D9488] font-medium';
- secondaryColor = 'text-[#0D9488]';
+ primaryColor = 'text-primary-500 font-medium';
+ secondaryColor = 'text-primary-500';
  }
 
  switch (colId) {
@@ -200,19 +200,19 @@ export function CaseTasksTable({
  }
  setSelectedTaskIds(newSet);
  }}
- className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
+ className="rounded border-border-strong text-primary-500 focus:ring-[#0D9488]"
  />
  );
  case 'edit':
  return (
- <button onClick={() => onEdit(task)} className="text-[#C8C4BB] hover:text-[#0D9488] transition-colors">
+ <button onClick={() => onEdit(task)} className="text-border-strong hover:text-primary-500 transition-colors">
  <Edit2 className="w-4 h-4" />
  </button>
  );
  case 'claimNumber':
  return <div className={cn('font-mono text-sm font-medium', primaryColor)}>{task.case?.caseNumber || 'N/A'}</div>;
  case 'lob':
- return <span className="text-xs font-mono text-[#8C8880]">AR</span>;
+ return <span className="text-xs font-mono text-text-muted">AR</span>;
  case 'dueDate':
  return (
  <div className={cn('flex items-center gap-1', primaryColor)}>
@@ -223,7 +223,7 @@ export function CaseTasksTable({
  case 'description':
  return <span className={primaryColor}>{task.title}</span>;
  case 'type':
- return <span className={cn('text-xs uppercase font-medium text-[#0D9488]', secondaryColor === 'text-[#5C5850]' ? 'text-[#0D9488]' : secondaryColor)}>{task.category.replace('_', ' ')}</span>;
+ return <span className={cn('text-xs uppercase font-medium text-primary-500', secondaryColor === 'text-text-secondary' ? 'text-primary-500' : secondaryColor)}>{task.category.replace('_', ' ')}</span>;
  case 'assignedTo':
  return <span className={secondaryColor}>{task.assignee.name || 'Unassigned'}</span>;
  case 'createdBy':
@@ -234,16 +234,16 @@ export function CaseTasksTable({
  };
 
  return (
- <div className="border border-[#E5E2DB] rounded-xl overflow-hidden flex flex-col bg-[#ffffff] shadow-[0_1px_3px_rgba(28,26,23,0.06)]">
+ <div className="border border-border rounded-xl overflow-hidden flex flex-col bg-surface shadow-[0_1px_3px_rgba(28,26,23,0.06)]">
  {/* Reassign / Search bar */}
- <div className="px-4 py-3 bg-[#FAF6EE] border-b border-[#E5E2DB] flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+ <div className="px-4 py-3 bg-background border-b border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
  <div className="flex items-center gap-2 flex-wrap">
- <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign From:</span>
+ <span className="text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Reassign From:</span>
  <select value={reassignFrom} onChange={(e) => setReassignFrom(e.target.value)} className={selectCls}>
  <option value="">Select User</option>
  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
  </select>
- <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign to:</span>
+ <span className="text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Reassign to:</span>
  <select value={reassignTo} onChange={(e) => setReassignTo(e.target.value)} className={selectCls}>
  <option value="">Select User</option>
  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
@@ -251,19 +251,19 @@ export function CaseTasksTable({
  </div>
  <div className="flex items-center gap-2 ml-auto">
  <div className="relative">
- <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#8C8880]" />
+ <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted" />
  <input
  type="text"
  placeholder="Search..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="pl-8 pr-3 py-1.5 border border-[#E5E2DB] rounded-lg text-sm bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] w-48 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="pl-8 pr-3 py-1.5 border border-border rounded-lg text-sm bg-surface text-text-primary placeholder-text-muted w-48 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
  {selectedTaskIds.size > 0 && (
  <button
  onClick={handleBulkComplete}
- className="text-sm px-3 py-1.5 bg-[#0D9488] text-[#ffffff] hover:bg-[#0F766E] rounded-lg transition-colors font-medium flex items-center gap-1"
+ className="text-sm px-3 py-1.5 bg-primary-500 text-white hover:bg-primary-600 rounded-lg transition-colors font-medium flex items-center gap-1"
  >
  <CheckCircle className="w-3.5 h-3.5" />
  Complete
@@ -275,8 +275,8 @@ export function CaseTasksTable({
  className={cn(
  'text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors',
  reassignTo && selectedTaskIds.size > 0
- ? 'text-[#0D9488] hover:text-[#0F766E]'
- : 'text-[#C8C4BB] cursor-not-allowed'
+ ? 'text-primary-500 hover:text-primary-600'
+ : 'text-border-strong cursor-not-allowed'
  )}
  >
  Reassign
@@ -285,15 +285,15 @@ export function CaseTasksTable({
  </div>
 
  {/* Open / Closed toggle + controls */}
- <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#E5E2DB]">
- <div className="flex items-center gap-1 bg-[#F3F1EC] p-1 rounded-lg">
+ <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+ <div className="flex items-center gap-1 bg-surface-raised p-1 rounded-lg">
  <button
  onClick={() => setShowClosedTasks(true)}
  className={cn(
  'px-3 py-1 rounded-md text-xs font-medium transition-all',
  showClosedTasks
- ? 'bg-[#ffffff] text-[#1C1A17] shadow-sm ring-1 ring-black/5'
- : 'text-[#8C8880] hover:text-[#1C1A17]'
+ ? 'bg-surface text-text-primary shadow-sm ring-1 ring-black/5'
+ : 'text-text-muted hover:text-text-primary'
  )}
  >
  Closed Tasks
@@ -303,8 +303,8 @@ export function CaseTasksTable({
  className={cn(
  'px-3 py-1 rounded-md text-xs font-medium transition-all',
  !showClosedTasks
- ? 'bg-[#ffffff] text-[#1C1A17] shadow-sm ring-1 ring-black/5'
- : 'text-[#8C8880] hover:text-[#1C1A17]'
+ ? 'bg-surface text-text-primary shadow-sm ring-1 ring-black/5'
+ : 'text-text-muted hover:text-text-primary'
  )}
  >
  Open Tasks
@@ -313,11 +313,11 @@ export function CaseTasksTable({
  <div className="flex gap-2">
  <button
  onClick={() => { setSearchQuery(''); setReassignFrom(''); setColumnFilters({}); }}
- className="px-3 py-1 border border-[#E5E2DB] text-[#5C5850] text-xs rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors"
+ className="px-3 py-1 border border-border text-text-secondary text-xs rounded-lg hover:bg-surface-raised bg-surface transition-colors"
  >
  Clear Table Filters
  </button>
- <button className="px-3 py-1 border border-[#E5E2DB] text-[#5C5850] text-xs rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors">
+ <button className="px-3 py-1 border border-border text-text-secondary text-xs rounded-lg hover:bg-surface-raised bg-surface transition-colors">
  Save Column Preferences
  </button>
  </div>
@@ -327,7 +327,7 @@ export function CaseTasksTable({
  <div className="flex-1 overflow-auto">
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
  <table className="w-full text-sm text-left">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8C8880] sticky top-0 z-10">
+ <thead className="bg-background border-b border-border text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted sticky top-0 z-10">
  <tr>
  <SortableContext items={columns.map(col => col.id)} strategy={horizontalListSortingStrategy}>
  {columns.map(col => (
@@ -343,12 +343,12 @@ export function CaseTasksTable({
  type="checkbox"
  checked={filteredTasks.length > 0 && selectedTaskIds.size === filteredTasks.length}
  onChange={toggleSelectAll}
- className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
+ className="rounded border-border-strong text-primary-500 focus:ring-[#0D9488]"
  />
  </div>
  ) : (
  <div
- className="flex items-center gap-1 hover:text-[#1C1A17] cursor-pointer py-1"
+ className="flex items-center gap-1 hover:text-text-primary cursor-pointer py-1"
  onClick={() => col.sortable && setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
  >
  {col.label}
@@ -360,9 +360,9 @@ export function CaseTasksTable({
  </SortableContext>
  </tr>
  </thead>
- <tbody className="divide-y divide-[#F3F1EC] bg-[#ffffff] text-[#5C5850]">
+ <tbody className="divide-y divide-[#F3F1EC] bg-surface text-text-secondary">
  {filteredTasks.length > 0 ? filteredTasks.map((task) => (
- <tr key={task.id} className="hover:bg-[#FAF6EE] transition-colors">
+ <tr key={task.id} className="hover:bg-background transition-colors">
  {columns.map(col => (
  <td key={col.id} className="px-4 py-3">
  {renderCell(task, col.id)}
@@ -371,7 +371,7 @@ export function CaseTasksTable({
  </tr>
  )) : (
  <tr>
- <td colSpan={columns.length} className="px-4 py-8 text-center text-[#8C8880]">
+ <td colSpan={columns.length} className="px-4 py-8 text-center text-text-muted">
  No tasks found
  </td>
  </tr>
@@ -382,11 +382,11 @@ export function CaseTasksTable({
  </div>
 
  {/* Footer / Pagination */}
- <div className="bg-[#FAF6EE] border-t border-[#E5E2DB] px-4 py-2.5 flex items-center justify-between text-xs text-[#8C8880]">
+ <div className="bg-background border-t border-border px-4 py-2.5 flex items-center justify-between text-xs text-text-muted">
  <div className="flex gap-1">
- <button className="px-2 py-1 rounded-md border border-[#E5E2DB] bg-[#ffffff] hover:bg-[#F3F1EC] transition-colors">&lt;</button>
- <button className="bg-[#0D9488] text-[#ffffff] px-2 py-1 rounded-md">1</button>
- <button className="px-2 py-1 rounded-md border border-[#E5E2DB] bg-[#ffffff] hover:bg-[#F3F1EC] transition-colors">&gt;</button>
+ <button className="px-2 py-1 rounded-md border border-border bg-surface hover:bg-surface-raised transition-colors">&lt;</button>
+ <button className="bg-primary-500 text-white px-2 py-1 rounded-md">1</button>
+ <button className="px-2 py-1 rounded-md border border-border bg-surface hover:bg-surface-raised transition-colors">&gt;</button>
  </div>
  <div>10 items per page</div>
  <div>1 – {filteredTasks.length} of {filteredTasks.length} items</div>

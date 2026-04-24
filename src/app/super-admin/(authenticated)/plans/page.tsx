@@ -69,27 +69,27 @@ export default function PlansPage() {
  return (
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  <h1 className="text-2xl font-bold mb-6">Subscription Plans</h1>
- <p className="text-gray-600 mb-8">
+ <p className="text-text-secondary mb-8">
  Define resource limits for each subscription tier. Set limits to -1 for unlimited access.
  </p>
 
  <div className="bg-white shadow overflow-hidden sm:rounded-lg">
  <table className="min-w-full divide-y divide-gray-200">
- <thead className="bg-gray-50">
+ <thead className="bg-surface-raised">
  <tr>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan Name</th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Users</th>
- <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Active Claims</th>
- <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+ <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Plan Name</th>
+ <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Code</th>
+ <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Max Users</th>
+ <th className="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Max Active Claims</th>
+ <th className="px-6 py-3 text-right text-xs font-medium text-text-muted uppercase tracking-wider">Actions</th>
  </tr>
  </thead>
  <tbody className="bg-white divide-y divide-gray-200">
  {plans.map((plan) => (
  <tr key={plan.id}>
- <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{plan.name}</td>
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{plan.code}</td>
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+ <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-primary">{plan.name}</td>
+ <td className="px-6 py-4 whitespace-nowrap text-sm text-text-muted">{plan.code}</td>
+ <td className="px-6 py-4 whitespace-nowrap text-sm text-text-muted">
  <input
  type="number"
  value={plan.maxUsers}
@@ -97,7 +97,7 @@ export default function PlansPage() {
  className="border rounded px-2 py-1 w-24"
  />
  </td>
- <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+ <td className="px-6 py-4 whitespace-nowrap text-sm text-text-muted">
  <input
  type="number"
  value={plan.maxActiveClaims}

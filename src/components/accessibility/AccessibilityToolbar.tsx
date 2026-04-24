@@ -184,7 +184,7 @@ export default function AccessibilityToolbar() {
  style={{ top: 'var(--mouse-y, 50%)' }}
  />
  <div
- className="fixed inset-0 bg-black/10 "
+ className="fixed inset-0 bg-black/10"
  style={{ maskImage: 'linear-gradient(to bottom, black calc(var(--mouse-y, 50%) - 40px), transparent calc(var(--mouse-y, 50%) - 40px), transparent calc(var(--mouse-y, 50%) + 40px), black calc(var(--mouse-y, 50%) + 40px))' }}
  />
  </div>

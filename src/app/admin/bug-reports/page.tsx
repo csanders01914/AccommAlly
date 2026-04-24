@@ -33,9 +33,9 @@ interface BugReport {
 
 const STATUS_COLORS: Record<string, string> = {
  OPEN: 'bg-red-100 text-red-700',
- IN_PROGRESS: 'bg-[#0D9488]/10 text-[#0D9488]',
+ IN_PROGRESS: 'bg-primary-500/10 text-primary-500',
  RESOLVED: 'bg-green-100 text-green-700',
- CLOSED: 'bg-[#F3F1EC] text-[#5C5850]'
+ CLOSED: 'bg-surface-raised text-text-secondary'
 };
 
 export default function BugReportsPage() {
@@ -99,29 +99,29 @@ export default function BugReportsPage() {
  {/* Header */}
  <div className="flex items-center justify-between">
  <div>
- <h1 className="text-2xl font-bold text-[#1C1A17] flex items-center gap-2">
- <Bug className="w-7 h-7 text-[#0D9488]" />
+ <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2">
+ <Bug className="w-7 h-7 text-primary-500" />
  Bug Reports
  </h1>
- <p className="text-[#8C8880] mt-1">
+ <p className="text-text-muted mt-1">
  Track and manage system issues reported by users
  </p>
  </div>
  <div className="flex items-center gap-4">
  <div className="relative">
- <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8C8880]" />
+ <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
  <input
  type="text"
  placeholder="Search reports..."
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="pl-10 pr-4 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="pl-10 pr-4 py-2 border border-border bg-surface text-text-primary placeholder-text-muted rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
  <select
  value={filterStatus}
  onChange={(e) => setFilterStatus(e.target.value)}
- className="pl-3 pr-8 py-2 border border-[#E5E2DB] bg-[#ffffff] text-[#1C1A17] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="pl-3 pr-8 py-2 border border-border bg-surface text-text-primary rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  >
  <option value="ALL">All Statuses</option>
  <option value="OPEN">Open</option>
@@ -133,40 +133,40 @@ export default function BugReportsPage() {
  </div>
 
  {/* List */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] overflow-hidden">
+ <div className="bg-surface rounded-xl border border-border overflow-hidden">
  {loading ? (
- <div className="p-12 text-center text-[#8C8880]">Loading reports...</div>
+ <div className="p-12 text-center text-text-muted">Loading reports...</div>
  ) : filteredReports.length === 0 ? (
- <div className="p-12 text-center text-[#8C8880]">No bug reports found.</div>
+ <div className="p-12 text-center text-text-muted">No bug reports found.</div>
  ) : (
  <div className="divide-y divide-[#F3F1EC]">
  {filteredReports.map((report) => (
- <div key={report.id} className="p-6 hover:bg-[#FAF6EE] transition-colors">
+ <div key={report.id} className="p-6 hover:bg-background transition-colors">
  <div className="flex items-start justify-between gap-4">
  <div className="flex-1 space-y-2">
  <div className="flex items-center gap-3">
  <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide", STATUS_COLORS[report.status])}>
  {report.status.replace('_', ' ')}
  </span>
- <span className="text-sm text-[#8C8880] flex items-center gap-1">
+ <span className="text-sm text-text-muted flex items-center gap-1">
  <Clock className="w-3 h-3" />
  {format(new Date(report.createdAt), 'MMM d, yyyy h:mm a')}
  </span>
  {report.transactionId && (
- <span className="text-xs font-mono text-[#8C8880] bg-[#F3F1EC] px-2 py-0.5 rounded">
+ <span className="text-xs font-mono text-text-muted bg-surface-raised px-2 py-0.5 rounded">
  ID: {report.transactionId}
  </span>
  )}
  </div>
- <h3 className="text-lg font-semibold text-[#1C1A17]">
+ <h3 className="text-lg font-semibold text-text-primary">
  {report.subject}
  </h3>
- <p className="text-[#5C5850] whitespace-pre-wrap">
+ <p className="text-text-secondary whitespace-pre-wrap">
  {report.description}
  </p>
- <div className="flex items-center gap-6 text-sm text-[#8C8880] pt-2">
+ <div className="flex items-center gap-6 text-sm text-text-muted pt-2">
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] flex items-center justify-center font-bold text-xs">
+ <div className="w-6 h-6 rounded-full bg-primary-500/10 text-primary-500 flex items-center justify-center font-bold text-xs">
  {report.reporterName.charAt(0)}
  </div>
  {report.reporterName}
@@ -185,7 +185,7 @@ export default function BugReportsPage() {
  <select
  value={report.status}
  onChange={(e) => handleStatusUpdate(report.id, e.target.value)}
- className="w-full px-3 py-1.5 text-sm bg-[#ffffff] border border-[#E5E2DB] text-[#1C1A17] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] cursor-pointer transition-colors"
+ className="w-full px-3 py-1.5 text-sm bg-surface border border-border text-text-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 cursor-pointer transition-colors"
  >
  <option value="OPEN">Open</option>
  <option value="IN_PROGRESS">In Progress</option>
@@ -196,7 +196,7 @@ export default function BugReportsPage() {
  {report.status !== 'CLOSED' && (
  <button
  onClick={() => handleStatusUpdate(report.id, 'CLOSED')}
- className="w-full px-3 py-1.5 text-xs font-medium text-[#5C5850] hover:text-[#1C1A17] bg-[#FAF6EE] hover:bg-[#F3F1EC] border border-[#E5E2DB] rounded-lg transition-colors"
+ className="w-full px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-background hover:bg-surface-raised border border-border rounded-lg transition-colors"
  >
  Mark Closed
  </button>

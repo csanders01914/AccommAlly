@@ -177,8 +177,8 @@ export function ExportButton() {
  disabled={exportState !== 'idle' && exportState !== 'done'}
  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed
  ${exportState === 'done'
- ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
- : 'bg-[#0D9488] hover:bg-[#0F766E] text-white'
+ ? 'bg-success hover:bg-success text-white'
+ : 'bg-primary-500 hover:bg-primary-600 text-white'
  }`}
  >
  {buttonContent()}

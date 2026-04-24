@@ -43,8 +43,8 @@ const INITIAL_RULE: RuleState = {
  checkedStar: false, checkedEmail: false, checkedSMS: false,
 };
 
-const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
-const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
+const labelCls = 'form-label';
+const inputCls = 'form-input';
 
 export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProps) {
  const [step, setStep] = useState<Step>(1);
@@ -94,7 +94,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  : (value ? `"${value}"` : label);
  return (
  <button onClick={() => { setEditMode({ field, type, label }); if (type === 'text') setEditValue(rule[field] as string); }}
- className="text-[#0D9488] underline hover:text-[#0F766E] mx-1 transition-colors">
+ className="text-primary-500 underline hover:text-primary-600 mx-1 transition-colors">
  {display}
  </button>
  );
@@ -104,19 +104,19 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-2xl h-[600px] flex flex-col relative overflow-hidden">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17]">Rules Wizard</h2>
- <button onClick={onClose} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <div className="modal-container w-full max-w-2xl h-[600px] flex flex-col relative overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary">Rules Wizard</h2>
+ <button onClick={onClose} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
  <div className="flex-1 flex flex-col min-h-0">
- <div className="flex-1 overflow-y-auto p-5 border-b border-[#E5E2DB] bg-[#FAF6EE]">
+ <div className="flex-1 overflow-y-auto p-5 border-b border-border bg-background">
  {step === 1 && (
  <div className="space-y-1">
- <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-3">Step 1 — Select condition(s)</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-3">Step 1 — Select condition(s)</p>
  <WizardCheckbox label="from [people or public group]" checked={rule.checkedSender} onChange={c => setRule({ ...rule, checkedSender: c })} />
  <WizardCheckbox label="with [specific words] in the subject" checked={rule.checkedSubject} onChange={c => setRule({ ...rule, checkedSubject: c })} />
  <WizardCheckbox label="with [specific words] in the body" checked={rule.checkedBody} onChange={c => setRule({ ...rule, checkedBody: c })} />
@@ -124,7 +124,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  )}
  {step === 2 && (
  <div className="space-y-1">
- <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-3">Step 2 — Select action(s)</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-3">Step 2 — Select action(s)</p>
  <WizardCheckbox label="move it to the [specified folder]" checked={rule.checkedMove} onChange={c => setRule({ ...rule, checkedMove: c, checkedCopy: c ? false : rule.checkedCopy })} />
  <WizardCheckbox label="copy it to the [specified folder]" checked={rule.checkedCopy} onChange={c => setRule({ ...rule, checkedCopy: c, checkedMove: c ? false : rule.checkedMove })} />
  <WizardCheckbox label="mark it as [read]" checked={rule.checkedRead} onChange={c => setRule({ ...rule, checkedRead: c })} />
@@ -135,7 +135,7 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  )}
  {step === 3 && (
  <div className="space-y-4">
- <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1">Step 3 — Finish rule setup</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1">Step 3 — Finish rule setup</p>
  <div>
  <label className={labelCls}>Rule Name</label>
  <input type="text" value={rule.name} onChange={e => setRule({ ...rule, name: e.target.value })} placeholder="e.g. Project Updates" className={inputCls} autoFocus />
@@ -145,9 +145,9 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  )}
  </div>
 
- <div className="h-40 p-4 bg-[#ffffff] overflow-y-auto border-b border-[#E5E2DB]">
- <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-2">Rule Description</p>
- <div className="p-3 border border-[#E5E2DB] rounded-lg text-sm text-[#5C5850] leading-relaxed bg-[#FAF6EE]">
+ <div className="h-40 p-4 bg-surface overflow-y-auto border-b border-border">
+ <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-2">Rule Description</p>
+ <div className="p-3 border border-border rounded-lg text-sm text-text-secondary leading-relaxed bg-background">
  Apply this rule after the message arrives
  {rule.checkedSender && <><br />&nbsp;&nbsp;from <Link label="people or public group" field="senderContains" type="text" value={rule.senderContains} /></>}
  {rule.checkedSubject && <><br />&nbsp;&nbsp;with <Link label="specific words" field="subjectContains" type="text" value={rule.subjectContains} /> in the subject</>}
@@ -161,21 +161,21 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  </div>
  </div>
 
- <div className="px-6 py-4 border-t border-[#E5E2DB] bg-[#FAF6EE] flex justify-between items-center">
- <button onClick={onClose} className="text-sm font-medium text-[#5C5850] hover:text-[#1C1A17] transition-colors">Cancel</button>
+ <div className="px-6 py-4 border-t border-border bg-background flex justify-between items-center">
+ <button onClick={onClose} className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Cancel</button>
  <div className="flex gap-2">
  <button disabled={step === 1} onClick={() => setStep(s => Math.max(1, s - 1) as Step)}
- className="px-4 py-2 text-sm font-medium text-[#5C5850] border border-[#E5E2DB] bg-[#ffffff] rounded-lg hover:bg-[#F3F1EC] disabled:opacity-40 transition-colors">
+ className="px-4 py-2 text-sm font-medium text-text-secondary border border-border bg-surface rounded-lg hover:bg-surface-raised disabled:opacity-40 transition-colors">
  ← Back
  </button>
  {step < 3 ? (
  <button onClick={() => setStep(s => Math.min(3, s + 1) as Step)}
- className="px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition-colors">
+ className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors">
  Next →
  </button>
  ) : (
  <button onClick={handleSave} disabled={isSaving}
- className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg disabled:opacity-50 transition-colors">
+ className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg disabled:opacity-50 transition-colors">
  {isSaving && <Loader2 className="w-3 h-3 animate-spin" />} Finish
  </button>
  )}
@@ -184,16 +184,16 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
 
  {editMode && (
  <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] p-5 w-80">
- <h3 className="text-sm font-semibold text-[#1C1A17] mb-3">{editMode.label}</h3>
+ <div className="modal-container p-5 w-80">
+ <h3 className="text-sm font-semibold text-text-primary mb-3">{editMode.label}</h3>
  {editMode.type === 'text' && (
  <input autoFocus value={editValue} onChange={e => setEditValue(e.target.value)}
- className="w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] mb-4 transition-colors" />
+ className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 mb-4 transition-colors" />
  )}
  {editMode.type === 'folder' && (
  <div className="space-y-1 mb-4 max-h-40 overflow-y-auto">
  {folders.map(f => (
- <label key={f.id} className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-[#FAF6EE] rounded-lg cursor-pointer text-sm text-[#5C5850]">
+ <label key={f.id} className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-background rounded-lg cursor-pointer text-sm text-text-secondary">
  <input type="checkbox" checked={rule.targetFolderIds.includes(f.id)}
  onChange={e => setRule({ ...rule, targetFolderIds: e.target.checked ? [...rule.targetFolderIds, f.id] : rule.targetFolderIds.filter(id => id !== f.id) })}
  className="rounded accent-[#0D9488]" />
@@ -201,13 +201,13 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
  {f.name}
  </label>
  ))}
- {folders.length === 0 && <p className="text-xs text-[#8C8880] px-2">No folders found.</p>}
+ {folders.length === 0 && <p className="text-xs text-text-muted px-2">No folders found.</p>}
  </div>
  )}
  <div className="flex justify-end gap-2">
- <button onClick={() => setEditMode(null)} className="px-3 py-1.5 text-xs font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">Cancel</button>
+ <button onClick={() => setEditMode(null)} className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">Cancel</button>
  <button onClick={() => { if (editMode.type === 'text') setRule({ ...rule, [editMode.field]: editValue }); setEditMode(null); }}
- className="px-3 py-1.5 text-xs font-semibold text-[#ffffff] bg-[#0D9488] hover:bg-[#0F766E] rounded-lg transition-colors">
+ className="px-3 py-1.5 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors">
  OK
  </button>
  </div>
@@ -221,9 +221,9 @@ export function RuleWizardModal({ isOpen, onClose, onSave }: RuleWizardModalProp
 
 function WizardCheckbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: (c: boolean) => void }) {
  return (
- <label className={cn('flex items-start gap-2.5 px-3 py-2 rounded-lg cursor-pointer leading-tight transition-colors', checked ? 'bg-[#0D9488]/8' : 'hover:bg-[#F3F1EC]')}>
+ <label className={cn('flex items-start gap-2.5 px-3 py-2 rounded-lg cursor-pointer leading-tight transition-colors', checked ? 'bg-primary-500/8' : 'hover:bg-surface-raised')}>
  <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="mt-0.5 rounded accent-[#0D9488]" />
- <span className="text-sm text-[#5C5850]">{label}</span>
+ <span className="text-sm text-text-secondary">{label}</span>
  </label>
  );
 }

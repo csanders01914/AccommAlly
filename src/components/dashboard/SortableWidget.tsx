@@ -35,8 +35,8 @@ export function SortableWidget({ id, className, children, onRemove }: SortableWi
  ref={setNodeRef}
  style={style}
  className={cn(
- "relative group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md transition-all h-full flex flex-col",
- isDragging && "shadow-xl ring-2 ring-blue-500/50 opacity-90 scale-[1.02]",
+ "relative group bg-surface rounded-xl border border-border shadow-md transition-all h-full flex flex-col",
+ isDragging && "shadow-xl ring-2 ring-primary-500/50 opacity-90 scale-[1.02]",
  className
  )}
  >
@@ -44,7 +44,7 @@ export function SortableWidget({ id, className, children, onRemove }: SortableWi
  <div
  {...attributes}
  {...listeners}
- className="absolute top-2 right-2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
+ className="absolute top-2 right-2 p-1.5 rounded-md hover:bg-surface-raised text-text-muted opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
  >
  <GripHorizontal className="w-4 h-4" />
  </div>

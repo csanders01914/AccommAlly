@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { Loader2 } from 'lucide-react';
-import { TenantThemeProvider } from '@/components/providers/TenantThemeProvider';
 
 export default function ReportsLayout({
  children,
@@ -49,7 +48,7 @@ export default function ReportsLayout({
  if (isLoading) {
  return (
  <div className="flex items-center justify-center min-h-screen app-background">
- <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }
@@ -57,18 +56,16 @@ export default function ReportsLayout({
  if (!currentUser) return null;
 
  return (
- <TenantThemeProvider settings={currentUser.tenant?.settings}>
- <div className="flex min-h-screen app-background">
+ <div className="flex min-h-screen bg-background">
  <Sidebar
  user={currentUser}
  unreadCount={unreadCount}
  initialCollapsed={true}
  onToggle={(collapsed) => setIsSidebarCollapsed(collapsed)}
  />
- <div className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+ <div className={`flex-1 transition-all duration-300 bg-background ${isSidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
  {children}
  </div>
  </div>
- </TenantThemeProvider>
  );
 }

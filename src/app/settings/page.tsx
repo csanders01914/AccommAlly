@@ -37,8 +37,8 @@ export default function SettingsPage() {
 
  if (loading) {
  return (
- <div className="min-h-screen flex items-center justify-center bg-[#FAF6EE]">
- <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
+ <div className="min-h-screen flex items-center justify-center bg-background">
+ <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
  </div>
  );
  }

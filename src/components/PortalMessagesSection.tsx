@@ -84,7 +84,7 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
 
  if (loading) {
  return (
- <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-6">
+ <div className="bg-surface-raised border border-border-strong rounded-xl p-6">
  <div className="flex items-center justify-center py-8">
  <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
  </div>
@@ -93,12 +93,12 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  }
 
  return (
- <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden shadow-md">
+ <div className="bg-surface border border-border-strong rounded-xl overflow-hidden shadow-md">
  {/* Header */}
- <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+ <div className="px-6 py-4 border-b border-border bg-surface-raised flex items-center justify-between">
  <div className="flex items-center gap-3">
  <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
- <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Portal Messages</h3>
+ <h3 className="text-lg font-semibold text-text-primary">Portal Messages</h3>
  {pendingCount > 0 && (
  <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
  {pendingCount} pending
@@ -107,17 +107,17 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  </div>
  <button
  onClick={fetchMessages}
- className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+ className="p-2 hover:bg-surface-raised dark:hover:bg-gray-700 rounded-lg transition-colors"
  title="Refresh messages"
  >
- <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+ <RefreshCw className="w-4 h-4 text-text-secondary" />
  </button>
  </div>
 
  {/* Messages List */}
- <div className="max-h-96 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900">
+ <div className="max-h-96 overflow-y-auto p-4 space-y-3 bg-surface-raised">
  {messages.length === 0 ? (
- <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+ <p className="text-center text-text-muted py-8">
  No portal messages yet. Messages from {clientName} will appear here.
  </p>
  ) : (
@@ -136,10 +136,10 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  }`}>
  <User className="w-3 h-3 text-white" />
  </div>
- <span className="text-sm font-bold text-gray-900 dark:text-white">
+ <span className="text-sm font-bold text-text-primary">
  {msg.direction === 'PORTAL_INBOUND' ? clientName : (msg.sender?.name || 'You')}
  </span>
- <span className="text-xs text-gray-600 dark:text-gray-400 ml-auto">
+ <span className="text-xs text-text-secondary ml-auto">
  {new Date(msg.createdAt).toLocaleString()}
  </span>
  {msg.direction === 'PORTAL_INBOUND' && (
@@ -147,11 +147,11 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  )}
  </div>
  {msg.subject && (
- <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 border-b border-gray-300 dark:border-gray-600 pb-2">
+ <p className="text-sm font-semibold text-text-primary mb-2 border-b border-border-strong pb-2">
  {msg.subject}
  </p>
  )}
- <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
+ <p className="text-sm text-text-primary whitespace-pre-wrap leading-relaxed">
  {msg.content}
  </p>
  </div>
@@ -160,7 +160,7 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  </div>
 
  {/* Reply Form */}
- <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3 bg-white dark:bg-gray-800">
+ <div className="p-4 border-t border-border space-y-3 bg-surface">
  {error && (
  <div className="flex items-center gap-2 text-red-700 dark:text-red-400 text-sm bg-red-100 dark:bg-red-900/30 p-3 rounded-lg border border-red-300 dark:border-red-700">
  <AlertCircle className="w-4 h-4" />
@@ -179,7 +179,7 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  placeholder="Subject (optional)"
  value={replySubject}
  onChange={(e) => setReplySubject(e.target.value)}
- className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+ className="w-full bg-surface-raised border border-border-strong rounded-lg px-4 py-2 text-text-primary placeholder-gray-500 dark:placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
  />
  <div className="flex gap-3">
  <textarea
@@ -187,7 +187,7 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  value={replyContent}
  onChange={(e) => setReplyContent(e.target.value)}
  rows={3}
- className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+ className="flex-1 bg-surface-raised border border-border-strong rounded-lg px-4 py-2 text-text-primary placeholder-gray-500 dark:placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
  />
  <button
  onClick={handleSendReply}
@@ -204,7 +204,7 @@ export default function PortalMessagesSection({ caseId, clientName }: PortalMess
  )}
  </button>
  </div>
- <p className="text-xs text-gray-600 dark:text-gray-400">
+ <p className="text-xs text-text-secondary">
  Sending a reply will automatically create a note and complete pending portal message tasks.
  </p>
  </div>

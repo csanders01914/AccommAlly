@@ -30,7 +30,7 @@ export function WorkflowTab() {
  .finally(() => setLoading(false));
  }, []);
 
- if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-blue-500" /></div>;
+ if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin h-8 w-8 text-primary-500" /></div>;
  if (!data) return <div>Failed to load data</div>;
 
  return (
@@ -38,12 +38,12 @@ export function WorkflowTab() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Interactions Summary */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ">
- <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
- <Activity className="h-5 w-5 text-indigo-500" />
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+ <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-text-primary">
+ <Activity className="h-5 w-5 text-primary-500" />
  Interactions Log Summary
  </h3>
- <p className="text-sm text-gray-500 mb-4">Total touchpoints across all cases</p>
+ <p className="text-sm text-text-muted mb-4">Total touchpoints across all cases</p>
  <div className="h-[250px] w-full">
  <ResponsiveContainer width="100%" height="100%">
  <BarChart data={data.interactions}>
@@ -58,28 +58,28 @@ export function WorkflowTab() {
  </div>
 
  {/* Outcome Effectiveness */}
- <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center items-center text-center ">
+ <div className="bg-surface p-6 rounded-xl border border-border shadow-sm flex flex-col justify-center items-center text-center">
  <div className="p-4 bg-green-100/50 dark:bg-green-900/30 rounded-full mb-4">
  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
  </div>
- <h3 className="text-3xl font-bold text-gray-800 dark:text-white">{data.outcomeStats.closedRatio}%</h3>
- <p className="text-sm font-medium text-gray-500 mt-2">Case Closure Ratio</p>
- <p className="text-xs text-gray-400 mt-1 max-w-xs">Percentage of total cases that have been successfully closed.</p>
+ <h3 className="text-3xl font-bold text-text-primary">{data.outcomeStats.closedRatio}%</h3>
+ <p className="text-sm font-medium text-text-muted mt-2">Case Closure Ratio</p>
+ <p className="text-xs text-text-muted mt-1 max-w-xs">Percentage of total cases that have been successfully closed.</p>
  </div>
  </div>
 
  {/* Pending Medical Documentation */}
- <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden ">
- <div className="p-6 border-b border-gray-200 dark:border-gray-700">
- <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 dark:text-white">
+ <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
+ <div className="p-6 border-b border-border">
+ <h3 className="text-lg font-semibold flex items-center gap-2 text-text-primary">
  <FileText className="h-5 w-5 text-amber-500" />
  Pending Medical Documentation
  </h3>
- <p className="text-sm text-gray-500 dark:text-gray-400">Follow-up needed for these cases</p>
+ <p className="text-sm text-text-muted">Follow-up needed for these cases</p>
  </div>
  <div className="overflow-x-auto">
  <table className="w-full text-left text-sm">
- <thead className="bg-white/20 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400">
+ <thead className="bg-white/20 /50 text-text-secondary">
  <tr>
  <th className="px-6 py-3 font-medium">Case Number</th>
  <th className="px-6 py-3 font-medium">Client</th>
@@ -92,12 +92,12 @@ export function WorkflowTab() {
  data.pendingMedical.map((item) => (
  <tr key={item.caseNumber} className="hover:bg-white/20 dark:hover:bg-gray-800/30">
  <td className="px-6 py-4 font-medium">{item.caseNumber}</td>
- <td className="px-6 py-4 text-gray-500">{item.clientName}</td>
- <td className="px-6 py-4 text-gray-500">
+ <td className="px-6 py-4 text-text-muted">{item.clientName}</td>
+ <td className="px-6 py-4 text-text-muted">
  {format(new Date(item.lastUpdated), 'MMM d, yyyy')}
  </td>
  <td className="px-6 py-4">
- <a href={`/cases/${item.caseNumber}`} className="text-blue-600 hover:text-blue-800 hover:underline">
+ <a href={`/cases/${item.caseNumber}`} className="text-primary-500 hover:text-primary-600 hover:underline">
  View Case
  </a>
  </td>
@@ -105,7 +105,7 @@ export function WorkflowTab() {
  ))
  ) : (
  <tr>
- <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+ <td colSpan={4} className="px-6 py-8 text-center text-text-muted">
  No pending medical documentation found.
  </td>
  </tr>

@@ -542,17 +542,17 @@ export default function TasksDashboardPage() {
 
  if (loading) {
  return (
- <div className="min-h-screen flex items-center justify-center bg-[#1C1A17]">
- <Loader2 className="w-10 h-10 animate-spin text-[#0D9488]" />
+ <div className="min-h-screen flex items-center justify-center bg-background">
+ <Loader2 className="w-10 h-10 animate-spin text-primary-500" />
  </div>
  );
  }
 
- const inputCls = 'w-full px-3 py-2 text-sm border border-[#E5E2DB] rounded-lg bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors';
- const labelCls = 'block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5';
+ const inputCls = 'form-input';
+ const labelCls = 'form-label';
 
  return (
- <div className="flex min-h-screen bg-[#1C1A17]">
+ <div className="flex min-h-screen bg-background">
  {currentUser && <Sidebar user={currentUser} unreadCount={unreadCount} onToggle={setSidebarCollapsed} />}
 
  <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
@@ -573,31 +573,31 @@ export default function TasksDashboardPage() {
  </div>
 
  {/* Content surface */}
- <div className="bg-[#FAF6EE] flex-1">
+ <div className="bg-background flex-1">
  <div className="px-6 py-6">
 
  {/* Main card */}
- <div className="bg-[#ffffff] rounded-xl border border-[#E5E2DB] shadow-[0_1px_3px_rgba(28,26,23,0.06)] overflow-hidden">
+ <div className="bg-surface rounded-xl border border-border shadow-[0_1px_3px_rgba(28,26,23,0.06)] overflow-hidden">
 
  {/* Collapsible Filter Section */}
- <div className="border-b border-[#E5E2DB]">
+ <div className="border-b border-border">
  <button
- className="w-full px-5 py-3.5 flex items-center justify-between hover:bg-[#FAF6EE] transition-colors text-left"
+ className="w-full px-5 py-3.5 flex items-center justify-between hover:bg-background transition-colors text-left"
  onClick={() => setShowFilters(!showFilters)}
  >
- <span className="text-sm font-semibold text-[#1C1A17]">Filters & Date Range</span>
- <ChevronDown className={cn("text-[#8C8880] w-4 h-4 transition-transform", showFilters ? "rotate-180" : "")} />
+ <span className="text-sm font-semibold text-text-primary">Filters & Date Range</span>
+ <ChevronDown className={cn("text-text-muted w-4 h-4 transition-transform", showFilters ? "rotate-180" : "")} />
  </button>
 
  {/* Active filter chips */}
  {activeFilters.length > 0 && (
  <div className="px-5 pb-3 flex flex-wrap gap-2">
  {activeFilters.map((chip) => (
- <span key={chip} className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#0D9488]/12 text-[#0D9488] text-xs font-medium rounded-full border border-[#0D9488]/20">
+ <span key={chip} className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-500/12 text-primary-500 text-xs font-medium rounded-full border border-primary-500/20">
  {chip}
  <button
  onClick={() => setActiveFilters(prev => prev.filter(f => f !== chip))}
- className="hover:text-[#0F766E] ml-0.5"
+ className="hover:text-primary-600 ml-0.5"
  aria-label={`Remove filter ${chip}`}
  >
  <X className="w-3 h-3" />
@@ -608,7 +608,7 @@ export default function TasksDashboardPage() {
  )}
 
  {showFilters && (
- <div className="px-5 pb-5 border-t border-[#F3F1EC]">
+ <div className="px-5 pb-5 border-t border-surface-raised">
  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
  {/* Clients */}
  <div className="relative">
@@ -625,23 +625,23 @@ export default function TasksDashboardPage() {
  placeholder="Search clients..."
  aria-label="Search Clients"
  />
- <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880] pointer-events-none" />
+ <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
  </div>
  {showClientDropdown && (
- <div className="absolute top-full left-0 right-0 mt-1 bg-[#ffffff] border border-[#E5E2DB] rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+ <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
  {clients
  .filter(c => {
  const s = clientSearch.toLowerCase();
  return (c.name.toLowerCase().includes(s) || c.code?.toLowerCase().includes(s)) && !activeFilters.includes(c.name);
  })
  .map(client => (
- <div key={client.id} className="px-3 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] cursor-pointer"
+ <div key={client.id} className="px-3 py-2 text-sm text-text-primary hover:bg-surface-raised cursor-pointer"
  onClick={() => { setActiveFilters(prev => [...prev, client.name]); setClientSearch(''); setShowClientDropdown(false); }}>
  {client.code ? `${client.code} — ${client.name}` : client.name}
  </div>
  ))}
  {clients.filter(c => { const s = clientSearch.toLowerCase(); return (c.name.toLowerCase().includes(s) || c.code?.toLowerCase().includes(s)) && !activeFilters.includes(c.name); }).length === 0 && (
- <div className="px-3 py-2 text-sm text-[#8C8880]">No clients found</div>
+ <div className="px-3 py-2 text-sm text-text-muted">No clients found</div>
  )}
  </div>
  )}
@@ -662,21 +662,21 @@ export default function TasksDashboardPage() {
  placeholder="Search examiners..."
  aria-label="Search Examiners"
  />
- <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880] pointer-events-none" />
+ <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" />
  </div>
  {showExaminerDropdown && (
- <div className="absolute top-full left-0 right-0 mt-1 bg-[#ffffff] border border-[#E5E2DB] rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
+ <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
  {users
  .filter(u => u.name !== 'System')
  .filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name))
  .map(user => (
- <div key={user.id} className="px-3 py-2 text-sm text-[#1C1A17] hover:bg-[#F3F1EC] cursor-pointer"
+ <div key={user.id} className="px-3 py-2 text-sm text-text-primary hover:bg-surface-raised cursor-pointer"
  onClick={() => { setActiveFilters(prev => [...prev, user.name]); setExaminerSearch(''); setShowExaminerDropdown(false); }}>
  {user.name}
  </div>
  ))}
  {users.filter(u => u.name.toLowerCase().includes(examinerSearch.toLowerCase()) && !activeFilters.includes(u.name)).length === 0 && (
- <div className="px-3 py-2 text-sm text-[#8C8880]">No users found</div>
+ <div className="px-3 py-2 text-sm text-text-muted">No users found</div>
  )}
  </div>
  )}
@@ -709,16 +709,16 @@ export default function TasksDashboardPage() {
  </div>
  </div>
 
- <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-[#F3F1EC]">
+ <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-surface-raised">
  <button
  onClick={() => { setActiveFilters([]); setDateRange({ start: '', end: '' }); setColumnFilters({}); setClientSearch(''); setExaminerSearch(''); setSearchQuery(''); }}
- className="px-4 py-1.5 border border-[#E5E2DB] text-[#5C5850] rounded-lg bg-[#ffffff] hover:bg-[#F3F1EC] text-sm font-medium transition-colors"
+ className="px-4 py-1.5 border border-border text-text-secondary rounded-lg bg-surface hover:bg-surface-raised text-sm font-medium transition-colors"
  >
  Clear
  </button>
  <button
  onClick={() => setShowFilters(false)}
- className="px-4 py-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold transition-colors"
+ className="px-4 py-1.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold transition-colors"
  >
  Apply
  </button>
@@ -728,32 +728,32 @@ export default function TasksDashboardPage() {
  </div>
 
  {/* Reassign Toolbar */}
- <div className="border-b border-[#E5E2DB] px-5 py-3 flex flex-wrap items-center gap-4 bg-[#FAF6EE]">
+ <div className="border-b border-border px-5 py-3 flex flex-wrap items-center gap-4 bg-background">
  <div className="flex items-center gap-2">
- <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign From:</span>
- <div className="border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#5C5850] bg-[#ffffff] min-w-[140px] cursor-not-allowed">
+ <span className="text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Reassign From:</span>
+ <div className="border border-border rounded-lg px-3 py-1.5 text-sm text-text-secondary bg-surface min-w-[140px] cursor-not-allowed">
  {currentUser?.name || 'Current User'}
  </div>
  </div>
  <div className="flex items-center gap-2">
- <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8C8880]">Reassign To:</span>
+ <span className="text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Reassign To:</span>
  <select
  value={reassignTo}
  onChange={(e) => setReassignTo(e.target.value)}
- className="border border-[#E5E2DB] rounded-lg px-3 py-1.5 text-sm text-[#1C1A17] bg-[#ffffff] min-w-[140px] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="border border-border rounded-lg px-3 py-1.5 text-sm text-text-primary bg-surface min-w-[140px] focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  >
  <option value="">Select…</option>
  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
  </select>
  </div>
  <div className="ml-auto relative">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C8880]" />
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
  <input
  type="text"
  placeholder="Search tasks…"
  value={searchQuery}
  onChange={(e) => setSearchQuery(e.target.value)}
- className="pl-9 pr-3 py-1.5 border border-[#E5E2DB] rounded-lg text-sm bg-[#ffffff] text-[#1C1A17] placeholder-[#8C8880] w-52 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors"
+ className="pl-9 pr-3 py-1.5 border border-border rounded-lg text-sm bg-surface text-text-primary placeholder-text-muted w-52 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors"
  />
  </div>
  <button
@@ -761,8 +761,8 @@ export default function TasksDashboardPage() {
  className={cn(
  "text-sm font-semibold px-4 py-1.5 rounded-lg transition-all",
  reassignTo && selectedTaskIds.size > 0
- ? "bg-[#0D9488] text-[#ffffff] hover:bg-[#0F766E]"
- : "text-[#C8C4BB] bg-[#F3F1EC] cursor-not-allowed border border-[#E5E2DB]"
+ ? "bg-primary-500 text-white hover:bg-primary-600"
+ : "text-border-strong bg-surface-raised cursor-not-allowed border border-border"
  )}
  disabled={!reassignTo || selectedTaskIds.size === 0}
  >
@@ -771,10 +771,10 @@ export default function TasksDashboardPage() {
  </div>
 
  {/* Controls Bar */}
- <div className="border-b border-[#E5E2DB] px-5 py-2.5 flex items-center justify-end gap-2">
+ <div className="border-b border-border px-5 py-2.5 flex items-center justify-end gap-2">
  <button
  onClick={handleExportToExcel}
- className="px-3 py-1.5 border border-[#E5E2DB] text-[#5C5850] text-xs font-medium rounded-lg hover:bg-[#F3F1EC] bg-[#ffffff] transition-colors"
+ className="px-3 py-1.5 border border-border text-text-secondary text-xs font-medium rounded-lg hover:bg-surface-raised bg-surface transition-colors"
  >
  Export CSV
  </button>
@@ -784,8 +784,8 @@ export default function TasksDashboardPage() {
  className={cn(
  "px-3 py-1.5 border text-xs font-medium rounded-lg transition-colors",
  hasActiveFilters
- ? "border-[#0D9488]/40 text-[#0D9488] bg-[#0D9488]/5 hover:bg-[#0D9488]/10"
- : "border-[#E5E2DB] text-[#C8C4BB] cursor-not-allowed bg-[#ffffff]"
+ ? "border-primary-500/40 text-primary-500 bg-primary-500/5 hover:bg-primary-500/10"
+ : "border-border text-border-strong cursor-not-allowed bg-surface"
  )}
  >
  Clear Table Filters
@@ -796,8 +796,8 @@ export default function TasksDashboardPage() {
  className={cn(
  "px-3 py-1.5 border text-xs font-medium rounded-lg transition-colors",
  hasColumnChanges
- ? "border-[#0D9488]/40 text-[#0D9488] bg-[#0D9488]/5 hover:bg-[#0D9488]/10"
- : "border-[#E5E2DB] text-[#C8C4BB] cursor-not-allowed bg-[#ffffff]"
+ ? "border-primary-500/40 text-primary-500 bg-primary-500/5 hover:bg-primary-500/10"
+ : "border-border text-border-strong cursor-not-allowed bg-surface"
  )}
  >
  Save Columns
@@ -808,12 +808,12 @@ export default function TasksDashboardPage() {
  <div className="overflow-x-auto">
  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
  <table className="w-full text-sm text-left table-fixed">
- <thead className="bg-[#FAF6EE] border-b border-[#E5E2DB]">
+ <thead className="bg-background border-b border-border">
  <tr>
  <th className="px-4 py-3 w-10">
  <input
  type="checkbox"
- className="rounded border-[#C8C4BB] text-[#0D9488] focus:ring-[#0D9488]"
+ className="rounded border-border-strong text-primary-500 focus:ring-[#0D9488]"
  checked={filteredTasks.length > 0 && filteredTasks.every(t => selectedTaskIds.has(t.id))}
  onChange={toggleSelectAll}
  />
@@ -847,13 +847,13 @@ export default function TasksDashboardPage() {
  const isOverdue = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate < today;
  const isDueToday = !['COMPLETED', 'CANCELLED'].includes(task.status) && taskDate.getTime() === today.getTime();
 
- const primaryColor = isOverdue ? "text-red-600 font-medium" : isDueToday ? "text-[#0D9488] font-medium" : "text-[#1C1A17]";
- const secondaryColor = isOverdue ? "text-red-500" : isDueToday ? "text-[#0D9488]" : "text-[#8C8880]";
+ const primaryColor = isOverdue ? "text-red-600 font-medium" : isDueToday ? "text-primary-500 font-medium" : "text-text-primary";
+ const secondaryColor = isOverdue ? "text-red-500" : isDueToday ? "text-primary-500" : "text-text-muted";
 
  return (
  <tr
  key={task.id}
- className="bg-[#ffffff] hover:bg-[#FAF6EE] transition-colors cursor-pointer group"
+ className="bg-surface hover:bg-background transition-colors cursor-pointer group"
  onClick={(e) => {
  if ((e.target as HTMLElement).closest('input[type="checkbox"], button')) return;
  if (task.case?.id) router.push(`/cases/${task.case.id}`);
@@ -869,11 +869,11 @@ export default function TasksDashboardPage() {
  else newSet.delete(task.id);
  setSelectedTaskIds(newSet);
  }}
- className="rounded border-[#C8C4BB]"
+ className="rounded border-border-strong"
  />
  </td>
  <td className="px-4 py-3">
- <button onClick={() => setSelectedTask(task)} className="text-[#C8C4BB] hover:text-[#0D9488] transition-colors">
+ <button onClick={() => setSelectedTask(task)} className="text-border-strong hover:text-primary-500 transition-colors">
  <Edit2 className="w-4 h-4" />
  </button>
  </td>
@@ -902,7 +902,7 @@ export default function TasksDashboardPage() {
  })
  ) : (
  <tr>
- <td colSpan={9} className="px-4 py-12 text-center text-[#8C8880] text-sm">
+ <td colSpan={9} className="px-4 py-12 text-center text-text-muted text-sm">
  No tasks found
  </td>
  </tr>
@@ -913,20 +913,20 @@ export default function TasksDashboardPage() {
  </div>
 
  {/* Pagination */}
- <div className="border-t border-[#E5E2DB] bg-[#FAF6EE] px-5 py-3 flex items-center justify-between text-xs text-[#8C8880]">
+ <div className="border-t border-border bg-background px-5 py-3 flex items-center justify-between text-xs text-text-muted">
  <div className="flex items-center gap-1">
  <button
  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
  disabled={currentPage === 1}
- className="px-2.5 py-1 border border-[#E5E2DB] rounded-lg disabled:opacity-40 hover:bg-[#ffffff] transition-colors"
+ className="px-2.5 py-1 border border-border rounded-lg disabled:opacity-40 hover:bg-surface transition-colors"
  >
  &lt;
  </button>
- <span className="px-3 text-[#5C5850]">Page {currentPage} of {Math.max(totalPages, 1)}</span>
+ <span className="px-3 text-text-secondary">Page {currentPage} of {Math.max(totalPages, 1)}</span>
  <button
  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
  disabled={currentPage === totalPages || totalPages === 0}
- className="px-2.5 py-1 border border-[#E5E2DB] rounded-lg disabled:opacity-40 hover:bg-[#ffffff] transition-colors"
+ className="px-2.5 py-1 border border-border rounded-lg disabled:opacity-40 hover:bg-surface transition-colors"
  >
  &gt;
  </button>
@@ -935,7 +935,7 @@ export default function TasksDashboardPage() {
  <select
  value={itemsPerPage}
  onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
- className="border border-[#E5E2DB] rounded-lg px-2 py-1 bg-[#ffffff] focus:outline-none focus:ring-1 focus:ring-[#0D9488] text-[#5C5850]"
+ className="border border-border rounded-lg px-2 py-1 bg-surface focus:outline-none focus:ring-1 focus:ring-[#0D9488] text-text-secondary"
  >
  <option value={10}>10</option>
  <option value={25}>25</option>

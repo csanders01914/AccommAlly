@@ -34,11 +34,11 @@ export default function EditNoteModal({ isOpen, onClose, onSave, initialData }: 
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
- <div className="bg-[#ffffff] rounded-xl shadow-[0_8px_40px_rgba(28,26,23,0.18)] border border-[#E5E2DB] w-full max-w-lg overflow-hidden">
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2DB]">
- <h2 className="text-base font-semibold text-[#1C1A17]">Edit Note</h2>
- <button onClick={onClose} disabled={isSaving} className="p-1.5 hover:bg-[#F3F1EC] rounded-lg transition-colors">
- <X className="w-4 h-4 text-[#8C8880]" />
+ <div className="modal-container w-full max-w-lg overflow-hidden">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+ <h2 className="text-base font-semibold text-text-primary">Edit Note</h2>
+ <button onClick={onClose} disabled={isSaving} className="p-1.5 hover:bg-surface-raised rounded-lg transition-colors">
+ <X className="w-4 h-4 text-text-muted" />
  </button>
  </div>
 
@@ -49,10 +49,10 @@ export default function EditNoteModal({ isOpen, onClose, onSave, initialData }: 
  </div>
  )}
  <div>
- <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8C8880] mb-1.5">Note Content</label>
+ <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-text-muted mb-1.5">Note Content</label>
  <textarea
  rows={6}
- className="w-full px-3 py-2.5 rounded-lg border border-[#E5E2DB] bg-[#FAF6EE] text-[#1C1A17] placeholder-[#8C8880] focus:outline-none focus:ring-2 focus:ring-[#0D9488]/30 focus:border-[#0D9488] transition-colors resize-none text-sm"
+ className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-colors resize-none text-sm"
  placeholder="Enter note content…"
  value={content}
  onChange={(e) => setContent(e.target.value)}
@@ -61,10 +61,10 @@ export default function EditNoteModal({ isOpen, onClose, onSave, initialData }: 
  />
  </div>
  <div className="flex justify-end gap-3 pt-2">
- <button type="button" onClick={onClose} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-[#5C5850] hover:bg-[#F3F1EC] rounded-lg transition-colors">
+ <button type="button" onClick={onClose} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-surface-raised rounded-lg transition-colors">
  Cancel
  </button>
- <button type="submit" disabled={isSaving} className="flex items-center gap-2 px-4 py-2 bg-[#0D9488] hover:bg-[#0F766E] text-[#ffffff] rounded-lg text-sm font-semibold transition-colors disabled:opacity-70">
+ <button type="submit" disabled={isSaving} className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-70">
  {isSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : <><Save className="w-4 h-4" /> Save Changes</>}
  </button>
  </div>
