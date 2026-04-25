@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
  const plan = await prisma.subscriptionPlan.findUnique({ where: { code: planCode } });
  if (!plan) return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
 
- const priceId = interval === 'yearly' ? plan.stripePriceIdYearly : plan.stripePriceIdMonthly;
+ // Resolve price ID: prefer DB value, fall back to env vars (STRIPE_PRICE_{CODE}_{INTERVAL})
+ const envKey = `STRIPE_PRICE_${planCode.toUpperCase()}_${interval.toUpperCase()}`;
+ const priceId = (interval === 'yearly' ? plan.stripePriceIdYearly : plan.stripePriceIdMonthly)
+   ?? process.env[envKey];
  if (!priceId) return NextResponse.json({ error: 'Plan not available for billing' }, { status: 400 });
 
  const tenant = await prisma.tenant.findUnique({ where: { id: session.tenantId } });

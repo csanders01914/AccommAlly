@@ -75,7 +75,9 @@ export async function POST(request: NextRequest) {
  }
 
  // Create new subscription at lower tier (skip for FREE — no price ID)
- const priceId = interval === 'yearly' ? newPlan.stripePriceIdYearly : newPlan.stripePriceIdMonthly;
+ const envKey = `STRIPE_PRICE_${planCode.toUpperCase()}_${interval.toUpperCase()}`;
+ const priceId = (interval === 'yearly' ? newPlan.stripePriceIdYearly : newPlan.stripePriceIdMonthly)
+   ?? process.env[envKey];
  let newSubId: string | null = null;
 
  if (priceId && tenant?.stripeCustomerId) {
