@@ -190,6 +190,10 @@ function SubscribeForm({ planName, planCode, interval, price, onSuccess, onClose
  <span className="flex items-center gap-1 text-xs" style={{ color: 'rgba(240,238,232,0.3)' }}>
  <ShieldCheck className="w-3.5 h-3.5" />Secured by Stripe
  </span>
+ <span style={{ color: 'rgba(240,238,232,0.12)' }}>|</span>
+ <span className="text-xs" style={{ color: 'rgba(240,238,232,0.3)' }}>
+ No card data stored by AccommAlly
+ </span>
  </div>
  </form>
  )}
