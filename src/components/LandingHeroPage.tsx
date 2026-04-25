@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Shield, ArrowRight } from 'lucide-react';
 
@@ -36,12 +37,14 @@ export function LandingHeroPage() {
  </span>
  </div>
 
- <h2
- className="text-4xl xl:text-5xl leading-[1.15] mb-6"
- style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
- >
- Where accommodation meets advocacy.
- </h2>
+ <Image
+  src="/images/main_hero.png"
+  alt="Where accommodation meets advocacy"
+  width={480}
+  height={320}
+  className="w-full h-auto object-contain mb-6"
+  priority
+ />
  <p className="text-base leading-relaxed" style={{ color: 'rgba(240,238,232,0.5)' }}>
  Trusted by HR and disability teams.
  </p>
