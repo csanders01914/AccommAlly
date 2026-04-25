@@ -1,0 +1,1 @@
+ALTER TYPE "ReportExportPaymentStatus" ADD VALUE IF NOT EXISTS 'CANCELLED';

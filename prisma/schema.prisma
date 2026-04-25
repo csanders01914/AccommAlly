@@ -846,6 +846,7 @@ enum ReportExportPaymentStatus {
   PENDING
   SUCCEEDED
   FAILED
+  CANCELLED
 }
 
 enum TenantStatus {
