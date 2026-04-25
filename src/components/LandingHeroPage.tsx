@@ -37,14 +37,12 @@ export function LandingHeroPage() {
  </span>
  </div>
 
- <Image
-  src="/images/main_hero.png"
-  alt="Where accommodation meets advocacy"
-  width={480}
-  height={320}
-  className="w-full h-auto object-contain mb-6"
-  priority
- />
+ <h2
+  className="text-4xl xl:text-5xl leading-[1.15] mb-6"
+  style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+ >
+  Where accommodation meets advocacy.
+ </h2>
  <p className="text-base leading-relaxed" style={{ color: 'rgba(240,238,232,0.5)' }}>
  Trusted by HR and disability teams.
  </p>
@@ -79,6 +77,17 @@ export function LandingHeroPage() {
  >
  AccommAlly
  </span>
+ </div>
+
+ <div className="w-full max-w-sm mb-8 rounded-xl overflow-hidden shadow-sm">
+  <Image
+   src="/images/main-hero.png"
+   alt="ADA expert consulting with a client"
+   width={480}
+   height={280}
+   className="w-full h-auto object-cover"
+   priority
+  />
  </div>
 
  <div className="w-full max-w-sm">
