@@ -44,7 +44,7 @@ export function SubscribeModal(props: SubscribeModalProps) {
  <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(ellipse at 30% 0%, rgba(13,148,136,0.10) 0%, transparent 60%)' }} />
  <button
  onClick={props.onClose}
- className="absolute top-4 right-4 p-1.5 rounded-full transition-colors z-10"
+ className="absolute top-4 right-4 p-1.5 rounded-full transition-colors z-20"
  style={{ color: 'rgba(240,238,232,0.4)' }}
  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0EEE8'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(240,238,232,0.08)'; }}
  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(240,238,232,0.4)'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'; }}

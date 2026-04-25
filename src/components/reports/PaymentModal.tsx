@@ -63,7 +63,7 @@ export function PaymentModal({ priceInfo, onSuccess, onClose }: PaymentModalProp
  <button
  id="payment-modal-close"
  onClick={onClose}
- className="absolute top-4 right-4 p-1.5 rounded-full transition-colors"
+ className="absolute top-4 right-4 p-1.5 rounded-full transition-colors z-20"
  style={{ color: 'rgba(240,238,232,0.4)' }}
  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#F0EEE8'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(240,238,232,0.08)'; }}
  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(240,238,232,0.4)'; (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'; }}
