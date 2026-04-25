@@ -23,12 +23,13 @@ export async function GET(request: NextRequest) {
 
  const [logs, total] = await Promise.all([
  prisma.auditLog.findMany({
+ where: { tenantId: session.tenantId },
  skip,
  take: limit,
  orderBy: { timestamp: 'desc' },
  include: { user: true }
  }),
- prisma.auditLog.count()
+ prisma.auditLog.count({ where: { tenantId: session.tenantId } })
  ]);
 
  // Manually decrypt nested user data (Extension doesn't always catch deep includes)

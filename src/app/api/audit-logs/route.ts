@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
  const limit = parseInt(searchParams.get('limit') || '50');
  const offset = parseInt(searchParams.get('offset') || '0');
 
- // Build where clause
- const where: any = {};
+ // Build where clause — always scoped to the authenticated tenant
+ const where: any = { tenantId: session.tenantId };
  if (userId) {
  where.userId = userId;
  }
