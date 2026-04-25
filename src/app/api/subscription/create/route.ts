@@ -5,6 +5,15 @@ import prisma from '@/lib/prisma';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
+ try {
+   return await handlePost(request);
+ } catch (err: any) {
+   console.error('[subscription/create]', err);
+   return NextResponse.json({ error: err?.message ?? 'Internal server error' }, { status: 500 });
+ }
+}
+
+async function handlePost(request: NextRequest) {
  const { session, error } = await requireAuth({ request, roles: ['ADMIN'] });
  if (error) return error;
 
