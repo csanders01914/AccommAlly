@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiFetchJSON } from '@/lib/api-client';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe, StripeCardElementOptions } from '@stripe/stripe-js';
+import Image from 'next/image';
 import {
   Loader2, Headset, CheckCircle2, Lock, ShieldCheck, ArrowRight,
   Calendar, Phone, User, MessageSquare, Users,
@@ -70,6 +71,18 @@ function LeftColumn() {
           Connect with our certified ADA experts for a 60-minute one-on-one session covering
           accommodations, compliance risks, and strategic decisions.
         </p>
+      </div>
+
+      {/* Hero Image */}
+      <div className="rounded-xl overflow-hidden">
+        <Image
+          src="/images/consultation.png"
+          alt="ADA expert consulting with a client at a desk with compliance materials"
+          width={720}
+          height={480}
+          className="w-full h-auto object-cover"
+          priority
+        />
       </div>
 
       {/* What's Included */}
