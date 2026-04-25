@@ -68,20 +68,23 @@ async function handlePost(request: NextRequest) {
    const customer = await stripe.customers.retrieve(stripeCustomerId) as Stripe.Customer;
    const defaultPM = customer.invoice_settings?.default_payment_method as string | undefined;
 
-   const subscription = await stripe.subscriptions.create({
-   customer: stripeCustomerId,
-   items: [{ price: priceId }],
-   ...(defaultPM ? { default_payment_method: defaultPM } : {}),
-   metadata: { tenantId: session.tenantId },
-   });
+   if (defaultPM) {
+     const subscription = await stripe.subscriptions.create({
+     customer: stripeCustomerId,
+     items: [{ price: priceId }],
+     default_payment_method: defaultPM,
+     metadata: { tenantId: session.tenantId },
+     });
 
-   await prisma.tenant.update({
-   where: { id: session.tenantId },
-   data: { stripeSubscriptionId: subscription.id, billingInterval: interval },
-   });
+     await prisma.tenant.update({
+     where: { id: session.tenantId },
+     data: { stripeSubscriptionId: subscription.id, billingInterval: interval },
+     });
 
-   const amountCents = (subscription as any).latest_invoice?.amount_due ?? 0;
-   return NextResponse.json({ requiresCardInput: false, amountCents });
+     const amountCents = (subscription as any).latest_invoice?.amount_due ?? 0;
+     return NextResponse.json({ requiresCardInput: false, amountCents });
+   }
+   // No saved payment method — fall through to card collection flow below
  }
 
  // Initial subscribe — collect card via Elements
