@@ -68,6 +68,15 @@ async function calcPageCount(tenantId: string): Promise<{ pageCount: number; amo
 }
 
 export async function POST(request: NextRequest) {
+  try {
+  return await handlePost(request);
+  } catch (err: any) {
+    console.error('[reports/create-payment-intent]', err);
+    return NextResponse.json({ error: err?.message ?? 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function handlePost(request: NextRequest) {
   const { session, error } = await requireAuth({ request });
   if (error) return error;
 
