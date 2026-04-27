@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
  const box = searchParams.get('box') || 'inbox'; // 'inbox', 'sent', 'starred', 'archived'
  const { page, limit, skip } = parsePagination(searchParams);
 
- const whereClause: any = {};
+ const whereClause: any = {
+ // Portal messages are scoped to per-claim mailboxes, never the general inbox
+ direction: { notIn: ['PORTAL_INBOUND', 'PORTAL_OUTBOUND'] },
+ };
 
  if (box === 'inbox') {
  // Simplified query matching unread-count logic exactly

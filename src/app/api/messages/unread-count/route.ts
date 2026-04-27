@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
  read: false,
  archived: false,
  deletedByRecipient: false,
- inInbox: true
+ inInbox: true,
+ direction: { notIn: ['PORTAL_INBOUND', 'PORTAL_OUTBOUND'] },
  }
  });
 

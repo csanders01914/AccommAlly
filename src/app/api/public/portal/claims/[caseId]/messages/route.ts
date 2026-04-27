@@ -77,6 +77,7 @@ export async function POST(
         recipientId: caseData.createdById,
         isExternal: false,
         direction: 'PORTAL_INBOUND',
+        inInbox: false,
       },
       select: { id: true, subject: true, content: true, createdAt: true },
     });
