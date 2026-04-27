@@ -73,7 +73,8 @@ export async function GET() {
  orderBy: { createdAt: 'desc' },
  take: 5,
  include: {
- sender: { select: { name: true } }
+ sender: { select: { name: true } },
+ case: { include: { claimant: { select: { name: true } } } },
  }
  });
 
@@ -180,7 +181,11 @@ export async function GET() {
  taskStats,
  messages: messages.map((m: any) => ({
  id: m.id,
- sender: m.sender ? decrypt(m.sender.name) : 'Claimant Portal',
+ sender: m.sender
+ ? decrypt(m.sender.name)
+ : m.case?.claimant?.name
+ ? decrypt(m.case.claimant.name)
+ : 'Claimant Portal',
  content: m.content,
  subject: m.subject,
  time: m.createdAt,
