@@ -1,5 +1,5 @@
 import { PORTAL_SESSION_COOKIE_NAME } from '@/lib/constants';
-import { jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import logger from '@/lib/logger';
 
@@ -27,6 +27,13 @@ export interface PortalSession {
  * Validates the portal session cookie and returns the typed payload.
  * Returns null if the token is missing, invalid, or not a portal session.
  */
+export async function signPortalToken(payload: Record<string, unknown>): Promise<string> {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: ALG })
+    .setExpirationTime('1h')
+    .sign(getPortalSecretKey());
+}
+
 export async function getPortalSession(): Promise<PortalSession | null> {
  const cookieStore = await cookies();
  const token = cookieStore.get(PORTAL_SESSION_COOKIE_NAME)?.value;

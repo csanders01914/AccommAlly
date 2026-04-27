@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { signToken } from '@/lib/auth';
+import { signPortalToken } from '@/lib/portal-auth';
 import { cookies } from 'next/headers';
 import { portalLoginRateLimiter } from '@/lib/rate-limit';
 import bcrypt from 'bcryptjs';
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       return invalidResponse;
     }
 
-    const token = await signToken({
+    const token = await signPortalToken({
       claimantId: claimant.id,
       tenantId: claimant.tenantId,
       role: 'CLAIMANT',
