@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, LogIn, UserPlus, ArrowRight, Loader2, AlertCircle, Lock } from 'lucide-react';
+import { Shield, LogIn, UserPlus, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 interface TenantInfo {
   name: string;
@@ -68,29 +68,6 @@ export default function OrgLandingPage() {
         </div>
 
         <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl space-y-3">
-          {/* Staff login */}
-          <Link
-            href="/login"
-            className="flex items-center justify-between w-full bg-surface border border-border hover:bg-surface-raised text-text-primary font-medium py-4 px-5 rounded-2xl transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
-                <Lock className="w-4 h-4 text-primary-500" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-text-primary text-sm">Staff Sign In</p>
-                <p className="text-xs text-text-muted">Examiners and coordinators</p>
-              </div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-text-muted opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
-          </Link>
-
-          <div className="relative flex items-center gap-3">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-text-muted font-medium">claimant portal</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
           {/* Claimant portal sign in */}
           <Link
             href="/portal/login"
@@ -101,11 +78,11 @@ export default function OrgLandingPage() {
                 <LogIn className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-sm">Claimant Sign In</p>
-                <p className="text-xs text-white/70">Access your accommodation requests</p>
+                <p className="font-semibold text-sm">Sign In</p>
+                <p className="text-xs text-white/90">Access your accommodation requests</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 opacity-80 group-hover:translate-x-1 transition-transform" />
           </Link>
 
           {/* Register — pass slug as org code */}
@@ -118,7 +95,7 @@ export default function OrgLandingPage() {
                 <UserPlus className="w-4 h-4 text-primary-500" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-text-primary text-sm">Create Claimant Account</p>
+                <p className="font-semibold text-text-primary text-sm">Create Account</p>
                 <p className="text-xs text-text-muted">First-time portal registration</p>
               </div>
             </div>
@@ -129,6 +106,8 @@ export default function OrgLandingPage() {
         <p className="text-center text-text-muted text-xs mt-6">
           Organization code:{' '}
           <span className="font-mono bg-surface border border-border px-1.5 py-0.5 rounded text-xs">{slug}</span>
+          {' · '}
+          <Link href="/login" className="hover:text-text-secondary transition-colors">Staff sign in</Link>
         </p>
       </div>
     </div>
