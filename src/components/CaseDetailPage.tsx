@@ -1001,7 +1001,7 @@ export function CaseDetailPage({
  {caseData.medicalCondition && (
  <div className="sm:col-span-2">
  <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-muted">Medical Condition / Reason</dt>
- <dd className="mt-1 text-sm text-text-primary bg-red-50 p-2 rounded border border-red-100">
+ <dd className="mt-1 text-sm text-text-primary">
  {caseData.medicalCondition}
  </dd>
  </div>
