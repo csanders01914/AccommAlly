@@ -71,15 +71,15 @@ export default function OrgLandingPage() {
           {/* Claimant portal sign in */}
           <Link
             href="/portal/login"
-            className="flex items-center justify-between w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-4 px-5 rounded-2xl transition-all shadow-md group"
+            className="flex items-center justify-between w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-4 px-5 rounded-2xl transition-all shadow-md group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
                 <LogIn className="w-4 h-4" />
               </div>
               <div className="text-left">
                 <p className="font-semibold text-sm">Sign In</p>
-                <p className="text-xs text-white/90">Access your accommodation requests</p>
+                <p className="text-xs text-slate-300">Access your accommodation requests</p>
               </div>
             </div>
             <ArrowRight className="w-4 h-4 opacity-80 group-hover:translate-x-1 transition-transform" />
