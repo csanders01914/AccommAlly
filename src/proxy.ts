@@ -5,6 +5,20 @@ import { CSRF_COOKIE_NAME, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "
 
 // Paths that require authentication
 const PROTECTED_PATHS = ["/dashboard", "/admin", "/auditor", "/cases"];
+
+// Subdomain → /org/[slug] routing (only active when MAIN_DOMAIN env var is set)
+const MAIN_DOMAIN = process.env.MAIN_DOMAIN;
+
+function extractSlug(host: string): string | null {
+  if (!MAIN_DOMAIN) return null;
+  const bare = host.split(':')[0];
+  if (bare === MAIN_DOMAIN || bare === `www.${MAIN_DOMAIN}`) return null;
+  if (bare.endsWith(`.${MAIN_DOMAIN}`)) {
+    const sub = bare.slice(0, bare.length - MAIN_DOMAIN.length - 1);
+    return sub && sub !== 'www' ? sub : null;
+  }
+  return null;
+}
 // Paths only for ADMIN
 const ADMIN_PATHS = ["/admin"];
 // Paths for ADMIN or AUDITOR
@@ -33,6 +47,14 @@ function buildCspHeader(nonce: string): string {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Subdomain routing: rewrite root to /org/[slug] when on a tenant subdomain
+  const slug = extractSlug(request.headers.get('host') || '');
+  if (slug && pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = `/org/${slug}`;
+    return NextResponse.rewrite(url);
+  }
 
   const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
   const cspHeader = buildCspHeader(nonce);
