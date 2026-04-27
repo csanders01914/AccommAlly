@@ -195,7 +195,12 @@ export async function GET() {
  });
 
  } catch (error) {
+ const message = error instanceof Error ? error.message : String(error);
+ const stack = error instanceof Error ? error.stack : undefined;
  logger.error({ err: error }, 'Dashboard API Error:');
- return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+ return NextResponse.json(
+   { error: 'Internal Server Error', detail: message, stack },
+   { status: 500 }
+ );
  }
 }
