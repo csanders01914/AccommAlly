@@ -1,132 +1,68 @@
 'use client';
-import { apiFetch } from '@/lib/api-client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Shield, Key, User, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { Shield, LogIn, UserPlus, ArrowRight } from 'lucide-react';
 
-export default function PortalLoginPage() {
- const router = useRouter();
- const [identifier, setIdentifier] = useState('');
- const [lastName, setLastName] = useState('');
- const [pin, setPin] = useState('');
- const [isLoading, setIsLoading] = useState(false);
- const [error, setError] = useState('');
+export default function PortalLandingPage() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDF6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
 
- const handleLogin = async (e: React.FormEvent) => {
- e.preventDefault();
- setIsLoading(true);
- setError('');
+      <div className="max-w-md w-full relative">
+        <div className="text-center mb-10">
+          <div className="inline-flex p-3 rounded-2xl bg-primary-500/10 mb-4 ring-1 ring-[#0D9488]/20">
+            <Shield className="w-8 h-8 text-primary-500" />
+          </div>
+          <h1 className="text-3xl font-bold text-text-primary">AccommAlly Portal</h1>
+          <p className="text-text-secondary text-sm mt-2">
+            Manage your accommodation requests securely online
+          </p>
+        </div>
 
- try {
- const res = await apiFetch('/api/public/portal/login', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ identifier, lastName, pin })
- });
+        <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl space-y-4">
+          <Link
+            href="/portal/login"
+            className="flex items-center justify-between w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-4 px-6 rounded-2xl transition-all shadow-md group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <LogIn className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold">Sign In</p>
+                <p className="text-xs text-white/70">Access your existing account</p>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+          </Link>
 
- if (res.ok) {
- router.push('/portal/dashboard');
- } else {
- const data = await res.json();
- setError(data.error || 'Login failed');
- }
- } catch (e) {
- setError('An error occurred. Please try again.');
- } finally {
- setIsLoading(false);
- }
- };
+          <div className="relative flex items-center gap-3">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-text-muted font-medium">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
 
- return (
- <div className="min-h-screen bg-background flex items-center justify-center p-4">
- {/* Background Pattern */}
- <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDF6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
+          <Link
+            href="/portal/register"
+            className="flex items-center justify-between w-full bg-surface border border-border hover:bg-surface-raised text-text-primary font-medium py-4 px-6 rounded-2xl transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center">
+                <UserPlus className="w-5 h-5 text-primary-500" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-text-primary">Create Account</p>
+                <p className="text-xs text-text-muted">Set up portal access for the first time</p>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-text-muted opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
+          </Link>
+        </div>
 
- <div className="max-w-md w-full relative">
- <div className="text-center mb-8">
- <div className="inline-flex p-3 rounded-2xl bg-primary-500/10 mb-4 ring-1 ring-[#0D9488]/20">
- <Shield className="w-8 h-8 text-primary-500" />
- </div>
- <h1 className="text-2xl font-bold text-text-primary">AccommAlly Portal</h1>
- <p className="text-text-secondary text-sm mt-2">Check the status of your accommodation request</p>
- </div>
-
- <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl">
- <form onSubmit={handleLogin} className="space-y-6">
- {error && (
- <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm flex items-center gap-2">
- <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
- </div>
- )}
-
- <div>
- <label htmlFor="identifier" className="block text-sm font-medium text-text-primary mb-2">Claim ID or Case Number</label>
- <div className="relative">
- <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
- <input
- id="identifier"
- type="text"
- value={identifier}
- onChange={(e) => setIdentifier(e.target.value)}
- placeholder="e.g. 123456 or AA..."
- className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all uppercase placeholder-text-muted"
- required
- autoComplete="username"
- />
- </div>
- </div>
-
- <div>
- <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-2">Last Name</label>
- <div className="relative">
- <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
- <input
- id="lastName"
- type="text"
- value={lastName}
- onChange={(e) => setLastName(e.target.value)}
- placeholder="Enter your last name"
- className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
- required
- autoComplete="family-name"
- />
- </div>
- </div>
-
- <div>
- <label htmlFor="pin" className="block text-sm font-medium text-text-primary mb-2">PIN</label>
- <div className="relative">
- <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
- <input
- id="pin"
- type="password"
- inputMode="numeric"
- value={pin}
- onChange={(e) => setPin(e.target.value)}
- placeholder="Enter your PIN"
- className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
- required
- autoComplete="current-password"
- />
- </div>
- <p className="mt-1.5 text-xs text-text-muted">Your PIN was provided when your case was opened. Contact your examiner if you need help.</p>
- </div>
-
- <button
- type="submit"
- disabled={isLoading}
- className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
- >
- {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>View Status <ArrowRight className="w-4 h-4" /></>}
- </button>
- </form>
- </div>
-
- <p className="text-center text-text-secondary text-xs mt-6">
- Need help? Contact your accommodation examiner directly.
- </p>
- </div>
- </div>
- );
+        <p className="text-center text-text-secondary text-xs mt-6">
+          Need help? Contact your accommodation examiner directly.
+        </p>
+      </div>
+    </div>
+  );
 }

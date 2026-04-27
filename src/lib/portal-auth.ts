@@ -18,7 +18,6 @@ function getPortalSecretKey(): Uint8Array {
 
 export interface PortalSession {
  claimantId: string;
- caseId: string;
  tenantId: string;
  role: 'CLAIMANT';
  purpose: 'portal';

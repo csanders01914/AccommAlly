@@ -180,7 +180,7 @@ export async function GET() {
  taskStats,
  messages: messages.map((m: any) => ({
  id: m.id,
- sender: decrypt(m.sender.name),
+ sender: m.sender ? decrypt(m.sender.name) : 'Claimant Portal',
  content: m.content,
  subject: m.subject,
  time: m.createdAt,

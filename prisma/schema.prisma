@@ -223,6 +223,7 @@ model Claimant {
   phoneHash      String?
   pinHash        String?
   passphraseHash String?
+  passwordHash   String?
   credentialType String   @default("PIN")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -418,11 +419,11 @@ model Document {
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
   caseId                String
-  uploadedById          String
+  uploadedById          String?
   annotationComments    AnnotationComment[]
   case                  Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
   tenant                Tenant       @relation(fields: [tenantId], references: [id])
-  uploadedBy            User         @relation(fields: [uploadedById], references: [id])
+  uploadedBy            User?        @relation(fields: [uploadedById], references: [id])
 
   @@index([tenantId])
   @@index([caseId])
