@@ -107,6 +107,7 @@ interface CaseDetailPageProps {
  caseId: string;
  currentUser: UserType;
  initialData?: ExtendedCase;
+ defaultTab?: string;
  onRefresh?: () => void;
  onAddNote?: (data: AddNoteData) => Promise<void>;
  onAddAccommodation?: (data: AddAccommodationData) => Promise<void>;
@@ -118,6 +119,7 @@ export function CaseDetailPage({
  caseId,
  currentUser,
  initialData,
+ defaultTab,
  onRefresh,
  onAddNote,
  onAddAccommodation,
@@ -125,7 +127,7 @@ export function CaseDetailPage({
  onBack
 }: CaseDetailPageProps) {
  const nextRouter = useNextRouter();
- const [activeTab, setActiveTab] = useState('dashboard');
+ const [activeTab, setActiveTab] = useState(defaultTab || 'dashboard');
  const [caseData, setCaseData] = useState<ExtendedCase | null>(initialData || null);
  const [isLoading, setIsLoading] = useState(!initialData);
  const [error, setError] = useState<string | null>(null);
@@ -259,11 +261,10 @@ export function CaseDetailPage({
  };
 
  useEffect(() => {
+ if (defaultTab) return; // URL param takes priority over localStorage
  const savedTab = localStorage.getItem('caseActiveTab');
- if (savedTab) {
- setActiveTab(savedTab);
- }
- }, []);
+ if (savedTab) setActiveTab(savedTab);
+ }, [defaultTab]);
 
 
  const fetchUsers = async () => {

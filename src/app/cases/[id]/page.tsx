@@ -1,16 +1,18 @@
 'use client';
 import { apiFetch } from '@/lib/api-client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { CaseDetailPage as CaseDetailComponent } from '@/components/CaseDetailPage';
 import { Loader2 } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 
-export default function CaseDetailPageWrapper() {
+function CaseDetailPageWrapperInner() {
  const router = useRouter();
  const params = useParams();
+ const searchParams = useSearchParams();
  const id = params?.id as string;
+ const tabParam = searchParams.get('tab') || undefined;
 
  const [caseData, setCaseData] = useState<any>(null);
  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -102,6 +104,7 @@ export default function CaseDetailPageWrapper() {
  caseId={id}
  initialData={caseData}
  currentUser={currentUser}
+ defaultTab={tabParam}
  onBack={() => router.push('/cases')}
  onRefresh={fetchData}
  onAddNote={async (noteData) => {
@@ -140,5 +143,13 @@ export default function CaseDetailPageWrapper() {
  />
  </div>
  </div>
+ );
+}
+
+export default function CaseDetailPageWrapper() {
+ return (
+ <Suspense>
+ <CaseDetailPageWrapperInner />
+ </Suspense>
  );
 }

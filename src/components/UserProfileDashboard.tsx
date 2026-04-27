@@ -31,6 +31,8 @@ interface DashMessage {
   content: string;
   time: string;
   unread: boolean;
+  caseId?: string | null;
+  direction?: string | null;
 }
 
 interface CallReq {
@@ -355,7 +357,11 @@ function MessagesCard({ messages }: { messages: DashMessage[] }) {
         messages.slice(0, 4).map(m => (
           <Link
             key={m.id}
-            href="/messages"
+            href={
+              (m.direction === 'PORTAL_INBOUND' || m.direction === 'PORTAL_OUTBOUND') && m.caseId
+                ? `/cases/${m.caseId}?tab=portal`
+                : '/messages'
+            }
             className="flex gap-3 px-4 py-3 border-b border-surface-raised hover:bg-background transition-colors last:border-b-0"
           >
             <div

@@ -189,7 +189,9 @@ export async function GET() {
  content: m.content,
  subject: m.subject,
  time: m.createdAt,
- unread: !m.read
+ unread: !m.read,
+ caseId: m.caseId ?? null,
+ direction: m.direction ?? null,
  })),
  unreadMessagesCount,
  callRequests: allCallRequests.slice(0, 10),
