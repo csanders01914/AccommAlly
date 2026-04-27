@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const claims = cases.map((c) => ({
+    const claims = cases.map((c: (typeof cases)[number]) => ({
       id: c.id,
       caseNumber: c.caseNumber,
       title: c.title,
