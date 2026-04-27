@@ -11,7 +11,7 @@ import {
 import { apiFetch } from '@/lib/api-client';
 import { Sidebar } from './Sidebar';
 
-// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface DashTask {
  id: string;
@@ -62,7 +62,7 @@ interface DashData {
  recentCases: DashCase[];
 }
 
-// â”€â”€ Small atoms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Small atoms ────────────────────────────────────────────────────────────
 
 function greeting(): string {
  const h = new Date().getHours();
@@ -104,9 +104,11 @@ function StatusDot({ status }: { status: string }) {
  PENDING: '#D97706', IN_PROGRESS: '#2563EB', COMPLETED: '#059669',
  CANCELLED: '#8C8880', OPEN: '#134E4A', CLOSED: '#8C8880',
  };
+ const color = colors[status] ?? '#8C8880';
  return (
- <span className="text-xs font-medium" style={{ color: colors[status] ?? '#8C8880' }}>
- â— {status.replace(/_/g, ' ')}
+ <span className="flex items-center gap-1 text-xs font-medium" style={{ color }}>
+ <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+ {status.replace(/_/g, ' ')}
  </span>
  );
 }
@@ -139,7 +141,7 @@ function Card({ title, icon: Icon, action, children }: {
  );
 }
 
-// â”€â”€ Widget: Tasks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Tasks ──────────────────────────────────────────────────────────
 
 function TasksCard({ tasks }: { tasks: DashTask[] }) {
  const now = new Date();
@@ -156,7 +158,7 @@ function TasksCard({ tasks }: { tasks: DashTask[] }) {
  icon={ListTodo}
  action={
  <Link href="/dashboard/tasks" className="text-xs font-medium text-primary-700 hover:text-text-primary">
- View all â†’
+ View all →
  </Link>
  }
  >
@@ -185,13 +187,13 @@ function TasksCard({ tasks }: { tasks: DashTask[] }) {
  : <Clock className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
  }
  <span className={`text-[13px] font-medium tabular-nums ${over ? 'text-red-600' : 'text-text-primary'}`}>
- {t.dueDate ? format(new Date(t.dueDate), 'MMM d') : 'â€”'}
+ {t.dueDate ? format(new Date(t.dueDate), 'MMM d') : '—'}
  </span>
  {today && !over && (
  <span className="text-[10px] font-semibold tracking-wide text-primary-700">TODAY</span>
  )}
  </div>
- <CaseChip caseNumber={t.claimNumber || t.case?.caseNumber || 'â€”'} danger={over} />
+ <CaseChip caseNumber={t.claimNumber || t.case?.caseNumber || '—'} danger={over} />
  <div className="min-w-0">
  <p className="text-[13px] text-text-primary truncate leading-snug">{t.title}</p>
  <div className="flex gap-2 items-center mt-0.5">
@@ -208,7 +210,7 @@ function TasksCard({ tasks }: { tasks: DashTask[] }) {
  );
 }
 
-// â”€â”€ Widget: Recent Cases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Recent Cases ───────────────────────────────────────────────────
 
 function RecentCasesCard({ cases }: { cases: DashCase[] }) {
  const statusStyle = (s: string) => {
@@ -225,7 +227,7 @@ function RecentCasesCard({ cases }: { cases: DashCase[] }) {
  icon={FileText}
  action={
  <Link href="/cases" className="text-xs font-medium text-primary-700 hover:text-text-primary">
- All cases â†’
+ All cases →
  </Link>
  }
  >
@@ -255,7 +257,7 @@ function RecentCasesCard({ cases }: { cases: DashCase[] }) {
  );
 }
 
-// â”€â”€ Widget: Calendar Peek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Calendar Peek ──────────────────────────────────────────────────
 
 function CalendarCard({ tasks }: { tasks: DashTask[] }) {
  const days = useMemo(() => {
@@ -308,7 +310,7 @@ function CalendarCard({ tasks }: { tasks: DashTask[] }) {
  );
 }
 
-// â”€â”€ Widget: Quick Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Quick Actions ──────────────────────────────────────────────────
 
 function QuickActionsCard() {
  const actions = [
@@ -335,7 +337,7 @@ function QuickActionsCard() {
  );
 }
 
-// â”€â”€ Widget: Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Messages ───────────────────────────────────────────────────────
 
 function MessagesCard({ messages }: { messages: DashMessage[] }) {
  return (
@@ -344,7 +346,7 @@ function MessagesCard({ messages }: { messages: DashMessage[] }) {
  icon={MessageSquare}
  action={
  <Link href="/messages" className="text-xs font-medium text-primary-700 hover:text-text-primary">
- Inbox â†’
+ Inbox →
  </Link>
  }
  >
@@ -382,7 +384,7 @@ function MessagesCard({ messages }: { messages: DashMessage[] }) {
  );
 }
 
-// â”€â”€ Widget: Call Requests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Widget: Call Requests ──────────────────────────────────────────────────
 
 function CallRequestsCard({ calls }: { calls: CallReq[] }) {
  return (
@@ -414,7 +416,7 @@ function CallRequestsCard({ calls }: { calls: CallReq[] }) {
  );
 }
 
-// â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main component ─────────────────────────────────────────────────────────
 
 export function UserProfileDashboard() {
  const router = useRouter();
@@ -481,7 +483,7 @@ export function UserProfileDashboard() {
  className="flex-1 h-full overflow-y-auto transition-all duration-300"
  style={{ marginLeft: sidebarCollapsed ? 64 : 256 }}
  >
- {/* â”€â”€ Editorial greeting band â”€â”€ */}
+ {/* ── Editorial greeting band ── */}
  <section
  className="relative overflow-hidden"
  style={{ background: '#1C1A17', color: '#F0EEE8', padding: '40px 48px 32px' }}
@@ -541,7 +543,7 @@ export function UserProfileDashboard() {
  </div>
  </section>
 
- {/* â”€â”€ Working surface â”€â”€ */}
+ {/* ── Working surface ── */}
  <div className="px-12 py-8 max-w-[1280px] mx-auto">
  <div className="grid gap-6" style={{ gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)' }}>
  {/* Left: 2/3 */}
