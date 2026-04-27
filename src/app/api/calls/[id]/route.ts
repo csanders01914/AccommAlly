@@ -112,7 +112,8 @@ export async function PATCH(
  content: noteContent,
  noteType: 'RETURN_CALL',
  caseId: call.caseId,
- authorId: (session as any).id
+ authorId: session.id as string,
+ tenantId: session.tenantId,
  }
  });
  }

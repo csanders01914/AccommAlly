@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { format, isToday } from 'date-fns';
 import {
   ListTodo, FileText, Mail, Phone, Calendar, Plus,
-  ChevronRight, AlertTriangle, Clock, Loader2, MessageSquare,
+  ChevronRight, AlertTriangle, Clock, Loader2, MessageSquare, X, Check,
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api-client';
 import { Sidebar } from './Sidebar';
@@ -385,14 +385,18 @@ function MessagesCard({ messages }: { messages: DashMessage[] }) {
 
 // -- Widget: Call Requests ----------------------------------------------------
 
-function CallRequestsCard({ calls }: { calls: CallReq[] }) {
+function CallRequestsCard({ calls, onLog }: { calls: CallReq[]; onLog: (call: CallReq) => void }) {
   return (
     <Card title="Call Requests" icon={Phone}>
       {calls.length === 0 ? (
         <p className="px-5 py-6 text-sm text-text-muted text-center">No pending call requests.</p>
       ) : (
         calls.slice(0, 4).map(c => (
-          <div key={c.id} className="flex items-center gap-3 px-4 py-3 border-b border-surface-raised last:border-b-0">
+          <button
+            key={c.id}
+            onClick={() => onLog(c)}
+            className="w-full flex items-center gap-3 px-4 py-3 border-b border-surface-raised last:border-b-0 hover:bg-background transition-colors text-left"
+          >
             <span className="w-8 h-8 rounded-lg bg-surface-raised text-primary-700 flex items-center justify-center flex-shrink-0">
               <Phone className="w-3.5 h-3.5" />
             </span>
@@ -408,7 +412,7 @@ function CallRequestsCard({ calls }: { calls: CallReq[] }) {
             <span className="text-[11px] text-text-muted font-mono flex-shrink-0 ml-2">
               {c.scheduledFor ? format(new Date(c.scheduledFor), 'MMM d') : format(new Date(c.createdAt), 'MMM d')}
             </span>
-          </div>
+          </button>
         ))
       )}
     </Card>
@@ -423,6 +427,38 @@ export function UserProfileDashboard() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [activeCall, setActiveCall] = useState<CallReq | null>(null);
+  const [callNote, setCallNote] = useState('');
+  const [callSubmitting, setCallSubmitting] = useState(false);
+  const [callError, setCallError] = useState('');
+
+  const handleLogCall = async () => {
+    if (!activeCall || !callNote.trim()) return;
+    setCallSubmitting(true);
+    setCallError('');
+    try {
+      const res = await apiFetch(`/api/calls/${activeCall.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'COMPLETED', note: callNote.trim() }),
+      });
+      if (res.ok) {
+        setData(prev => prev ? {
+          ...prev,
+          callRequests: prev.callRequests.filter(c => c.id !== activeCall.id),
+        } : prev);
+        setActiveCall(null);
+        setCallNote('');
+      } else {
+        const d = await res.json();
+        setCallError(d.error || 'Failed to save note.');
+      }
+    } catch {
+      setCallError('An error occurred. Please try again.');
+    } finally {
+      setCallSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -526,10 +562,72 @@ export function UserProfileDashboard() {
           <MessagesCard messages={data.messages} />
           <div className="flex flex-col gap-5">
             <QuickActionsCard />
-            {data.callRequests.length > 0 && <CallRequestsCard calls={data.callRequests} />}
+            {data.callRequests.length > 0 && <CallRequestsCard calls={data.callRequests} onLog={c => { setActiveCall(c); setCallNote(''); setCallError(''); }} />}
           </div>
         </div>
       </div>
+
+      {/* Return Call Modal */}
+      {activeCall && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setActiveCall(null)} />
+          <div className="relative bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-primary-700" />
+                <h2 className="text-base font-semibold text-text-primary">Log Return Call</h2>
+              </div>
+              <button onClick={() => setActiveCall(null)} className="text-text-muted hover:text-text-primary transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="px-6 py-4 bg-surface-raised border-b border-border space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-text-primary">{activeCall.name}</p>
+                {activeCall.urgent && (
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded-full">URGENT</span>
+                )}
+              </div>
+              {activeCall.case && (
+                <p className="text-xs text-text-muted font-mono">{activeCall.case.caseNumber}</p>
+              )}
+              <p className="text-xs text-text-secondary">{activeCall.reason}</p>
+            </div>
+
+            <div className="px-6 py-4 space-y-3">
+              <label className="block text-sm font-medium text-text-primary">
+                Return call notes <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                rows={5}
+                value={callNote}
+                onChange={e => setCallNote(e.target.value)}
+                placeholder="Summarize the call — outcome, next steps, follow-up required..."
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-primary-700 transition-all placeholder-text-muted resize-none"
+                autoFocus
+              />
+              {callError && <p className="text-xs text-red-500">{callError}</p>}
+            </div>
+
+            <div className="flex gap-3 px-6 pb-5">
+              <button
+                onClick={handleLogCall}
+                disabled={!callNote.trim() || callSubmitting}
+                className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-xl transition-all"
+              >
+                {callSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> Save &amp; Complete</>}
+              </button>
+              <button
+                onClick={() => setActiveCall(null)}
+                className="flex-1 bg-surface border border-border hover:bg-surface-raised text-text-secondary text-sm font-medium py-2.5 rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
