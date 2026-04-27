@@ -94,7 +94,7 @@ function PortalRegisterPageInner() {
           </p>
           <Link
             href="/portal/login"
-            className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all"
+            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl transition-all"
           >
             Sign In Now <ArrowRight className="w-4 h-4" />
           </Link>
@@ -310,7 +310,7 @@ function PortalRegisterPageInner() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

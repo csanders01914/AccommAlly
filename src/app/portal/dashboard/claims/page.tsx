@@ -133,7 +133,7 @@ function ClaimsPageInner() {
             </div>
             <Link
               href="/portal/dashboard/new-claim"
-              className="hidden sm:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all shadow-sm"
+              className="hidden sm:inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all shadow-sm"
             >
               <FilePlus className="w-4 h-4" /> New Claim
             </Link>
@@ -168,7 +168,7 @@ function ClaimsPageInner() {
             </p>
             <Link
               href="/portal/dashboard/new-claim"
-              className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all"
+              className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl transition-all"
             >
               <FilePlus className="w-4 h-4" /> File a Claim
             </Link>

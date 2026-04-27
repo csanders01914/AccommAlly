@@ -101,7 +101,7 @@ export default function PortalLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

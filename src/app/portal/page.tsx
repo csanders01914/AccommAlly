@@ -22,7 +22,7 @@ export default function PortalLandingPage() {
         <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl space-y-4">
           <Link
             href="/portal/login"
-            className="flex items-center justify-between w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-4 px-6 rounded-2xl transition-all shadow-md group"
+            className="flex items-center justify-between w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-4 px-6 rounded-2xl transition-all shadow-md group"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">

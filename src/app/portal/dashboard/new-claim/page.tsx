@@ -83,7 +83,7 @@ export default function NewClaimPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/portal/dashboard/claims"
-                className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all"
+                className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl transition-all"
               >
                 View My Claims <ArrowRight className="w-4 h-4" />
               </Link>
@@ -186,7 +186,7 @@ export default function NewClaimPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

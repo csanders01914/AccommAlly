@@ -432,7 +432,7 @@ function ClaimDetailInner() {
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim() || sendingMessage}
-                      className="self-end px-4 py-2 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-500/50 text-white font-medium rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                      className="self-end px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-800/50 text-white font-medium rounded-lg transition-all flex items-center gap-2 shadow-sm"
                     >
                       {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-4 h-4" /> Send</>}
                     </button>
