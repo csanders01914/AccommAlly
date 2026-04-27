@@ -1,8 +1,8 @@
 'use client';
 
 import { apiFetch } from '@/lib/api-client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Shield,
@@ -21,10 +21,11 @@ import {
   EyeOff,
 } from 'lucide-react';
 
-export default function PortalRegisterPage() {
+function PortalRegisterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({
-    organizationCode: '',
+    organizationCode: searchParams.get('org') ?? '',
     firstName: '',
     lastName: '',
     birthdate: '',
@@ -341,5 +342,13 @@ export default function PortalRegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PortalRegisterPage() {
+  return (
+    <Suspense>
+      <PortalRegisterPageInner />
+    </Suspense>
   );
 }
