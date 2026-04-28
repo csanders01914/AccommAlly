@@ -21,6 +21,19 @@ import {
   EyeOff,
 } from 'lucide-react';
 
+const inputStyle = {
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #E5E2DB',
+  color: '#1C1A17',
+};
+
+const inputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 0 2px #115E59';
+};
+const inputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+};
+
 function PortalRegisterPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -83,18 +96,30 @@ function PortalRegisterPageInner() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center bg-surface border border-border rounded-3xl p-10 shadow-xl">
-          <div className="inline-flex p-3 rounded-2xl bg-green-500/10 mb-4 ring-1 ring-green-500/20">
-            <CheckCircle className="w-8 h-8 text-green-500" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAF6EE' }}>
+        <div
+          className="max-w-md w-full text-center rounded-3xl p-10 shadow-xl"
+          style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+        >
+          <div
+            className="inline-flex p-3 rounded-2xl mb-4"
+            style={{ backgroundColor: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.2)' }}
+          >
+            <CheckCircle className="w-8 h-8" style={{ color: '#059669' }} />
           </div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Account Created!</h2>
-          <p className="text-text-secondary text-sm mb-6">
+          <h2
+            className="text-2xl mb-2"
+            style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+          >
+            Account Created!
+          </h2>
+          <p className="text-sm mb-6" style={{ color: '#5C5850' }}>
             Your portal account has been set up. You&apos;ll be redirected to sign in shortly.
           </p>
           <Link
             href="/portal/login"
-            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-medium px-6 py-3 rounded-xl transition-all"
+            className="inline-flex items-center gap-2 font-medium px-6 py-3 rounded-xl transition-all"
+            style={{ backgroundColor: '#0D9488', color: '#FFFFFF' }}
           >
             Sign In Now <ArrowRight className="w-4 h-4" />
           </Link>
@@ -104,241 +129,341 @@ function PortalRegisterPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 py-10">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDF6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
+    <div className="min-h-screen flex" style={{ backgroundColor: '#FAF6EE' }}>
 
-      <div className="max-w-md w-full relative">
-        <div className="text-center mb-8">
-          <div className="inline-flex p-3 rounded-2xl bg-primary-500/10 mb-4 ring-1 ring-[#0D9488]/20">
-            <Shield className="w-8 h-8 text-primary-500" />
-          </div>
-          <h1 className="text-2xl font-bold text-text-primary">Create Your Account</h1>
-          <p className="text-text-secondary text-sm mt-2">
-            You&apos;ll need the organization code from your employer
+      {/* Left panel — brand */}
+      <div
+        className="hidden lg:flex lg:w-[42%] xl:w-[38%] flex-col justify-between p-12 relative overflow-hidden sticky top-0 h-screen"
+        style={{ backgroundColor: '#1C1A17' }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(ellipse at 30% 20%, rgba(13,148,136,0.12) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 80%, rgba(13,148,136,0.06) 0%, transparent 50%)`,
+          }}
+        />
+
+        <div className="relative z-10">
+          <Link href="/portal" className="flex items-center gap-3 mb-16">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: '#0D9488' }}
+            >
+              <Shield className="w-4 h-4 text-white" aria-hidden="true" />
+            </div>
+            <span
+              className="text-xl"
+              style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+            >
+              AccommAlly
+            </span>
+          </Link>
+
+          <h2
+            className="text-4xl xl:text-5xl leading-[1.15] mb-6"
+            style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+          >
+            Create your account.
+          </h2>
+          <p className="text-base leading-relaxed" style={{ color: 'rgba(240,238,232,0.5)' }}>
+            You&apos;ll need the organization code provided by your employer or HR department.
           </p>
         </div>
 
-        <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl">
-          <form onSubmit={handleRegister} className="space-y-5">
-            {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                {error}
-              </div>
-            )}
+        <div className="relative z-10">
+          <p className="text-xs" style={{ color: 'rgba(240,238,232,0.25)' }}>
+            AccommAlly &nbsp;&middot;&nbsp; Claimant Portal
+          </p>
+        </div>
 
-            {/* Organization */}
-            <div>
-              <label htmlFor="organizationCode" className="block text-sm font-medium text-text-primary mb-2">
-                Organization Code
-              </label>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                <input
-                  id="organizationCode"
-                  type="text"
-                  value={form.organizationCode}
-                  onChange={set('organizationCode')}
-                  placeholder="e.g. acme-corp"
-                  className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
-                  required
-                  autoComplete="organization"
-                />
-              </div>
-              <p className="mt-1.5 text-xs text-text-muted">
-                Provided by your employer or HR department.
+        <div
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(13,148,136,0.4), transparent)' }}
+        />
+      </div>
+
+      {/* Right panel — scrollable form */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col items-center px-6 py-12 sm:px-12 min-h-full">
+
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2.5 mb-8 lg:hidden self-start">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: '#0D9488' }}
+            >
+              <Shield className="w-3.5 h-3.5 text-white" aria-hidden="true" />
+            </div>
+            <span
+              className="text-lg"
+              style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+            >
+              AccommAlly
+            </span>
+          </div>
+
+          <div className="w-full max-w-sm">
+            <div className="mb-8">
+              <h1
+                className="text-3xl mb-2"
+                style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+              >
+                Create Your Account
+              </h1>
+              <p className="text-sm" style={{ color: '#5C5850' }}>
+                You&apos;ll need your organization code to get started.
               </p>
             </div>
 
-            {/* Name */}
-            <div className="border-t border-border pt-4">
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-                Your Information
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-text-primary mb-2">
-                    First Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
+            <form onSubmit={handleRegister} className="space-y-5">
+              {error && (
+                <div
+                  className="p-3 rounded-xl text-sm flex items-center gap-2"
+                  style={{ backgroundColor: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)', color: '#DC2626' }}
+                >
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              {/* Organization */}
+              <div>
+                <label htmlFor="organizationCode" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                  Organization Code
+                </label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                  <input
+                    id="organizationCode"
+                    type="text"
+                    value={form.organizationCode}
+                    onChange={set('organizationCode')}
+                    placeholder="e.g. acme-corp"
+                    className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                    style={inputStyle}
+                    onFocus={inputFocus}
+                    onBlur={inputBlur}
+                    required
+                    autoComplete="organization"
+                  />
+                </div>
+                <p className="mt-1.5 text-xs" style={{ color: '#8C8880' }}>
+                  Provided by your employer or HR department.
+                </p>
+              </div>
+
+              {/* Name */}
+              <div style={{ borderTop: '1px solid #E5E2DB', paddingTop: '1rem' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#8C8880' }}>
+                  Your Information
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                      First Name
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                      <input
+                        id="firstName"
+                        type="text"
+                        value={form.firstName}
+                        onChange={set('firstName')}
+                        placeholder="Jane"
+                        className="w-full rounded-xl pl-10 pr-3 py-3 text-sm outline-none transition-all"
+                        style={inputStyle}
+                        onFocus={inputFocus}
+                        onBlur={inputBlur}
+                        required
+                        autoComplete="given-name"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                      Last Name
+                    </label>
                     <input
-                      id="firstName"
+                      id="lastName"
                       type="text"
-                      value={form.firstName}
-                      onChange={set('firstName')}
-                      placeholder="Jane"
-                      className="w-full bg-surface border border-border rounded-xl pl-10 pr-3 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
+                      value={form.lastName}
+                      onChange={set('lastName')}
+                      placeholder="Smith"
+                      className="w-full rounded-xl px-3 py-3 text-sm outline-none transition-all"
+                      style={inputStyle}
+                      onFocus={inputFocus}
+                      onBlur={inputBlur}
                       required
-                      autoComplete="given-name"
+                      autoComplete="family-name"
                     />
                   </div>
                 </div>
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-text-primary mb-2">
-                    Last Name
-                  </label>
+              </div>
+
+              <div>
+                <label htmlFor="birthdate" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                  Date of Birth
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
                   <input
-                    id="lastName"
-                    type="text"
-                    value={form.lastName}
-                    onChange={set('lastName')}
-                    placeholder="Smith"
-                    className="w-full bg-surface border border-border rounded-xl px-3 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
+                    id="birthdate"
+                    type="date"
+                    value={form.birthdate}
+                    onChange={set('birthdate')}
+                    className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                    style={inputStyle}
+                    onFocus={inputFocus}
+                    onBlur={inputBlur}
                     required
-                    autoComplete="family-name"
                   />
                 </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="birthdate" className="block text-sm font-medium text-text-primary mb-2">
-                Date of Birth
-              </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                <input
-                  id="birthdate"
-                  type="date"
-                  value={form.birthdate}
-                  onChange={set('birthdate')}
-                  className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all"
-                  required
-                />
+              {/* Credentials */}
+              <div style={{ borderTop: '1px solid #E5E2DB', paddingTop: '1rem' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#8C8880' }}>
+                  Account Credentials
+                </p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                      <input
+                        id="email"
+                        type="email"
+                        value={form.email}
+                        onChange={set('email')}
+                        placeholder="you@example.com"
+                        className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                        style={inputStyle}
+                        onFocus={inputFocus}
+                        onBlur={inputBlur}
+                        required
+                        autoComplete="email"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={form.password}
+                        onChange={set('password')}
+                        placeholder="At least 8 characters"
+                        className="w-full rounded-xl pl-10 pr-10 py-3 text-sm outline-none transition-all"
+                        style={inputStyle}
+                        onFocus={inputFocus}
+                        onBlur={inputBlur}
+                        required
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                        style={{ color: '#8C8880' }}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                      Confirm Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                      <input
+                        id="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        value={form.confirmPassword}
+                        onChange={set('confirmPassword')}
+                        placeholder="Re-enter your password"
+                        className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                        style={inputStyle}
+                        onFocus={inputFocus}
+                        onBlur={inputBlur}
+                        required
+                        autoComplete="new-password"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Credentials */}
-            <div className="border-t border-border pt-4">
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-                Account Credentials
+              {/* PIN */}
+              <div style={{ borderTop: '1px solid #E5E2DB', paddingTop: '1rem' }}>
+                <label htmlFor="pin" className="block text-sm font-medium mb-2" style={{ color: '#1C1A17' }}>
+                  Phone Verification PIN
+                </label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#8C8880' }} aria-hidden="true" />
+                  <input
+                    id="pin"
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={form.pin}
+                    onChange={set('pin')}
+                    placeholder="4–6 digit PIN"
+                    className="w-full rounded-xl pl-10 pr-4 py-3 text-sm outline-none transition-all"
+                    style={inputStyle}
+                    onFocus={inputFocus}
+                    onBlur={inputBlur}
+                    required
+                  />
+                </div>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: '#8C8880' }}>
+                  Choose a 4–6 digit PIN. Your examiner will use this to verify your identity by phone. Do not share it.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full font-medium py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                style={{ backgroundColor: '#0D9488', color: '#FFFFFF' }}
+                onMouseEnter={(e) => !isLoading && (e.currentTarget.style.backgroundColor = '#0F766E')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0D9488')}
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>Create Account <ArrowRight className="w-4 h-4" /></>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 text-center space-y-3" style={{ borderTop: '1px solid #E5E2DB' }}>
+              <p className="text-sm" style={{ color: '#5C5850' }}>
+                Already have an account?{' '}
+                <Link href="/portal/login" className="font-medium" style={{ color: '#0D9488' }}>
+                  Sign in
+                </Link>
               </p>
-
-              <div className="space-y-3">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={form.email}
-                      onChange={set('email')}
-                      placeholder="you@example.com"
-                      className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
-                      required
-                      autoComplete="email"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.password}
-                      onChange={set('password')}
-                      placeholder="At least 8 characters"
-                      className="w-full bg-surface border border-border rounded-xl pl-10 pr-10 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
-                      required
-                      autoComplete="new-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((p) => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                    <input
-                      id="confirmPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.confirmPassword}
-                      onChange={set('confirmPassword')}
-                      placeholder="Re-enter your password"
-                      className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
-                      required
-                      autoComplete="new-password"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* PIN */}
-            <div className="border-t border-border pt-4">
-              <label htmlFor="pin" className="block text-sm font-medium text-text-primary mb-2">
-                Phone Verification PIN
-              </label>
-              <div className="relative">
-                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" aria-hidden="true" />
-                <input
-                  id="pin"
-                  type="password"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={form.pin}
-                  onChange={set('pin')}
-                  placeholder="4–6 digit PIN"
-                  className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-text-primary outline-none focus:ring-2 focus:ring-[#0D9488] transition-all placeholder-text-muted"
-                  required
-                />
-              </div>
-              <p className="mt-2 text-xs text-text-muted leading-relaxed">
-                Choose a 4–6 digit PIN. When you call in, your examiner will ask for this to verify your identity. Do not share it with anyone.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  Create Account <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-border text-center">
-            <p className="text-sm text-text-secondary">
-              Already have an account?{' '}
-              <Link href="/portal/login" className="text-primary-500 hover:text-primary-600 font-medium">
-                Sign in
+              <Link
+                href="/portal"
+                className="inline-flex items-center gap-1 text-xs"
+                style={{ color: '#8C8880' }}
+              >
+                <ArrowLeft className="w-3 h-3" /> Back to portal
               </Link>
-            </p>
+            </div>
           </div>
-        </div>
-
-        <div className="mt-4 text-center">
-          <Link
-            href="/portal"
-            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors"
-          >
-            <ArrowLeft className="w-3 h-3" /> Back
-          </Link>
         </div>
       </div>
     </div>

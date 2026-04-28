@@ -5,63 +5,144 @@ import { Shield, LogIn, UserPlus, ArrowRight } from 'lucide-react';
 
 export default function PortalLandingPage() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDF6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
+    <div className="min-h-screen flex" style={{ backgroundColor: '#FAF6EE' }}>
 
-      <div className="max-w-md w-full relative">
-        <div className="text-center mb-10">
-          <div className="inline-flex p-3 rounded-2xl bg-primary-500/10 mb-4 ring-1 ring-[#0D9488]/20">
-            <Shield className="w-8 h-8 text-primary-500" />
+      {/* Left panel — brand identity */}
+      <div
+        className="hidden lg:flex lg:w-[42%] xl:w-[38%] flex-col justify-between p-12 relative overflow-hidden"
+        style={{ backgroundColor: '#1C1A17' }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(ellipse at 30% 20%, rgba(13,148,136,0.12) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 80%, rgba(13,148,136,0.06) 0%, transparent 50%)`,
+          }}
+        />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-16">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: '#0D9488' }}
+            >
+              <Shield className="w-4 h-4 text-white" aria-hidden="true" />
+            </div>
+            <span
+              className="text-xl"
+              style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+            >
+              AccommAlly
+            </span>
           </div>
-          <h1 className="text-3xl font-bold text-text-primary">AccommAlly Portal</h1>
-          <p className="text-text-secondary text-sm mt-2">
-            Manage your accommodation requests securely online
+
+          <h2
+            className="text-4xl xl:text-5xl leading-[1.15] mb-6"
+            style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+          >
+            Your accommodation requests, securely online.
+          </h2>
+          <p className="text-base leading-relaxed" style={{ color: 'rgba(240,238,232,0.5)' }}>
+            Track your case status, message your examiner, and upload documents — all in one place.
           </p>
         </div>
 
-        <div className="bg-surface border border-border rounded-3xl p-8 shadow-xl space-y-4">
-          <Link
-            href="/portal/login"
-            className="flex items-center justify-between w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-4 px-6 rounded-2xl transition-all shadow-md group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                <LogIn className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold">Sign In</p>
-                <p className="text-xs text-white/70">Access your existing account</p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform" />
-          </Link>
-
-          <div className="relative flex items-center gap-3">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-text-muted font-medium">or</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          <Link
-            href="/portal/register"
-            className="flex items-center justify-between w-full bg-surface border border-border hover:bg-surface-raised text-text-primary font-medium py-4 px-6 rounded-2xl transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center">
-                <UserPlus className="w-5 h-5 text-primary-500" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-text-primary">Create Account</p>
-                <p className="text-xs text-text-muted">Set up portal access for the first time</p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-text-muted opacity-50 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
-          </Link>
+        <div className="relative z-10 space-y-4">
+          <div
+            className="h-px w-full"
+            style={{ background: 'linear-gradient(to right, transparent, rgba(13,148,136,0.4), transparent)' }}
+          />
+          <p className="text-xs" style={{ color: 'rgba(240,238,232,0.25)' }}>
+            AccommAlly &nbsp;&middot;&nbsp; Claimant Portal
+          </p>
         </div>
 
-        <p className="text-center text-text-secondary text-xs mt-6">
-          Need help? Contact your accommodation examiner directly.
-        </p>
+        <div
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(13,148,136,0.4), transparent)' }}
+        />
+      </div>
+
+      {/* Right panel — actions */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-12">
+
+        {/* Mobile logo */}
+        <div className="flex items-center gap-2.5 mb-10 lg:hidden">
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: '#0D9488' }}
+          >
+            <Shield className="w-3.5 h-3.5 text-white" aria-hidden="true" />
+          </div>
+          <span
+            className="text-lg"
+            style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+          >
+            AccommAlly
+          </span>
+        </div>
+
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <h1
+              className="text-3xl mb-2"
+              style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+            >
+              Claimant Portal
+            </h1>
+            <p className="text-sm" style={{ color: '#5C5850' }}>
+              Sign in to manage your accommodation requests.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Link
+              href="/portal/login"
+              className="group flex items-center justify-between w-full font-medium py-4 px-5 rounded-2xl transition-all shadow-sm"
+              style={{ backgroundColor: '#0D9488', color: '#FFFFFF' }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0F766E')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0D9488')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+                  <LogIn className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold">Sign In</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Access your existing account</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            <div className="relative flex items-center gap-3 py-1">
+              <div className="flex-1 h-px" style={{ backgroundColor: '#E5E2DB' }} />
+              <span className="text-xs font-medium" style={{ color: '#8C8880' }}>or</span>
+              <div className="flex-1 h-px" style={{ backgroundColor: '#E5E2DB' }} />
+            </div>
+
+            <Link
+              href="/portal/register"
+              className="group flex items-center justify-between w-full font-medium py-4 px-5 rounded-2xl border transition-all"
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E2DB', color: '#1C1A17' }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(13,148,136,0.08)' }}>
+                  <UserPlus className="w-5 h-5" style={{ color: '#0D9488' }} />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold" style={{ color: '#1C1A17' }}>Create Account</p>
+                  <p className="text-xs" style={{ color: '#8C8880' }}>Set up portal access for the first time</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" style={{ color: '#8C8880' }} />
+            </Link>
+          </div>
+
+          <p className="text-center text-xs mt-8" style={{ color: '#8C8880' }}>
+            Need help? Contact your accommodation examiner directly.
+          </p>
+        </div>
       </div>
     </div>
   );

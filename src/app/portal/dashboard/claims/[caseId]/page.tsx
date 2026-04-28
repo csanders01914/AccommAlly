@@ -55,14 +55,14 @@ interface Document {
   createdAt: string;
 }
 
-function statusStyle(status: string) {
-  const map: Record<string, string> = {
-    OPEN: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20',
-    IN_PROGRESS: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-    PENDING_REVIEW: 'text-violet-500 bg-violet-500/10 border-violet-500/20',
-    CLOSED: 'text-green-500 bg-green-500/10 border-green-500/20',
-    ARCHIVED: 'text-text-muted bg-surface border-border',
-    APPEAL: 'text-orange-500 bg-orange-500/10 border-orange-500/20',
+function statusStyle(status: string): { color: string; bg: string; border: string } {
+  const map: Record<string, { color: string; bg: string; border: string }> = {
+    OPEN:           { color: '#D97706', bg: 'rgba(217,119,6,0.08)',   border: 'rgba(217,119,6,0.25)' },
+    IN_PROGRESS:    { color: '#2563EB', bg: 'rgba(37,99,235,0.08)',   border: 'rgba(37,99,235,0.25)' },
+    PENDING_REVIEW: { color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.25)' },
+    CLOSED:         { color: '#059669', bg: 'rgba(5,150,105,0.08)',   border: 'rgba(5,150,105,0.25)' },
+    ARCHIVED:       { color: '#8C8880', bg: 'rgba(140,136,128,0.08)', border: 'rgba(140,136,128,0.25)' },
+    APPEAL:         { color: '#EA580C', bg: 'rgba(234,88,12,0.08)',   border: 'rgba(234,88,12,0.25)' },
   };
   return map[status] ?? map.OPEN;
 }
@@ -212,16 +212,30 @@ function ClaimDetailInner() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-surface sticky top-0 z-10">
+    <div className="min-h-screen" style={{ backgroundColor: '#FAF6EE' }}>
+      {/* Dark branded header */}
+      <header className="sticky top-0 z-10" style={{ backgroundColor: '#1C1A17', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-primary-500" />
-            <span className="text-text-primary font-bold">AccommAlly Portal</span>
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: '#0D9488' }}
+            >
+              <Shield className="w-3.5 h-3.5 text-white" aria-hidden="true" />
+            </div>
+            <span
+              className="text-base"
+              style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#F0EEE8' }}
+            >
+              AccommAlly
+            </span>
           </div>
           <button
             onClick={handleLogout}
-            className="text-sm text-text-secondary hover:text-text-primary flex items-center gap-2 transition-colors"
+            className="text-sm flex items-center gap-1.5 transition-colors"
+            style={{ color: 'rgba(240,238,232,0.55)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#F0EEE8')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(240,238,232,0.55)')}
           >
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
@@ -231,7 +245,8 @@ function ClaimDetailInner() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <Link
           href="/portal/dashboard/claims"
-          className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary transition-colors mb-6"
+          className="inline-flex items-center gap-1 text-sm mb-6 transition-colors"
+          style={{ color: '#8C8880' }}
         >
           <ArrowLeft className="w-4 h-4" /> All Claims
         </Link>
@@ -239,15 +254,18 @@ function ClaimDetailInner() {
         {/* Case Header */}
         {caseLoading && !caseData && (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#0D9488' }} />
           </div>
         )}
 
         {caseError && (
-          <div className="bg-surface border border-border rounded-2xl p-8 text-center mb-6">
-            <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-            <p className="text-text-secondary text-sm mb-4">{caseError}</p>
-            <button onClick={fetchStatus} className="text-sm text-primary-500 hover:text-primary-600 font-medium">
+          <div
+            className="rounded-2xl p-8 text-center mb-6"
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+          >
+            <AlertCircle className="w-8 h-8 mx-auto mb-3" style={{ color: '#DC2626' }} />
+            <p className="text-sm mb-4" style={{ color: '#5C5850' }}>{caseError}</p>
+            <button onClick={fetchStatus} className="text-sm font-medium" style={{ color: '#0D9488' }}>
               Try again
             </button>
           </div>
@@ -255,19 +273,33 @@ function ClaimDetailInner() {
 
         {caseData && (
           <>
-            <div className="bg-surface border border-border rounded-2xl p-6 mb-6 shadow-sm">
+            <div
+              className="rounded-2xl p-6 mb-6 shadow-sm"
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+            >
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-mono text-text-muted">{caseData.caseNumber}</span>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-semibold ${statusStyle(caseData.status)}`}>
-                      {caseData.status === 'CLOSED'
-                        ? <CheckCircle className="w-3 h-3" />
-                        : <Clock className="w-3 h-3" />}
-                      {caseData.status.replace('_', ' ')}
-                    </span>
+                    <span className="text-xs font-mono" style={{ color: '#8C8880' }}>{caseData.caseNumber}</span>
+                    {(() => {
+                      const s = statusStyle(caseData.status);
+                      return (
+                        <span
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                          style={{ color: s.color, backgroundColor: s.bg, border: `1px solid ${s.border}` }}
+                        >
+                          {caseData.status === 'CLOSED' ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                          {caseData.status.replace('_', ' ')}
+                        </span>
+                      );
+                    })()}
                   </div>
-                  <h1 className="text-xl font-bold text-text-primary">{caseData.title}</h1>
+                  <h1
+                    className="text-xl"
+                    style={{ fontFamily: 'var(--font-instrument-serif), Georgia, serif', color: '#1C1A17' }}
+                  >
+                    {caseData.title}
+                  </h1>
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
@@ -278,16 +310,26 @@ function ClaimDetailInner() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 bg-surface border border-border p-1 rounded-xl shadow-sm w-fit mb-6">
+            <div
+              className="flex gap-1 p-1 rounded-xl shadow-sm w-fit mb-6"
+              style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+            >
               {tabs.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className="py-2 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                  style={
                     activeTab === t.id
-                      ? 'bg-primary-500 text-white shadow-sm'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-raised'
-                  }`}
+                      ? { backgroundColor: '#0D9488', color: '#FFFFFF' }
+                      : { color: '#5C5850', backgroundColor: 'transparent' }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeTab !== t.id) (e.currentTarget as HTMLElement).style.backgroundColor = '#F3F1EC';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== t.id) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                  }}
                 >
                   {t.icon} {t.label}
                 </button>
@@ -297,10 +339,12 @@ function ClaimDetailInner() {
             {/* STATUS TAB */}
             {activeTab === 'status' && (
               <div className="space-y-6">
-                {/* Timeline */}
-                <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-primary-500" /> Process Timeline
+                <div
+                  className="rounded-2xl p-6 shadow-sm"
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+                >
+                  <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: '#1C1A17' }}>
+                    <Calendar className="w-4 h-4" style={{ color: '#0D9488' }} /> Process Timeline
                   </h3>
                   <ol className="space-y-4">
                     <TimelineStep completed title="Request Submitted" date={caseData.createdAt} />
@@ -316,30 +360,49 @@ function ClaimDetailInner() {
                   </ol>
                 </div>
 
-                {/* Description */}
                 {caseData.description && (
-                  <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-semibold text-text-primary mb-3">Request Details</h3>
-                    <p className="text-text-secondary text-sm whitespace-pre-wrap leading-relaxed">{caseData.description}</p>
+                  <div
+                    className="rounded-2xl p-6 shadow-sm"
+                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+                  >
+                    <h3 className="font-semibold mb-3" style={{ color: '#1C1A17' }}>Request Details</h3>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: '#5C5850' }}>{caseData.description}</p>
                   </div>
                 )}
 
-                {/* Accommodations */}
                 {caseData.accommodations.length > 0 && (
-                  <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                    <h3 className="font-semibold text-text-primary mb-4">Accommodations</h3>
+                  <div
+                    className="rounded-2xl p-6 shadow-sm"
+                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+                  >
+                    <h3 className="font-semibold mb-4" style={{ color: '#1C1A17' }}>Accommodations</h3>
                     <ul className="space-y-3">
                       {caseData.accommodations.map((acc, i) => (
-                        <li key={i} className="flex items-start gap-3 p-3 bg-background border border-border rounded-xl">
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 p-3 rounded-xl"
+                          style={{ backgroundColor: '#FAF6EE', border: '1px solid #E5E2DB' }}
+                        >
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-text-primary">{acc.type.replace(/_/g, ' ')}</p>
-                            {acc.description && <p className="text-xs text-text-muted mt-0.5">{acc.description}</p>}
+                            <p className="text-sm font-medium" style={{ color: '#1C1A17' }}>{acc.type.replace(/_/g, ' ')}</p>
+                            {acc.description && <p className="text-xs mt-0.5" style={{ color: '#8C8880' }}>{acc.description}</p>}
                           </div>
-                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
-                            acc.status === 'APPROVED' ? 'text-green-500 bg-green-500/10 border-green-500/20' :
-                            acc.status === 'REJECTED' ? 'text-red-400 bg-red-400/10 border-red-400/20' :
-                            'text-yellow-500 bg-yellow-500/10 border-yellow-500/20'
-                          }`}>{acc.status}</span>
+                          {(() => {
+                            const accStyle =
+                              acc.status === 'APPROVED'
+                                ? { color: '#059669', bg: 'rgba(5,150,105,0.08)', border: 'rgba(5,150,105,0.25)' }
+                                : acc.status === 'REJECTED'
+                                ? { color: '#DC2626', bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.25)' }
+                                : { color: '#D97706', bg: 'rgba(217,119,6,0.08)', border: 'rgba(217,119,6,0.25)' };
+                            return (
+                              <span
+                                className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
+                                style={{ color: accStyle.color, backgroundColor: accStyle.bg, border: `1px solid ${accStyle.border}` }}
+                              >
+                                {acc.status}
+                              </span>
+                            );
+                          })()}
                         </li>
                       ))}
                     </ul>
@@ -350,66 +413,88 @@ function ClaimDetailInner() {
 
             {/* MESSAGES TAB */}
             {activeTab === 'messages' && (
-              <div className="bg-surface border border-border rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-border bg-background flex items-center justify-between">
-                  <h3 className="font-semibold text-text-primary flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-primary-500" /> Messages with Your Examiner
+              <div
+                className="rounded-2xl shadow-sm overflow-hidden"
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+              >
+                <div
+                  className="px-6 py-4 flex items-center justify-between"
+                  style={{ borderBottom: '1px solid #E5E2DB', backgroundColor: '#FAF6EE' }}
+                >
+                  <h3 className="font-semibold flex items-center gap-2" style={{ color: '#1C1A17' }}>
+                    <MessageSquare className="w-4 h-4" style={{ color: '#0D9488' }} /> Messages with Your Examiner
                   </h3>
                   <button
                     onClick={fetchMessages}
-                    className="p-1.5 hover:bg-surface rounded-lg transition-colors"
+                    className="p-1.5 rounded-lg transition-colors"
                     title="Refresh"
+                    style={{ color: '#0D9488' }}
                   >
-                    <RefreshCw className={`w-4 h-4 text-primary-500 ${messagesLoading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-4 h-4 ${messagesLoading ? 'animate-spin' : ''}`} />
                   </button>
                 </div>
 
                 <div className="max-h-96 overflow-y-auto p-4 space-y-3">
                   {messagesLoading && messages.length === 0 ? (
                     <div className="flex justify-center py-8">
-                      <Loader2 className="w-6 h-6 text-primary-500 animate-spin" />
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#0D9488' }} />
                     </div>
                   ) : messages.length === 0 ? (
-                    <p className="text-center text-text-secondary py-8 text-sm">
+                    <p className="text-center py-8 text-sm" style={{ color: '#5C5850' }}>
                       No messages yet. Send a message to your examiner below.
                     </p>
                   ) : (
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`p-4 rounded-xl border ${
+                        className="p-4 rounded-xl"
+                        style={
                           msg.direction === 'PORTAL_INBOUND'
-                            ? 'bg-primary-500/5 border-primary-500/20 ml-4'
-                            : 'bg-background border-border mr-4'
-                        }`}
+                            ? { backgroundColor: 'rgba(13,148,136,0.05)', border: '1px solid rgba(13,148,136,0.18)', marginLeft: '1rem' }
+                            : { backgroundColor: '#FAF6EE', border: '1px solid #E5E2DB', marginRight: '1rem' }
+                        }
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${msg.direction === 'PORTAL_INBOUND' ? 'bg-primary-500/10' : 'bg-surface-raised'}`}>
-                            <User className={`w-3 h-3 ${msg.direction === 'PORTAL_INBOUND' ? 'text-primary-500' : 'text-text-secondary'}`} />
+                          <div
+                            className="w-6 h-6 rounded-full flex items-center justify-center"
+                            style={msg.direction === 'PORTAL_INBOUND' ? { backgroundColor: 'rgba(13,148,136,0.1)' } : { backgroundColor: '#F3F1EC' }}
+                          >
+                            <User
+                              className="w-3 h-3"
+                              style={{ color: msg.direction === 'PORTAL_INBOUND' ? '#0D9488' : '#5C5850' }}
+                            />
                           </div>
-                          <span className="text-sm font-bold text-text-primary">
+                          <span className="text-sm font-bold" style={{ color: '#1C1A17' }}>
                             {msg.direction === 'PORTAL_INBOUND' ? 'You' : 'Examiner'}
                           </span>
-                          <span className="text-xs text-text-muted ml-auto">
+                          <span className="text-xs ml-auto" style={{ color: '#8C8880' }}>
                             {new Date(msg.createdAt).toLocaleString()}
                           </span>
                         </div>
                         {msg.subject && (
-                          <p className="text-sm font-semibold text-text-primary mb-2 border-b border-border pb-2">{msg.subject}</p>
+                          <p
+                            className="text-sm font-semibold mb-2 pb-2"
+                            style={{ color: '#1C1A17', borderBottom: '1px solid #E5E2DB' }}
+                          >
+                            {msg.subject}
+                          </p>
                         )}
-                        <p className="text-sm text-text-primary whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: '#1C1A17' }}>{msg.content}</p>
                       </div>
                     ))
                   )}
                 </div>
 
-                <div className="p-4 border-t border-border bg-background space-y-3">
+                <div className="p-4 space-y-3" style={{ borderTop: '1px solid #E5E2DB', backgroundColor: '#FAF6EE' }}>
                   {messageAlert && (
-                    <div className={`flex items-center gap-2 text-sm p-3 rounded-lg border ${
-                      messageAlert.type === 'success'
-                        ? 'text-green-700 bg-green-50 border-green-200'
-                        : 'text-red-500 bg-red-500/10 border-red-500/20'
-                    }`}>
+                    <div
+                      className="flex items-center gap-2 text-sm p-3 rounded-lg"
+                      style={
+                        messageAlert.type === 'success'
+                          ? { color: '#059669', backgroundColor: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.25)' }
+                          : { color: '#DC2626', backgroundColor: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)' }
+                      }
+                    >
                       {messageAlert.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                       {messageAlert.text}
                     </div>
@@ -419,7 +504,10 @@ function ClaimDetailInner() {
                     placeholder="Subject (optional)"
                     value={messageSubject}
                     onChange={(e) => setMessageSubject(e.target.value)}
-                    className="w-full bg-surface border border-border rounded-lg px-4 py-2 text-text-primary placeholder-text-muted outline-none focus:ring-2 focus:ring-[#0D9488] text-sm"
+                    className="w-full rounded-lg px-4 py-2 text-sm outline-none transition-all"
+                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB', color: '#1C1A17' }}
+                    onFocus={(e) => (e.currentTarget.style.boxShadow = '0 0 0 2px #115E59')}
+                    onBlur={(e) => (e.currentTarget.style.boxShadow = 'none')}
                   />
                   <div className="flex gap-3">
                     <textarea
@@ -427,12 +515,18 @@ function ClaimDetailInner() {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       rows={3}
-                      className="flex-1 bg-surface border border-border rounded-lg px-4 py-2 text-text-primary placeholder-text-muted outline-none focus:ring-2 focus:ring-[#0D9488] resize-none text-sm"
+                      className="flex-1 rounded-lg px-4 py-2 text-sm outline-none resize-none transition-all"
+                      style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB', color: '#1C1A17' }}
+                      onFocus={(e) => (e.currentTarget.style.boxShadow = '0 0 0 2px #115E59')}
+                      onBlur={(e) => (e.currentTarget.style.boxShadow = 'none')}
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim() || sendingMessage}
-                      className="self-end px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-800/50 text-white font-medium rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                      className="self-end px-4 py-2 font-medium rounded-lg transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+                      style={{ backgroundColor: '#0D9488', color: '#FFFFFF' }}
+                      onMouseEnter={(e) => !sendingMessage && newMessage.trim() && (e.currentTarget.style.backgroundColor = '#0F766E')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0D9488')}
                     >
                       {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-4 h-4" /> Send</>}
                     </button>
@@ -445,17 +539,23 @@ function ClaimDetailInner() {
             {activeTab === 'documents' && (
               <div className="space-y-4">
                 {/* Upload Card */}
-                <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-primary-500" /> Upload a Document
+                <div
+                  className="rounded-2xl p-6 shadow-sm"
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+                >
+                  <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: '#1C1A17' }}>
+                    <Upload className="w-4 h-4" style={{ color: '#0D9488' }} /> Upload a Document
                   </h3>
 
                   {uploadAlert && (
-                    <div className={`flex items-center gap-2 text-sm p-3 rounded-lg border mb-4 ${
-                      uploadAlert.type === 'success'
-                        ? 'text-green-700 bg-green-50 border-green-200'
-                        : 'text-red-500 bg-red-500/10 border-red-500/20'
-                    }`}>
+                    <div
+                      className="flex items-center gap-2 text-sm p-3 rounded-lg mb-4"
+                      style={
+                        uploadAlert.type === 'success'
+                          ? { color: '#059669', backgroundColor: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.25)' }
+                          : { color: '#DC2626', backgroundColor: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)' }
+                      }
+                    >
                       {uploadAlert.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                       {uploadAlert.text}
                     </div>
@@ -465,7 +565,10 @@ function ClaimDetailInner() {
                     <select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="bg-surface border border-border rounded-lg px-3 py-2 text-text-primary text-sm outline-none focus:ring-2 focus:ring-[#0D9488]"
+                      className="rounded-lg px-3 py-2 text-sm outline-none transition-all"
+                      style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB', color: '#1C1A17' }}
+                      onFocus={(e) => (e.currentTarget.style.boxShadow = '0 0 0 2px #115E59')}
+                      onBlur={(e) => (e.currentTarget.style.boxShadow = 'none')}
                     >
                       <option value="MEDICAL">Medical</option>
                       <option value="LEGAL">Legal</option>
@@ -473,13 +576,18 @@ function ClaimDetailInner() {
                       <option value="CORRESPONDENCE">Correspondence</option>
                       <option value="OTHER">Other</option>
                     </select>
-                    <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-border hover:border-primary-500/50 rounded-xl px-4 py-3 cursor-pointer transition-colors group">
+                    <label
+                      className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed rounded-xl px-4 py-3 cursor-pointer transition-colors group"
+                      style={{ borderColor: '#E5E2DB' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(13,148,136,0.4)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E5E2DB')}
+                    >
                       {uploading ? (
-                        <Loader2 className="w-5 h-5 text-primary-500 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin" style={{ color: '#0D9488' }} />
                       ) : (
                         <>
-                          <Upload className="w-5 h-5 text-text-muted group-hover:text-primary-500 transition-colors" />
-                          <span className="text-sm text-text-secondary group-hover:text-primary-500 transition-colors">
+                          <Upload className="w-5 h-5" style={{ color: '#8C8880' }} />
+                          <span className="text-sm" style={{ color: '#5C5850' }}>
                             Click to select a file (max 10 MB)
                           </span>
                         </>
@@ -494,46 +602,54 @@ function ClaimDetailInner() {
                       />
                     </label>
                   </div>
-                  <p className="text-xs text-text-muted mt-2">
+                  <p className="text-xs mt-2" style={{ color: '#8C8880' }}>
                     Accepted: PDF, images, Word, Excel, text, ZIP
                   </p>
                 </div>
 
                 {/* Document List */}
-                <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm">
+                <div
+                  className="rounded-2xl p-6 shadow-sm"
+                  style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E2DB' }}
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-text-primary flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-primary-500" /> Documents on File
+                    <h3 className="font-semibold flex items-center gap-2" style={{ color: '#1C1A17' }}>
+                      <FileText className="w-4 h-4" style={{ color: '#0D9488' }} /> Documents on File
                     </h3>
                     <button
                       onClick={fetchDocuments}
-                      className="p-1.5 hover:bg-background rounded-lg transition-colors"
+                      className="p-1.5 rounded-lg transition-colors"
                       title="Refresh"
+                      style={{ color: '#8C8880' }}
                     >
-                      <RefreshCw className={`w-4 h-4 text-text-muted ${docsLoading ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`w-4 h-4 ${docsLoading ? 'animate-spin' : ''}`} />
                     </button>
                   </div>
 
                   {docsLoading && documents.length === 0 ? (
                     <div className="flex justify-center py-6">
-                      <Loader2 className="w-6 h-6 text-primary-500 animate-spin" />
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#0D9488' }} />
                     </div>
                   ) : documents.length === 0 ? (
-                    <p className="text-text-secondary text-sm text-center py-6">No documents on file for this claim.</p>
+                    <p className="text-sm text-center py-6" style={{ color: '#5C5850' }}>No documents on file for this claim.</p>
                   ) : (
                     <ul className="space-y-2">
                       {documents.map((doc) => (
                         <li
                           key={doc.id}
-                          className="flex items-center justify-between p-3 bg-background border border-border rounded-xl hover:bg-surface-raised transition-colors"
+                          className="flex items-center justify-between p-3 rounded-xl transition-colors"
+                          style={{ backgroundColor: '#FAF6EE', border: '1px solid #E5E2DB' }}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-primary-500/10 flex items-center justify-center flex-shrink-0">
-                              <FileText className="w-4 h-4 text-primary-500" />
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: 'rgba(13,148,136,0.08)' }}
+                            >
+                              <FileText className="w-4 h-4" style={{ color: '#0D9488' }} />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-sm font-medium text-text-primary truncate">{doc.fileName}</p>
-                              <p className="text-xs text-text-muted">
+                              <p className="text-sm font-medium truncate" style={{ color: '#1C1A17' }}>{doc.fileName}</p>
+                              <p className="text-xs" style={{ color: '#8C8880' }}>
                                 {doc.category} · {formatBytes(doc.fileSize)} · {new Date(doc.createdAt).toLocaleDateString()}
                               </p>
                             </div>
@@ -542,10 +658,11 @@ function ClaimDetailInner() {
                             href={`/api/public/portal/documents/${doc.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 hover:bg-surface rounded-lg transition-colors flex-shrink-0 ml-2"
+                            className="p-2 rounded-lg transition-colors flex-shrink-0 ml-2"
                             title="View/Download"
+                            style={{ color: '#0D9488' }}
                           >
-                            <Download className="w-4 h-4 text-primary-500" />
+                            <Download className="w-4 h-4" />
                           </a>
                         </li>
                       ))}
@@ -575,19 +692,24 @@ function TimelineStep({
   return (
     <li className="flex gap-4">
       <div className="flex flex-col items-center">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-          completed ? 'bg-green-50 border-green-500 text-green-600' :
-          active ? 'bg-primary-500/10 border-primary-500 text-primary-500 animate-pulse' :
-          'border-border text-border'
-        }`}>
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center border-2"
+          style={
+            completed
+              ? { backgroundColor: 'rgba(5,150,105,0.08)', borderColor: '#059669', color: '#059669' }
+              : active
+              ? { backgroundColor: 'rgba(13,148,136,0.08)', borderColor: '#0D9488', color: '#0D9488' }
+              : { backgroundColor: 'transparent', borderColor: '#E5E2DB', color: '#E5E2DB' }
+          }
+        >
           {completed ? <CheckCircle className="w-5 h-5" /> : <div className="w-2 h-2 bg-current rounded-full" />}
         </div>
-        <div className="w-0.5 h-full bg-border min-h-[28px]" />
+        <div className="w-0.5 h-full min-h-[28px]" style={{ backgroundColor: '#E5E2DB' }} />
       </div>
-      <div className={`pb-6 ${completed || active ? 'opacity-100' : 'opacity-50'}`}>
-        <p className="text-text-primary font-medium text-sm">{title}</p>
-        {date && <p className="text-xs text-text-muted mt-0.5">{new Date(date).toLocaleDateString()}</p>}
-        {active && <p className="text-xs text-primary-500 mt-0.5">In Progress</p>}
+      <div className={`pb-6 ${completed || active ? 'opacity-100' : 'opacity-40'}`}>
+        <p className="font-medium text-sm" style={{ color: '#1C1A17' }}>{title}</p>
+        {date && <p className="text-xs mt-0.5" style={{ color: '#8C8880' }}>{new Date(date).toLocaleDateString()}</p>}
+        {active && <p className="text-xs mt-0.5" style={{ color: '#0D9488' }}>In Progress</p>}
       </div>
     </li>
   );
@@ -595,11 +717,11 @@ function TimelineStep({
 
 function InfoCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="bg-background border border-border rounded-xl p-3">
-      <p className="text-text-muted text-xs flex items-center gap-1 mb-1">
+    <div className="rounded-xl p-3" style={{ backgroundColor: '#FAF6EE', border: '1px solid #E5E2DB' }}>
+      <p className="text-xs flex items-center gap-1 mb-1" style={{ color: '#8C8880' }}>
         {icon} {label}
       </p>
-      <p className="text-text-primary text-sm font-medium">{value}</p>
+      <p className="text-sm font-medium" style={{ color: '#1C1A17' }}>{value}</p>
     </div>
   );
 }
@@ -608,8 +730,8 @@ export default function ClaimDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FAF6EE' }}>
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#0D9488' }} />
         </div>
       }
     >

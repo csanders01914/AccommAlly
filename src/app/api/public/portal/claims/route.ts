@@ -2,14 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getPortalSession } from '@/lib/portal-auth';
 import { decrypt, encrypt } from '@/lib/encryption';
-import crypto from 'crypto';
+import { generateClaimNumber } from '@/lib/generateCaseNumber';
 import logger from '@/lib/logger';
-
-function generateCaseNumber(): string {
-  const year = new Date().getFullYear();
-  const random = crypto.randomInt(10000, 99999);
-  return `AA-${year}-${random}`;
-}
 
 const VALID_ACCOMMODATION_TYPES = [
   'CHANGE_IN_FUNCTIONS',
@@ -122,12 +116,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let caseNumber = generateCaseNumber();
-    for (let i = 0; i < 5; i++) {
-      const existing = await prisma.case.findUnique({ where: { caseNumber } });
-      if (!existing) break;
-      caseNumber = generateCaseNumber();
-    }
+    const caseNumber = generateClaimNumber({ date: new Date(), sequence: 1, type: 'AR' });
 
     const decryptedName = decrypt(claimant.name);
     const lastName = decryptedName.trim().split(/\s+/).pop() ?? '';
